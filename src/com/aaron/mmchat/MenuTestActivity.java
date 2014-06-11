@@ -45,7 +45,7 @@ public class MenuTestActivity extends Activity implements OnClickListener, Login
         // TODO Auto-generated method stub
         MMContext context = MMContext.getInstance(this);
         LoginManager manager = (LoginManager) context.getService(MMContext.LOGIN_SERVICE);
-        manager.login("shuijwan@cisco.com", "wsj1985SH", this);
+        manager.login("flyalizee@gmail.com", "45397254", this);
     }
     @Override
     public void onLoginSuccessed() {

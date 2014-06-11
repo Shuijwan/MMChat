@@ -9,6 +9,7 @@ package com.aaron.mmchat.core.services;
 
 import android.R.interpolator;
 import android.content.Context;
+import android.util.Log;
 
 import com.aaron.mmchat.core.LoginManager;
 
@@ -20,6 +21,16 @@ import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 
+import org.jivesoftware.smackx.caps.EntityCapsManager;
+import org.jivesoftware.smackx.caps.cache.SimpleDirectoryPersistentCache;
+import org.jivesoftware.smackx.disco.ServiceDiscoveryManager;
+import org.jivesoftware.smackx.iqversion.packet.Version;
+import org.jivesoftware.smackx.ping.PingManager;
+import org.jivesoftware.smackx.receipts.DeliveryReceiptManager;
+import org.jivesoftware.smackx.receipts.ReceiptReceivedListener;
+
+
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -67,7 +78,7 @@ public class LoginManagerService extends BaseManagerService implements LoginMana
     public void login(String email, String password, LoginCallback callback) {
         int index = email.lastIndexOf("@");
         String username = email.substring(0, index);
-        String domain = email.substring(index);
+        String domain = email.substring(index+1);
         
         ConnectionConfiguration configuration = initConfiguration(domain);
         XMPPConnection connection = new XMPPTCPConnection(configuration);
@@ -77,7 +88,7 @@ public class LoginManagerService extends BaseManagerService implements LoginMana
         con.configuration = configuration;
         
         mConnections.put(email, con);
-        
+        initServiceDiscovery(connection);
         doLogin(connection, username, password, callback);
       
     }
@@ -93,6 +104,8 @@ public class LoginManagerService extends BaseManagerService implements LoginMana
         
         ConnectionConfiguration configuration = new ConnectionConfiguration(domain);
         configuration.setReconnectionAllowed(false);
+        configuration.setSendPresence(false);
+        configuration.setCompressionEnabled(false); // disable for now
         configuration.setSecurityMode(ConnectionConfiguration.SecurityMode.required);
         try {
             SSLContext sc = SSLContext.getInstance("TLS");
@@ -121,6 +134,37 @@ public class LoginManagerService extends BaseManagerService implements LoginMana
         }   
         
         return configuration;
+    }
+    
+    private void initServiceDiscovery(XMPPConnection connection) {
+        // register connection features
+        ServiceDiscoveryManager sdm = ServiceDiscoveryManager.getInstanceFor(connection);
+        File capsCacheDir = null;
+        // init Entity Caps manager with storage in app's cache dir
+        try {
+            if (capsCacheDir == null) {
+                capsCacheDir = new File(mContext.getCacheDir(), "entity-caps-cache");
+                capsCacheDir.mkdirs();
+                EntityCapsManager.setPersistentCache(new SimpleDirectoryPersistentCache(capsCacheDir));
+            }
+        } catch (java.io.IOException e) {
+            Log.e("TTT", "Could not init Entity Caps cache: " + e.getLocalizedMessage());
+        }
+
+        // reference PingManager, set ping flood protection to 10s
+        PingManager.setDefaultPingInterval(10*1000);
+        PingManager.getInstanceFor(connection).setPingInterval(10*1000);
+        
+
+        // reference DeliveryReceiptManager, add listener
+        DeliveryReceiptManager dm = DeliveryReceiptManager.getInstanceFor(connection);
+        dm.enableAutoReceipts();
+        
+        dm.addReceiptReceivedListener(new ReceiptReceivedListener() { // DOES NOT WORK IN CARBONS
+            public void onReceiptReceived(String fromJid, String toJid, String receiptId) {
+                Log.d("TTT", "got delivery receipt for " + receiptId);
+//                changeMessageDeliveryStatus(receiptId, ChatConstants.DS_ACKED);
+            }});
     }
     
     private void doLogin(final XMPPConnection connection, final String username, final String password, final LoginCallback callback) {
