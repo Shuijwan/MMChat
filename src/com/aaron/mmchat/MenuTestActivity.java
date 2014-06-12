@@ -17,6 +17,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.aaron.mmchat.core.ContactManager;
 import com.aaron.mmchat.core.LoginManager;
 import com.aaron.mmchat.core.LoginManager.LoginCallback;
 import com.aaron.mmchat.core.MMContext;
@@ -45,15 +46,20 @@ public class MenuTestActivity extends Activity implements OnClickListener, Login
         // TODO Auto-generated method stub
         MMContext context = MMContext.getInstance(this);
         LoginManager manager = (LoginManager) context.getService(MMContext.LOGIN_SERVICE);
-        manager.login("flyalizee@gmail.com", "45397254", this);
+        manager.login("shuijwan@cisco.com", "wsj1985SH");
+        manager.registerLoginCallback(this);
     }
     @Override
-    public void onLoginSuccessed() {
+    public void onLoginSuccessed(String jid) {
         // TODO Auto-generated method stub
         Log.i("TTT","success");
+        MMContext context = MMContext.getInstance(this);
+        ContactManager manager = (ContactManager) context.getService(MMContext.CONTACT_SERVICE);
+        manager.refreshContactList(jid);
+        
     }
     @Override
-    public void onLoginFailed(int errorcode) {
+    public void onLoginFailed(String jid, int errorcode) {
         // TODO Auto-generated method stub
         Log.i("TTT","fail");
     }

@@ -7,7 +7,6 @@
 
 package com.aaron.mmchat.core.services;
 
-import android.R.interpolator;
 import android.content.Context;
 import android.util.Log;
 
@@ -24,7 +23,6 @@ import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smackx.caps.EntityCapsManager;
 import org.jivesoftware.smackx.caps.cache.SimpleDirectoryPersistentCache;
 import org.jivesoftware.smackx.disco.ServiceDiscoveryManager;
-import org.jivesoftware.smackx.iqversion.packet.Version;
 import org.jivesoftware.smackx.ping.PingManager;
 import org.jivesoftware.smackx.receipts.DeliveryReceiptManager;
 import org.jivesoftware.smackx.receipts.ReceiptReceivedListener;
@@ -52,30 +50,23 @@ import javax.net.ssl.X509TrustManager;
 public class LoginManagerService extends BaseManagerService implements LoginManager {
 
     private static final int DEFAULT_PORT = 5222;
-    
-    
-    
-    static class Connection {
-        XMPPConnection connection;
-        ConnectionConfiguration configuration;
-    }
-    
+   
     private Context mContext;
     
-    private HashMap<String, Connection> mConnections;
-   
+    private ArrayList<LoginCallback> mCallbacks;
+    
     public LoginManagerService(Context context) {
         mContext = context;
-        mConnections = new HashMap<String, LoginManagerService.Connection>();
+        mCallbacks = new ArrayList<LoginManager.LoginCallback>();
     }
 
     @Override
-    public void login(String username, String password, String server, LoginCallback callback) {
-        login(username, password, server, DEFAULT_PORT, callback);   
+    public void login(String username, String password, String server) {
+        login(username, password, server, DEFAULT_PORT);   
     }
 
     @Override
-    public void login(String email, String password, LoginCallback callback) {
+    public void login(String email, String password) {
         int index = email.lastIndexOf("@");
         String username = email.substring(0, index);
         String domain = email.substring(index+1);
@@ -87,43 +78,47 @@ public class LoginManagerService extends BaseManagerService implements LoginMana
         con.connection = connection;
         con.configuration = configuration;
         
-        mConnections.put(email, con);
+        sConnections.put(email, con);
         initServiceDiscovery(connection);
-        doLogin(connection, username, password, callback);
+        doLogin(connection, username, password, email);
       
     }
 
     @Override
-    public void login(String username, String password, String server, int port,
-            LoginCallback callback) {
-        ConnectionConfiguration configuration = new ConnectionConfiguration(server, port);
+    public void login(String username, String password, String server, int port) {
+        ConnectionConfiguration configuration = initConfiguration(server, port);
+        XMPPConnection connection = new XMPPTCPConnection(configuration);
+        
+        Connection con = new Connection();
+        con.connection = connection;
+        con.configuration = configuration;
+        
+        String jid = username+"@"+server;
+        sConnections.put(jid, con);
+        initServiceDiscovery(connection);
+        doLogin(connection, username, password, jid);
         
     }
     
     private ConnectionConfiguration initConfiguration(String domain) {
-        
         ConnectionConfiguration configuration = new ConnectionConfiguration(domain);
-        configuration.setReconnectionAllowed(false);
-        configuration.setSendPresence(false);
-        configuration.setCompressionEnabled(false); // disable for now
-        configuration.setSecurityMode(ConnectionConfiguration.SecurityMode.required);
-        try {
-            SSLContext sc = SSLContext.getInstance("TLS");
-            sc.init(null, new X509TrustManager[] { new MemorizingTrustManager(mContext) },
-                    new java.security.SecureRandom());
-            configuration.setCustomSSLContext(sc);
-        } catch (java.security.GeneralSecurityException e) {
-            e.printStackTrace();
-        }   
-        
+        initConfiguration(configuration);
         return configuration;
     }
     
     private ConnectionConfiguration initConfiguration(String server, int port) {
         
         ConnectionConfiguration configuration = new ConnectionConfiguration(server, port);
+        initConfiguration(configuration);
+        return configuration;
+    }
+
+    private void initConfiguration(ConnectionConfiguration configuration) {
         configuration.setReconnectionAllowed(false);
+        configuration.setSendPresence(false);
+        configuration.setCompressionEnabled(false); // disable for now
         configuration.setSecurityMode(ConnectionConfiguration.SecurityMode.required);
+        configuration.setRosterLoadedAtLogin(false);
         try {
             SSLContext sc = SSLContext.getInstance("TLS");
             sc.init(null, new X509TrustManager[] { new MemorizingTrustManager(mContext) },
@@ -132,10 +127,8 @@ public class LoginManagerService extends BaseManagerService implements LoginMana
         } catch (java.security.GeneralSecurityException e) {
             e.printStackTrace();
         }   
-        
-        return configuration;
     }
-    
+      
     private void initServiceDiscovery(XMPPConnection connection) {
         // register connection features
         ServiceDiscoveryManager sdm = ServiceDiscoveryManager.getInstanceFor(connection);
@@ -167,7 +160,7 @@ public class LoginManagerService extends BaseManagerService implements LoginMana
             }});
     }
     
-    private void doLogin(final XMPPConnection connection, final String username, final String password, final LoginCallback callback) {
+    private void doLogin(final XMPPConnection connection, final String username, final String password, final String jid) {
         enqueneTask(new Runnable() {
             
             @Override
@@ -175,23 +168,47 @@ public class LoginManagerService extends BaseManagerService implements LoginMana
                 try {
                     connection.connect();
                     connection.login(username, password, "MMChat");
-                    callback.onLoginSuccessed();
+                    notifyLoginSuccess(jid);
                 } catch (SmackException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
-                    callback.onLoginFailed(LOGIN_ERROR_OTHER);
+                    notifyLoginFailed(jid, LOGIN_ERROR_OTHER);
                 } catch (IOException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
-                    callback.onLoginFailed(LOGIN_ERROR_OTHER);
+                    notifyLoginFailed(jid, LOGIN_ERROR_OTHER);
                 } catch (XMPPException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
-                    callback.onLoginFailed(LOGIN_ERROR_OTHER);
+                    notifyLoginFailed(jid, LOGIN_ERROR_OTHER);
                 }
                 
             }
         });
+    }
+
+    @Override
+    public void registerLoginCallback(LoginCallback callback) {
+        if(!mCallbacks.contains(callback)) {
+            mCallbacks.add(callback);
+        }
+    }
+
+    @Override
+    public void unregisterLoginCallback(LoginCallback callback) {
+        mCallbacks.remove(callback);
     }  
+    
+    private void notifyLoginSuccess(String clientJid) {
+        for(LoginCallback callback : mCallbacks) {
+            callback.onLoginSuccessed(clientJid);
+        }
+    }
+    
+    private void notifyLoginFailed(String clientJid, int errorcode) {
+        for(LoginCallback callback : mCallbacks) {
+            callback.onLoginFailed(clientJid, errorcode);
+        }
+    }
 
 }

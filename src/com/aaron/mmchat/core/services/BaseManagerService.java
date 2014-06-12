@@ -9,6 +9,12 @@ package com.aaron.mmchat.core.services;
 
 import android.graphics.drawable.Drawable.Callback;
 
+import com.aaron.mmchat.core.BaseXmppObject;
+
+import org.jivesoftware.smack.ConnectionConfiguration;
+import org.jivesoftware.smack.XMPPConnection;
+
+import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -24,21 +30,22 @@ import java.util.concurrent.ThreadPoolExecutor;
  *
  */
 
-public abstract class BaseManagerService {
-    
-    private static ExecutorService sThreadPool;
+public abstract class BaseManagerService extends BaseXmppObject {
     
     
-    public void init() {
-        if(sThreadPool == null) {
-            sThreadPool = Executors.newFixedThreadPool(5);
-        }
-    }
-
-    public void enqueneTask(Runnable runnable) {
-        init();
-        sThreadPool.execute(runnable);
+    
+    static class Connection {
+        XMPPConnection connection;
+        ConnectionConfiguration configuration;
     }
     
+    protected static HashMap<String, Connection> sConnections;
     
+    static {
+        sConnections = new HashMap<String, Connection>();
+    }
+    
+    public XMPPConnection getXmppConnection(String clientJid) {
+        return sConnections.get(clientJid).connection;
+    }
 }

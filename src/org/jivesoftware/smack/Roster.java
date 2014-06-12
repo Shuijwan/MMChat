@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -83,6 +84,8 @@ public class Roster {
     private final Map<String,RosterEntry> entries = new ConcurrentHashMap<String,RosterEntry>();
     private final List<RosterEntry> unfiledEntries = new CopyOnWriteArrayList<RosterEntry>();
     private final List<RosterListener> rosterListeners = new CopyOnWriteArrayList<RosterListener>();
+    private final List<RosterListener2> rosterListeners2 = new CopyOnWriteArrayList<RosterListener2>();
+    
     private final Map<String, Map<String, Presence>> presenceMap = new ConcurrentHashMap<String, Map<String, Presence>>();
     // The roster is marked as initialized when at least a single roster packet
     // has been received and processed.
@@ -675,6 +678,36 @@ public class Roster {
         }
     }
 
+    private void fireRosterChangedEvent2(Collection<String> addedGroups, Collection<String> deletedGroups) {
+        for(RosterListener2 listener : rosterListeners2) {
+            if(!addedGroups.isEmpty()) {
+                listener.onGroupAdded(addedGroups);
+            }
+            
+            if(!deletedGroups.isEmpty()) {
+                listener.onGroupRemoved(deletedGroups);
+            }
+        }
+    }
+    
+    private void fireRosterChangedEvent3(HashMap<String, Set<String>> addedRosters, HashMap<String, Set<String>> deletedRosters) {
+        for(RosterListener2 listener : rosterListeners2) {
+            if(!addedRosters.isEmpty()) {
+                listener.onRostersAdded(addedRosters);
+            }
+            
+            if(!deletedRosters.isEmpty()) {
+                listener.onRostersRemoved(deletedRosters);
+            }
+        }
+    }
+    
+    private void fireRosterRefreshed() {
+        for(RosterListener2 listener : rosterListeners2) {
+            listener.onRosterRefreshed();
+        }
+    }
+    
     /**
      * Fires roster presence changed event to roster listeners.
      *
@@ -687,7 +720,9 @@ public class Roster {
     }
 
     private void addUpdateEntry(Collection<String> addedEntries, Collection<String> updatedEntries,
-                    Collection<String> unchangedEntries, RosterPacket.Item item, RosterEntry entry) {
+                    Collection<String> unchangedEntries, RosterPacket.Item item, RosterEntry entry, 
+                    Collection<String> addedGroups, Collection<String> deletedGroups, 
+                    HashMap<String,Set<String>> addedRosters , HashMap<String,Set<String>> deletedRosters) {
         RosterEntry oldEntry = entries.put(item.getUser(), entry);
         if (oldEntry == null) {
             addedEntries.add(item.getUser());
@@ -724,9 +759,19 @@ public class Roster {
             if (group == null) {
                 group = createGroup(groupName);
                 groups.put(groupName, group);
+                if(addedGroups != null) {
+                    addedGroups.add(groupName);
+                }
             }
             // Add the entry.
             group.addEntryLocal(entry);
+            
+            if(addedRosters != null) {
+                if(addedRosters.get(entry.getUser()) == null) {
+                    addedRosters.put(entry.getUser(), new HashSet<String>());
+                }
+                addedRosters.get(entry.getUser()).add(groupName);
+            }
         }
 
         // Remove user from the remaining groups.
@@ -738,25 +783,48 @@ public class Roster {
 
         for (String groupName : oldGroupNames) {
             RosterGroup group = getGroup(groupName);
+            
+            if(deletedRosters != null && group.contains(entry)) {
+                if(deletedRosters.get(entry.getUser()) == null) {
+                    deletedRosters.put(entry.getUser(), new HashSet<String>());
+                }
+                deletedRosters.get(entry.getUser()).add(groupName);
+            }
             group.removeEntryLocal(entry);
             if (group.getEntryCount() == 0) {
                 groups.remove(groupName);
+                if(deletedGroups != null) {
+                    deletedGroups.add(groupName);
+                }
             }
         }
     }
 
-    private void deleteEntry(Collection<String> deletedEntries, RosterEntry entry) {
+    private void deleteEntry(Collection<String> deletedEntries, RosterEntry entry , Collection<String> deletedGroups, HashMap<String, Set<String>> deletedRosters) {
         String user = entry.getUser();
         entries.remove(user);
         unfiledEntries.remove(entry);
         presenceMap.remove(StringUtils.parseBareAddress(user));
         deletedEntries.add(user);
-
+        
+        if(deletedRosters != null && deletedRosters.get(user) == null) {
+            deletedRosters.put(user, new HashSet<String>());
+        }
+        
+        
         for (Entry<String,RosterGroup> e: groups.entrySet()) {
             RosterGroup group = e.getValue();
+            if(deletedRosters != null && group.contains(entry)) {
+                deletedRosters.get(user).add(group.getName());
+            }
+            
             group.removeEntryLocal(entry);
+  
             if (group.getEntryCount() == 0) {
                 groups.remove(e.getKey());
+                if(deletedGroups != null) {
+                    deletedGroups.add(e.getKey());
+                }
             }
         }
     }
@@ -768,13 +836,14 @@ public class Roster {
      * This is used by {@link RosterPushListener} and {@link RosterResultListener} to
      * cleanup groups after removing contacts.
      */
-    private void removeEmptyGroups() {
+    private void removeEmptyGroups(Collection<String> deletedGroups) {
         // We have to do this because RosterGroup.removeEntry removes the entry immediately
         // (locally) and the group could remain empty.
         // TODO Check the performance/logic for rosters with large number of groups
         for (RosterGroup group : getGroups()) {
             if (group.getEntryCount() == 0) {
                 groups.remove(group.getName());
+                deletedGroups.add(group.getName());
             }
         }
     }
@@ -978,7 +1047,7 @@ public class Roster {
                 for (RosterPacket.Item item : validItems) {
                     RosterEntry entry = new RosterEntry(item.getUser(), item.getName(),
                             item.getItemType(), item.getItemStatus(), Roster.this, connection);
-                    addUpdateEntry(addedEntries, updatedEntries, unchangedEntries, item, entry);
+                    addUpdateEntry(addedEntries, updatedEntries, unchangedEntries, item, entry, null, null, null, null);
                 }
 
                 // Delete all entries which where not added or updated
@@ -990,14 +1059,14 @@ public class Roster {
                 toDelete.removeAll(updatedEntries);
                 toDelete.removeAll(unchangedEntries);
                 for (String user : toDelete) {
-                    deleteEntry(deletedEntries, entries.get(user));
+                    deleteEntry(deletedEntries, entries.get(user), null, null);
                 }
 
                 if (rosterStore != null) {
                     rosterStore.resetEntries(validItems, version);
                 }
 
-                removeEmptyGroups();
+                removeEmptyGroups(null);
             }
             else {
                 // Empty roster result as defined in RFC6121 2.6.3. An empty roster result basically
@@ -1007,7 +1076,7 @@ public class Roster {
                 for (RosterPacket.Item item : rosterStore.getEntries()) {
                     RosterEntry entry = new RosterEntry(item.getUser(), item.getName(),
                             item.getItemType(), item.getItemStatus(), Roster.this, connection);
-                    addUpdateEntry(addedEntries, updatedEntries, unchangedEntries, item, entry);
+                    addUpdateEntry(addedEntries, updatedEntries, unchangedEntries, item, entry, null, null, null, null);
                 }
             }
 
@@ -1017,6 +1086,8 @@ public class Roster {
             }
             // Fire event for roster listeners.
             fireRosterChangedEvent(addedEntries, updatedEntries, deletedEntries);
+            
+            fireRosterRefreshed();
         }
     }
 
@@ -1051,7 +1122,13 @@ public class Roster {
             Collection<String> updatedEntries = new ArrayList<String>();
             Collection<String> deletedEntries = new ArrayList<String>();
             Collection<String> unchangedEntries = new ArrayList<String>();
-
+            
+            Collection<String> addedGroups = new HashSet<String>();
+            Collection<String> deletedGroups = new HashSet<String>();
+            
+            HashMap<String, Set<String>> addedRosters = new HashMap<String,Set<String>>();
+            HashMap<String, Set<String>> deletedRosters = new HashMap<String,Set<String>>();
+            
             // We assured abouve that the size of items is exaclty 1, therefore we are able to
             // safely retrieve this single item here.
             Item item = items.iterator().next();
@@ -1059,23 +1136,27 @@ public class Roster {
                             item.getItemType(), item.getItemStatus(), Roster.this, connection);
 
             if (item.getItemType().equals(RosterPacket.ItemType.remove)) {
-                deleteEntry(deletedEntries, entry);
+                deleteEntry(deletedEntries, entry, deletedGroups, deletedRosters);
                 if (rosterStore != null) {
                     rosterStore.removeEntry(entry.getUser(), version);
                 }
             }
             else if (hasValidSubscriptionType(item)) {
-                addUpdateEntry(addedEntries, updatedEntries, unchangedEntries, item, entry);
+                addUpdateEntry(addedEntries, updatedEntries, unchangedEntries, item, entry, addedGroups, deletedGroups, addedRosters, deletedRosters);
                 if (rosterStore != null) {
                     rosterStore.addEntry(item, version);
                 }
             }
             connection.sendPacket(IQ.createResultIQ(rosterPacket));
 
-            removeEmptyGroups();
+            removeEmptyGroups(deletedGroups);
 
             // Fire event for roster listeners.
             fireRosterChangedEvent(addedEntries, updatedEntries, deletedEntries);
+            
+            fireRosterChangedEvent2(addedGroups, deletedGroups);
+            
+            fireRosterChangedEvent3(addedRosters, deletedRosters);
         }
     }
 }

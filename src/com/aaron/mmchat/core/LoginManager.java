@@ -25,15 +25,48 @@ public interface LoginManager {
     public static final int LOGIN_ERROR_OTHER = 1;
     
     public static interface LoginCallback {
-        public void onLoginSuccessed();
-        public void onLoginFailed(int errorcode);
+        public void onLoginSuccessed(String clientJid);
+        public void onLoginFailed(String clientJid, int errorcode);
     }
     
+    /**
+     * register login result callback
+     * @param callback
+     * 
+     */
+    public void registerLoginCallback(LoginCallback callback);
     
-    public void login(String email, String password, LoginCallback callback);
+    /**
+     * unregister login result callback
+     * @param callback
+     * */
+    public void unregisterLoginCallback(LoginCallback callback);
     
-    public void login(String username, String password, String server, LoginCallback callback);
+    /**
+     * login through DNS SRV
+     * @param email
+     * @param password
+     * 
+     * */
+    public void login(String email, String password);
     
-    public void login(String username, String password, String server, int port, LoginCallback callback);
+    /**
+     * login through custom server using default port(52222)
+     * @param username
+     * @param password
+     * @param server
+     * 
+     * */
+    public void login(String username, String password, String server);
+    
+    /**
+     * login through custom server and port
+     * @param username
+     * @param password
+     * @param server
+     * @param port
+     * 
+     * */
+    public void login(String username, String password, String server, int port);
 
 }

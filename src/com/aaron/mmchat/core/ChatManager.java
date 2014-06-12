@@ -7,6 +7,9 @@
 
 package com.aaron.mmchat.core;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 /**
  *
  * @Title: ChatManager.java
