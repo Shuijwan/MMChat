@@ -26,7 +26,7 @@ public abstract class BaseXmppObject {
     private static ExecutorService sThreadPool;
     
     static {
-        sThreadPool = Executors.newFixedThreadPool(5);
+        sThreadPool = Executors.newFixedThreadPool(3);
     }
     
     public void enqueneTask(Runnable runnable) {

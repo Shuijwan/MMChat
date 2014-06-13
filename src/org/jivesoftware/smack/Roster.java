@@ -156,7 +156,7 @@ public class Roster {
 
         });
         // If the connection is already established, call reload
-        if (connection.isAuthenticated()) {
+        if (connection.isAuthenticated() && connection.getConfiguration().isRosterLoadedAtLogin()) {
             try {
                 reload();
             }
@@ -260,6 +260,28 @@ public class Roster {
         rosterListeners.remove(rosterListener);
     }
 
+    /**
+     * Adds a listener to this roster. The listener will be fired anytime one or more
+     * changes to the roster are pushed from the server.
+     *
+     * @param rosterListener a roster listener.
+     */
+    public void addRosterListener2(RosterListener2 rosterListener) {
+        if (!rosterListeners2.contains(rosterListener)) {
+            rosterListeners2.add(rosterListener);
+        }
+    }
+
+    /**
+     * Removes a listener from this roster. The listener will be fired anytime one or more
+     * changes to the roster are pushed from the server.
+     *
+     * @param rosterListener a roster listener.
+     */
+    public void removeRosterListener2(RosterListener2 rosterListener) {
+        rosterListeners2.remove(rosterListener);
+    }
+    
     /**
      * Creates a new group.<p>
      * <p/>

@@ -116,9 +116,10 @@ public class LoginManagerService extends BaseManagerService implements LoginMana
     private void initConfiguration(ConnectionConfiguration configuration) {
         configuration.setReconnectionAllowed(false);
         configuration.setSendPresence(false);
-        configuration.setCompressionEnabled(false); // disable for now
+        configuration.setCompressionEnabled(true);
         configuration.setSecurityMode(ConnectionConfiguration.SecurityMode.required);
         configuration.setRosterLoadedAtLogin(false);
+        
         try {
             SSLContext sc = SSLContext.getInstance("TLS");
             sc.init(null, new X509TrustManager[] { new MemorizingTrustManager(mContext) },

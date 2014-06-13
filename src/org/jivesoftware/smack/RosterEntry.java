@@ -19,6 +19,7 @@ package org.jivesoftware.smack;
 
 import org.jivesoftware.smack.SmackException.NotConnectedException;
 import org.jivesoftware.smack.packet.IQ;
+import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.RosterPacket;
 
 import java.util.*;
@@ -35,6 +36,8 @@ public class RosterEntry {
     private String name;
     private RosterPacket.ItemType type;
     private RosterPacket.ItemStatus status;
+    private Presence.Mode presenceMode;
+    private String presenceStatus;
     final private Roster roster;
     final private XMPPConnection connection;
 
@@ -55,6 +58,7 @@ public class RosterEntry {
         this.status = status;
         this.roster = roster;
         this.connection = connection;
+        updatePresence();
     }
 
     /**
@@ -240,4 +244,17 @@ public class RosterEntry {
         return item;
     }
 
+    public Presence.Mode getPresence() {
+        return  presenceMode;
+    }
+    
+    public String getPresenceStatus() {
+        return presenceStatus;
+    }
+    
+    public void updatePresence() {
+        Presence presence = roster.getPresence(user);
+        presenceMode = presence.getMode();
+        presenceStatus = presence.getStatus();
+    }
 }

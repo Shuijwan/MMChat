@@ -10,7 +10,9 @@ package com.aaron.mmchat.core;
 import android.R.interpolator;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  *
@@ -28,22 +30,22 @@ public interface ContactManager {
     public static final int CONTACT_OPERATION_ERROR = 1;
     
     public static interface ContactListCallback {
-        public void onContactListUpdate(String clientJid);
+        public void onContactListAllRefreshed(String clientJid);
         public void onContactRemovedFailed(String contact, int errorcode);
         public void onContactRemoved(String contact);
         public void onContactAdded(String contact);
         public void onContactAddedFailed(String contact, int errorcode);
-//        public void onContactGroupAdded(ContactGroup group);
-//        public void onContactGroupAddedFailed(ContactGroup group, int errorcode);
-//        public void onContactGroupRemoved(ContactGroup group);
-//        public void onContactGroupRemovedFailed(ContactGroup group, int errorcode);
+        public void onContactGroupsAdded(Collection<String> groups);
+        public void onContactGroupsRemoved(Collection<String> groups);
+        public void onContactUpdated(String contact);
+        public void onContactPresenceUpdated(String contact);
     }
     
     public void registerContactListCallback(ContactListCallback callback);
     
     public void unregisterContactListCallback(ContactListCallback callback);
     
-    public ArrayList<ContactGroup> getContactList(String clientJid);
+    public List<ContactGroup> getContactList(String clientJid);
     
     public boolean refreshContactList(String clientJid);
 

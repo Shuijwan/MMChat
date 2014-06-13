@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal" 
+    android:paddingLeft="15dip"
+    android:paddingRight="15dip"
+    android:background="@android:color/background_light">
+    <ImageView 
+        android:id="@+id/icon"
+        android:layout_width="40dip"
+        android:layout_height="40dip"
+        android:src="@drawable/jabber"
+        android:layout_marginRight="20dip"
+        android:layout_gravity="center_vertical"/>
+	<TextView 
+	    android:id="@+id/name"
+	    android:layout_width="wrap_content"
+	    android:layout_height="60dip"
+	    android:text="Cisco Jabber"
+	    android:textSize="20sp"
+	    android:textColor="@android:color/background_dark"
+	    android:layout_gravity="center_vertical"
+	    android:gravity="center_vertical"/>
+</LinearLayout>

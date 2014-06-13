@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<known-account-type>    
+	<account-type id="cisco jabber" icon="cisco" name="Cisco Jabber" domain="cisco.com" port="5222" ssl="1"/>
+</known-account-type>

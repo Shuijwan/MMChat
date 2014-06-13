@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#bde4f8"
+    android:paddingLeft="20dip"
+    android:paddingRight="20dip">
+    <ImageView 
+        android:id="@+id/app_logo"
+        android:layout_width="100dip"
+        android:layout_height="100dip"
+        android:src="@drawable/app_logo_large"
+        android:layout_marginTop="40dip"
+        android:layout_centerHorizontal="true"/>
+    <TextView 
+        android:id="@+id/app_title"
+        android:layout_below="@id/app_logo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/app_name"
+        android:layout_marginTop="10dip"
+        android:textSize="25sp"
+        android:typeface="monospace"
+        android:textStyle="bold"
+        android:layout_centerHorizontal="true"/>
+    
+    <Spinner 
+        android:id="@+id/account_types"
+        android:layout_width="match_parent"
+        android:layout_height="60dip"
+        android:layout_below="@id/app_title"
+        android:layout_marginTop="40dip"
+        android:layout_centerHorizontal="true"
+        android:padding="0dip"/>
+
+    <Button 
+        android:id="@+id/custom_account"
+        android:layout_width="match_parent"
+        android:layout_height="60dip"
+        android:layout_below="@id/account_types"
+        android:layout_marginTop="40dip"
+        android:layout_centerHorizontal="true"
+        android:text="@string/custom_account"/>
+</RelativeLayout>

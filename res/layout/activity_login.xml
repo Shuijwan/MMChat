@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#bde4f8"
+    android:padding="20dip"
+    android:gravity="center">
+    
+    <TextView 
+        android:id="@+id/info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/input_account_info"
+        android:textSize="18sp"
+        android:textStyle="bold"/>
+    <RelativeLayout 
+        android:id="@+id/account_type"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/info"
+        android:layout_marginTop="15dip">
+	    <ImageView 
+	        android:id="@+id/account_type_icon"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        
+	        android:src="@drawable/jabber"/>
+	
+	     <TextView
+	         android:id="@+id/account_type_name"
+	         android:layout_width="wrap_content"
+	         android:layout_height="wrap_content"
+	         android:layout_marginLeft="16dp"
+	         android:layout_toRightOf="@+id/account_type_icon"
+	         android:text="Cisco Jabber"
+	         android:textSize="20sp" 
+	         android:layout_centerVertical="true"/>
+	</RelativeLayout>
+	
+    <EditText 
+        android:id="@+id/username"
+        android:layout_width="match_parent"
+        android:layout_height="45dip"
+        android:hint="@string/username"
+        android:layout_below="@id/account_type"
+        android:layout_marginTop="40dip"/>
+    
+    <EditText 
+        android:id="@+id/password"
+        android:layout_width="match_parent"
+        android:layout_height="45dip"
+        android:hint="@string/password"
+        android:layout_below="@id/username"
+        android:layout_marginTop="20dip"/>
+    
+    <Button 
+        android:id="@+id/login"
+        android:layout_width="match_parent"
+        android:layout_height="60dip"
+        android:text="@string/login"
+        android:layout_below="@id/password"
+        android:layout_marginTop="60dip"/>
+</RelativeLayout>

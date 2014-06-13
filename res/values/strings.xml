@@ -2,6 +2,12 @@
 <resources>
 
     <string name="hello">Hello World, MenuTestActivity!</string>
-    <string name="app_name">MenuTest</string>
-
+    <string name="app_name">Aloha</string>
+    <string name="select_account">Select Account</string>
+    <string name="custom_account">Custom Account</string>
+    <string name="select_account_info">Please select an account</string>
+    <string name="input_account_info">Please input the username and password.</string>
+    <string name="username">Account Name</string>
+	<string name="password">Password</string>
+	<string name="login">Login</string>
 </resources>
