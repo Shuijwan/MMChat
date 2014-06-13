@@ -55,6 +55,7 @@ public class LoginActivity extends Activity implements OnClickListener, LoginCal
     
     public void onCreate(Bundle savedBundle) {
         super.onCreate(savedBundle);
+        setTitle(R.string.login);
         setContentView(R.layout.activity_login);
         
         mAccount = getIntent().getParcelableExtra("account"); 

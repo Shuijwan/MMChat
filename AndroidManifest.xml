@@ -13,7 +13,7 @@
         android:theme="@android:style/Theme.Holo" >
         <activity
             android:name=".login.ChooseAccountTypeActivity"
-            android:label="@string/select_account" >
+             >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -22,7 +22,7 @@
         </activity>
        <activity
             android:name=".login.LoginActivity"
-            android:label="@string/login" />
+            />
         <activity android:name="de.duenndns.ssl.MemorizingActivity" />
     </application>
 

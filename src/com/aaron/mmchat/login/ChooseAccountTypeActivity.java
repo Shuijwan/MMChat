@@ -107,6 +107,7 @@ public class ChooseAccountTypeActivity extends Activity implements OnItemSelecte
     
     public void onCreate(Bundle savedBundle) {
         super.onCreate(savedBundle);
+        setTitle(R.string.select_account);
         setContentView(R.layout.activity_choose_account_type);
         
         mAccountSpinner = (Spinner) findViewById(R.id.account_types);
