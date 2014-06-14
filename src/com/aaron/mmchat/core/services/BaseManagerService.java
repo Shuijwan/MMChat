@@ -7,23 +7,19 @@
 
 package com.aaron.mmchat.core.services;
 
-import android.graphics.drawable.Drawable.Callback;
-
 import com.aaron.mmchat.core.BaseXmppObject;
 
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.XMPPConnection;
 
 import java.util.HashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  *
  * @Title: BaseManagerService.java
  * @Package: com.aaron.mmchat.core.services
- * @Description: 
+ * @Description: Base class for services handle the core logical, all services share
+ * the underly XmppConnection, see @LoginManagerService, @ContactManagerService and @ChatManagerService.
  * 
  * @Author: aaron
  * @Date: 2014-6-10
@@ -31,8 +27,6 @@ import java.util.concurrent.ThreadPoolExecutor;
  */
 
 public abstract class BaseManagerService extends BaseXmppObject {
-    
-    
     
     static class Connection {
         XMPPConnection connection;

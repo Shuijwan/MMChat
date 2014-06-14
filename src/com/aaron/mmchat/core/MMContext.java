@@ -9,7 +9,7 @@ package com.aaron.mmchat.core;
 
 import android.content.Context;
 
-import com.aaron.mmchat.core.services.ChatManagerServices;
+import com.aaron.mmchat.core.services.ChatManagerService;
 import com.aaron.mmchat.core.services.ContactManagerService;
 import com.aaron.mmchat.core.services.LoginManagerService;
 
@@ -47,7 +47,7 @@ public class MMContext {
         LoginManagerService loginManagerService = new LoginManagerService(appContext);
         mServices.put(LOGIN_SERVICE, loginManagerService);
         mServices.put(CONTACT_SERVICE, new ContactManagerService(loginManagerService));
-        mServices.put(CHAT_SERVICE, new ChatManagerServices());
+        mServices.put(CHAT_SERVICE, new ChatManagerService());
         
         SmackAndroid.init(appContext);
     }

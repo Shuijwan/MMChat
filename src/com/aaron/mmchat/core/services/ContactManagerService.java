@@ -7,20 +7,13 @@
 
 package com.aaron.mmchat.core.services;
 
-import android.R.interpolator;
-import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.util.Log;
-
-import com.aaron.mmchat.core.Contact;
 import com.aaron.mmchat.core.ContactGroup;
 import com.aaron.mmchat.core.ContactManager;
 import com.aaron.mmchat.core.LoginManager;
 import com.aaron.mmchat.core.LoginManager.LoginCallback;
-import com.aaron.mmchat.core.MMContext;
-
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.RosterGroup;

@@ -14,7 +14,8 @@ import java.util.concurrent.Executors;
  *
  * @Title: BaseXmppObject.java
  * @Package: com.aaron.mmchat.core
- * @Description: 
+ * @Description: All smack sync api, should extends from BaseXmppObject to do async call,
+ * for example, @BaseManagerService, @ContactGroup 
  * 
  * @Author: aaron
  * @Date: 2014-6-12

@@ -22,9 +22,9 @@ import com.aaron.mmchat.core.ChatManager;
  *
  */
 
-public class ChatManagerServices extends BaseManagerService implements ChatManager {
+public class ChatManagerService extends BaseManagerService implements ChatManager {
 
-    public ChatManagerServices() {
+    public ChatManagerService() {
         // TODO Auto-generated constructor stub
     }
 

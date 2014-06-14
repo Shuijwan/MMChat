@@ -32,8 +32,6 @@ import org.jivesoftware.smackx.receipts.ReceiptReceivedListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
-
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.X509TrustManager;
 
