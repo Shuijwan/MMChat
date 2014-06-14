@@ -9,6 +9,8 @@ package com.aaron.mmchat.login;
 
 import android.R.interpolator;
 import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.content.res.XmlResourceParser;
 import android.os.Bundle;
 import android.os.Handler;
@@ -27,11 +29,13 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.aaron.mmchat.R;
+import com.aaron.mmchat.core.AccountType;
 
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -46,57 +50,14 @@ import java.util.ArrayList;
 
 public class ChooseAccountTypeActivity extends Activity implements OnItemSelectedListener {
     
+    public static void startChooseAccountTypeActivity(Context context) {
+        Intent intent = new Intent(context, ChooseAccountTypeActivity.class);
+        context.startActivity(intent);
+    }
+    
     private Spinner mAccountSpinner;
     private Button mCustomButton;
-    private ArrayList<AccountType> mAccounts;
-    
-    public static class AccountType implements Parcelable {
-        public String id;
-        public int icon;
-        public String name;
-        public String domain;
-        public int port;
-        public boolean ssl;
-        
-        @Override
-        public int describeContents() {
-            return 0;
-        }
-        
-        public void writeToParcel(Parcel out, int flags) {
-            out.writeString(id);
-            out.writeInt(icon);
-            out.writeString(name);
-            out.writeString(domain);
-            out.writeInt(port);
-            out.writeInt(ssl ? 1 : 0);
-        }
-
-        public static final Parcelable.Creator<AccountType> CREATOR
-                = new Parcelable.Creator<AccountType>() {
-            public AccountType createFromParcel(Parcel in) {
-                return new AccountType(in);
-            }
-
-            public AccountType[] newArray(int size) {
-                return new AccountType[size];
-            }
-        };
-        
-        private AccountType(Parcel in) {
-            id = in.readString();
-            icon = in.readInt();
-            name = in.readString();
-            domain = in.readString();
-            port = in.readInt();
-            ssl = in.readInt() == 1 ;
-        }
-        
-        public AccountType() {
-            
-        }
-        
-    }
+    private List<AccountType> mAccounts;
     
     private Handler mHandler = new Handler() {
         public void handleMessage(Message msg) {
@@ -113,64 +74,29 @@ public class ChooseAccountTypeActivity extends Activity implements OnItemSelecte
         mAccountSpinner = (Spinner) findViewById(R.id.account_types);
         mCustomButton = (Button) findViewById(R.id.custom_account);
         
-        mAccounts = loadKnownAccoutType();
+        mAccounts = AccountType.getKnownAccountTypes();
         mAccountSpinner.setAdapter(new AccountAdapter(mAccounts));
         mAccountSpinner.setOnItemSelectedListener(this);
     }
     
-    private ArrayList<AccountType> loadKnownAccoutType() {
-        
-        XmlResourceParser parser = getResources().getXml(R.xml.known_account_type);
-        ArrayList<AccountType> accounts = new ArrayList<AccountType>();
-        accounts.add(new AccountType());
-        try {  
-            AccountType account;
-            String tagname;
-            while (parser.getEventType() != XmlResourceParser.END_DOCUMENT) {  
-                 
-                if (parser.getEventType() == XmlResourceParser.START_TAG) {  
-                    tagname = parser.getName();  
-                    if(tagname.equals("account-type")) {
-                        account = new AccountType();
-                        account.id = parser.getAttributeValue(0);
-                        account.icon = getResourceId(parser.getAttributeValue(1));
-                        account.name = parser.getAttributeValue(2);
-                        account.domain = parser.getAttributeValue(3);
-                        account.port = Integer.parseInt(parser.getAttributeValue(4));
-                        account.ssl = Integer.parseInt(parser.getAttributeValue(5)) == 1;
-                        accounts.add(account);
-                    } 
-                }             
-                parser.next();  
-            }  
-           
-        } catch (XmlPullParserException e) {  
-            e.printStackTrace();
-        } catch (IOException e) {  
-            e.printStackTrace();  
-        }  
-        return accounts;
-    }
-    
     class AccountAdapter extends BaseAdapter {
      
-        private ArrayList<AccountType> mAccounts;
+        private List<AccountType> mAccounts;
         private LayoutInflater mInflater;
         
-        public AccountAdapter(ArrayList<AccountType> accounts) {
+        public AccountAdapter(List<AccountType> accounts) {
             mAccounts = accounts;
             mInflater = LayoutInflater.from(ChooseAccountTypeActivity.this);
         }
         
         @Override
         public int getCount() {
-            // TODO Auto-generated method stub
-            return mAccounts.size();
+            return 1 + mAccounts.size();
         }
 
         @Override
         public Object getItem(int position) {
-            return mAccounts.get(position);
+            return position == 0 ? null : mAccounts.get(position-1);
         }
 
         @Override
@@ -208,11 +134,7 @@ public class ChooseAccountTypeActivity extends Activity implements OnItemSelecte
         
         
     }
-    
-    private int getResourceId(String name) {
-        return getResources().getIdentifier(name, "drawable", getPackageName());
-    }
-    
+      
     static class Holder {
         ImageView icon;
         TextView name;
@@ -220,9 +142,9 @@ public class ChooseAccountTypeActivity extends Activity implements OnItemSelecte
 
     @Override
     public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-        AccountType account = mAccounts.get(arg2);
         mHandler.removeMessages(1);
         if(arg2 != 0) {
+            AccountType account = mAccounts.get(arg2-1);
             Message msg = Message.obtain(mHandler, 1, account);
             mHandler.sendMessageDelayed(msg, 1500);
         }

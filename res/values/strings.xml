@@ -10,4 +10,13 @@
     <string name="username">Account Name</string>
 	<string name="password">Password</string>
 	<string name="login">Login</string>
+	
+	<string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
+    
+    <string name="chat">Chat</string>
+    <string name="contact">Contact</string>
+    <string name="setting">Setting</string>
+    <string name="accounts">ACCOUNT:</string>
+    
 </resources>

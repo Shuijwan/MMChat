@@ -10,6 +10,7 @@ package com.aaron.mmchat.core.services;
 import android.content.Context;
 import android.util.Log;
 
+import com.aaron.mmchat.core.AccountManager;
 import com.aaron.mmchat.core.LoginManager;
 
 import de.duenndns.ssl.MemorizingTrustManager;
@@ -50,7 +51,8 @@ import javax.net.ssl.X509TrustManager;
 public class LoginManagerService extends BaseManagerService implements LoginManager {
 
     private static final int DEFAULT_PORT = 5222;
-   
+    
+    private boolean mEntityCapInited = false;
     private Context mContext;
     
     private ArrayList<LoginCallback> mCallbacks;
@@ -133,18 +135,19 @@ public class LoginManagerService extends BaseManagerService implements LoginMana
     private void initServiceDiscovery(XMPPConnection connection) {
         // register connection features
         ServiceDiscoveryManager sdm = ServiceDiscoveryManager.getInstanceFor(connection);
-        File capsCacheDir = null;
-        // init Entity Caps manager with storage in app's cache dir
-        try {
-            if (capsCacheDir == null) {
-                capsCacheDir = new File(mContext.getCacheDir(), "entity-caps-cache");
+        
+        if(!mEntityCapInited) {
+            // init Entity Caps manager with storage in app's cache dir
+            try {
+                File capsCacheDir = new File(mContext.getCacheDir(), "entity-caps-cache");
                 capsCacheDir.mkdirs();
                 EntityCapsManager.setPersistentCache(new SimpleDirectoryPersistentCache(capsCacheDir));
+                
+            } catch (java.io.IOException e) {
+                Log.e("TTT", "Could not init Entity Caps cache: " + e.getLocalizedMessage());
             }
-        } catch (java.io.IOException e) {
-            Log.e("TTT", "Could not init Entity Caps cache: " + e.getLocalizedMessage());
+            mEntityCapInited = true;
         }
-
         // reference PingManager, set ping flood protection to 10s
         PingManager.setDefaultPingInterval(10*1000);
         PingManager.getInstanceFor(connection).setPingInterval(10*1000);
@@ -170,6 +173,7 @@ public class LoginManagerService extends BaseManagerService implements LoginMana
                     connection.connect();
                     connection.login(username, password, "MMChat");
                     notifyLoginSuccess(jid);
+                    AccountManager.getInstance(mContext).addAccount(jid.substring(jid.lastIndexOf("@")+1), username, password);
                 } catch (SmackException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();

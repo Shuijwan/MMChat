@@ -21,10 +21,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.aaron.mmchat.R;
+import com.aaron.mmchat.core.AccountType;
 import com.aaron.mmchat.core.LoginManager;
 import com.aaron.mmchat.core.LoginManager.LoginCallback;
 import com.aaron.mmchat.core.MMContext;
-import com.aaron.mmchat.login.ChooseAccountTypeActivity.AccountType;;
+import com.aaron.mmchat.home.HomeActivity;
 
 /**
  *
@@ -94,6 +95,7 @@ public class LoginActivity extends Activity implements OnClickListener, LoginCal
             public void run() {
                 // TODO Auto-generated method stub
                 Toast.makeText(LoginActivity.this, "login success", Toast.LENGTH_LONG).show();
+                HomeActivity.startHomeActivity(LoginActivity.this);
             }
         });
         
@@ -102,7 +104,7 @@ public class LoginActivity extends Activity implements OnClickListener, LoginCal
 
     @Override
     public void onLoginFailed(String clientJid, int errorcode) {
- runOnUiThread(new Runnable() {
+        runOnUiThread(new Runnable() {
             
             @Override
             public void run() {

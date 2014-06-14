@@ -27,7 +27,7 @@
     <Spinner 
         android:id="@+id/account_types"
         android:layout_width="match_parent"
-        android:layout_height="60dip"
+        android:layout_height="50dip"
         android:layout_below="@id/app_title"
         android:layout_marginTop="40dip"
         android:layout_centerHorizontal="true"
