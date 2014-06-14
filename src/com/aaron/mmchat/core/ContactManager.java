@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -46,6 +47,8 @@ public interface ContactManager {
     public void unregisterContactListCallback(ContactListCallback callback);
     
     public List<ContactGroup> getContactList(String clientJid);
+    
+    public Map<String, ArrayList<ContactGroup>> getAllContactList();
     
     public boolean refreshContactList(String clientJid);
 

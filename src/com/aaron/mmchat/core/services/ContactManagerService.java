@@ -10,6 +10,8 @@ package com.aaron.mmchat.core.services;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.util.Log;
+
 import com.aaron.mmchat.core.ContactGroup;
 import com.aaron.mmchat.core.ContactManager;
 import com.aaron.mmchat.core.LoginManager;
@@ -30,6 +32,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -203,6 +206,17 @@ public class ContactManagerService extends BaseManagerService implements Contact
                 contactGroup = new ContactGroup(group);
                 contactlist.add(contactGroup);
                 contactlistMap.put(group.getName(), contactGroup);
+            }
+            
+            Collection<RosterEntry> unfiledEntries = roster.getUnfiledEntries();
+            if(!unfiledEntries.isEmpty()) {
+                RosterGroup tmp = roster.createGroup("Contact");
+                for(RosterEntry entry : unfiledEntries) {
+                    tmp.addEntryLocal(entry);
+                }
+                ContactGroup tmpGroup = new ContactGroup(tmp);
+                contactlist.add(tmpGroup);
+                contactlistMap.put(tmpGroup.getName(), tmpGroup);
             }
             notifyContactListAllRefreshed(clientJid);
         }
@@ -386,9 +400,15 @@ public class ContactManagerService extends BaseManagerService implements Contact
     public List<ContactGroup> getContactList(String clientJid) {
         return Collections.unmodifiableList(mAllContactLists.get(clientJid));
     }
+    
+    @Override
+    public Map<String, ArrayList<ContactGroup>> getAllContactList() {
+        return mAllContactLists;
+    }
 
     @Override
     public boolean refreshContactList(String clientJid) {
+        Log.i("TTT", "refreshlist:"+clientJid);
         Roster roster = mRosters.get(clientJid);
         try {
             roster.reload();
@@ -494,6 +514,8 @@ public class ContactManagerService extends BaseManagerService implements Contact
         mRosters.put(clientJid, roster);
         roster.addRosterListener(new ContactListListener(clientJid));
         roster.addRosterListener2(new ContactListListener2(clientJid));
+        
+        refreshContactList(clientJid);
     }
 
     @Override

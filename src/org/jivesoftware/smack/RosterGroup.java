@@ -220,7 +220,7 @@ public class RosterGroup {
         }
     }
 
-    void addEntryLocal(RosterEntry entry) {
+    public void addEntryLocal(RosterEntry entry) {
         // Update the entry if it is already in the list
         synchronized (entries) {
             entries.remove(entry);
@@ -228,7 +228,7 @@ public class RosterGroup {
         }
     }
 
-    void removeEntryLocal(RosterEntry entry) {
+    public void removeEntryLocal(RosterEntry entry) {
          // Only remove the entry if it's in the entry list.
         synchronized (entries) {
             if (entries.contains(entry)) {

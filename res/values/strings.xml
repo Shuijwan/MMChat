@@ -19,4 +19,6 @@
     <string name="setting">Setting</string>
     <string name="accounts">ACCOUNT:</string>
     
+    <string name="empty_contact_info">No Contacts. Add contact to start chat.</string>
+    
 </resources>

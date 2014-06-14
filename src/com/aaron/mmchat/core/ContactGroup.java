@@ -53,6 +53,10 @@ public class ContactGroup extends BaseXmppObject {
         }
     }
     
+    public ArrayList<Contact> getContacts() {
+        return mContacts;
+    }
+    
     public String getName() {
         return mRosterGroup.getName();
     }

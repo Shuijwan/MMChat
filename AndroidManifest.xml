@@ -4,7 +4,7 @@
     android:versionCode="1"
     android:versionName="1.0" >
 
-    <uses-sdk android:targetSdkVersion="16" />
+    <uses-sdk android:targetSdkVersion="16" android:minSdkVersion="14"/>
 
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -14,7 +14,7 @@
         android:theme="@android:style/Theme.Holo.Light" 
         android:name="com.aaron.mmchat.MMChatApplication">
          <activity
-            android:name=".login.ChooseAccountTypeActivity">
+            android:name=".home.HomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -22,7 +22,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".login.LoginActivity" />
-        <activity android:name=".home.HomeActivity" />
+        <activity android:name=".login.ChooseAccountTypeActivity"/>
        
         <activity android:name="de.duenndns.ssl.MemorizingActivity" />
     </application>
