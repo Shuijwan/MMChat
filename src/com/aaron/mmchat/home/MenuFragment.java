@@ -1,10 +1,3 @@
-/**
- *
- * Copyright 2014 Cisco Inc. All rights reserved.
- * MenuFragment.java
- *
- */
-
 package com.aaron.mmchat.home;
 
 import android.app.Activity;
@@ -24,7 +17,6 @@ import com.aaron.mmchat.R;
 import com.aaron.mmchat.core.AccountManager;
 import com.aaron.mmchat.core.AccountManager.Account;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -40,11 +32,13 @@ public class MenuFragment extends Fragment implements OnItemClickListener {
     public static final int MENU_CHATLIST = 0;
     public static final int MENU_CONTACTLIST = 1;
     public static final int MENU_SETTING = 2;
-
+    public static final int MENU_ACCOUNT = MENU_SETTING + 2;
+    
     public static final int NORMAL_MENU_COUNT = MENU_SETTING + 1;
-
-    public static interface ActiveMenuChangedCallback {
+    
+    public static interface MenuCallback {
         public void onActiveMenuChanged(int menuId);
+        public void onMenuClicked();
     }
 
     private static class NormalMenu {
@@ -60,16 +54,18 @@ public class MenuFragment extends Fragment implements OnItemClickListener {
     }
     
     private NormalMenu[] NORMAL_MENUS = new NormalMenu[]{
-            new NormalMenu(MENU_CHATLIST, R.drawable.nav_chats_normal, R.string.chat), 
+            new NormalMenu(MENU_CHATLIST, R.drawable.nav_chats_normal, R.string.message), 
             new NormalMenu(MENU_CONTACTLIST, R.drawable.nav_contact_normal, R.string.contact), 
             new NormalMenu(MENU_SETTING, R.drawable.nav_settings_normal, R.string.setting)};
     
     private MenuAdapter mAdapter;
+    private MenuCallback mActiveMenuChangedCallback;
+    private int mCurrentActiveMenuId = 0;
 
     @Override
     public void onAttach(Activity activity) {
-        // TODO Auto-generated method stub
         super.onAttach(activity);
+        mActiveMenuChangedCallback = (MenuCallback) activity;
     }
 
     @Override
@@ -115,8 +111,16 @@ public class MenuFragment extends Fragment implements OnItemClickListener {
 
     @Override
     public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-        // TODO Auto-generated method stub
-
+        if(mCurrentActiveMenuId != arg2) {
+            if(arg2 < NORMAL_MENU_COUNT) {
+                mActiveMenuChangedCallback.onActiveMenuChanged(arg2);
+            } else if(arg2 >= MENU_ACCOUNT) {
+                mActiveMenuChangedCallback.onActiveMenuChanged(arg2);
+            }
+            mCurrentActiveMenuId = arg2;
+        }
+        mActiveMenuChangedCallback.onMenuClicked();
+        
     }
 
     class MenuAdapter extends BaseAdapter {

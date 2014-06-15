@@ -1,10 +1,3 @@
-/**
- *
- * Copyright 2014 Cisco Inc. All rights reserved.
- * ContactListFragment.java
- *
- */
-
 package com.aaron.mmchat.home;
 
 import android.app.Activity;
