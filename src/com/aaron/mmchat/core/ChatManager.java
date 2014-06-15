@@ -25,6 +25,8 @@ public interface ChatManager {
     
     public static interface ChatListCallback {
         
+        public void onP2PChatCreated(P2PChat chat);
+        
     }
     
     public void registerChatListCallback(ChatListCallback callback);
@@ -37,7 +39,9 @@ public interface ChatManager {
     
     public ArrayList<PersistentGroupChat> getPersistentGroupChatList();
     
-    public void createP2PChat(String jid);
+    public P2PChat getP2PChat(String clientJid, String jid);
+    
+    public P2PChat getOrCreateP2PChat(String clientJid, String jid);
     
     public void removeP2PChat(P2PChat chat);
     
