@@ -224,30 +224,6 @@ public class ContactListFragment extends Fragment {
         }
 
         @Override
-        public void onContactRemovedFailed(String clientJid, String contact, int errorcode) {
-            // TODO Auto-generated method stub
-            
-        }
-
-        @Override
-        public void onContactRemoved(String clientJid, String contact) {
-            // TODO Auto-generated method stub
-            
-        }
-
-        @Override
-        public void onContactAdded(String clientJid, String contact) {
-            // TODO Auto-generated method stub
-            
-        }
-
-        @Override
-        public void onContactAddedFailed(String clientJid, String contact, int errorcode) {
-            // TODO Auto-generated method stub
-            
-        }
-
-        @Override
         public void onContactGroupsAdded(String clientJid, Collection<String> groups) {
             mSparseArray.clear();
             notifyDataSetChanged();
@@ -260,19 +236,6 @@ public class ContactListFragment extends Fragment {
             notifyDataSetChanged();
             
         }
-
-        @Override
-        public void onContactUpdated(String clientJid, String contact) {
-            // TODO Auto-generated method stub
-            
-        }
-
-        @Override
-        public void onContactPresenceUpdated(String clientJid, String contact) {
-            // TODO Auto-generated method stub
-            
-        }
-
     }
 
     static class ViewHolder {

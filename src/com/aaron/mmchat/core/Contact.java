@@ -13,6 +13,8 @@ import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.Presence.Mode;
 
+import java.util.ArrayList;
+
 /**
  *
  * @Title: Contact.java
@@ -30,11 +32,59 @@ public class Contact extends BaseXmppObject {
     public static final int AWAY = 1;
     public static final int DND = 2;
     public static final int UNAVAILABLE = 3;
+    
+    public static interface ContactCallback {
+        /**
+         * callback for @Contact' info changed
+         * */
+        public void onContactUpdated();
+        
+        /**
+         * callback for @Contact's presence changed
+         * 
+         * */
+        public void onContactPresenceUpdated();
+    }
 
+    private ArrayList<ContactCallback> mCallbacks;
+    
     RosterEntry mRosterEntry;
     
     public Contact(RosterEntry rosterEntry) {
         mRosterEntry = rosterEntry;
+        mCallbacks = new ArrayList<Contact.ContactCallback>();
+    }
+    
+    public void setRosterEntry(RosterEntry entry) {
+        mRosterEntry = entry;
+        notifyContactUpdated();
+    }
+    
+    public void registerContactCallback(ContactCallback callback) {
+        if(!mCallbacks.contains(callback)) {
+            mCallbacks.add(callback);
+        }
+    }
+    
+    public void unregisterContactCallback(ContactCallback callback) {
+        mCallbacks.remove(callback);
+    }
+    
+    private void notifyContactUpdated() {
+        for(ContactCallback callback : mCallbacks) {
+            callback.onContactUpdated();
+        }
+    }
+    
+    private void notifyContactPresenceUpdated() {
+        for(ContactCallback callback : mCallbacks) {
+            callback.onContactPresenceUpdated();
+        }
+    }
+    
+    public void updatePresence() {
+        mRosterEntry.updatePresence();
+        notifyContactPresenceUpdated();
     }
     
     public String getJid() {

@@ -19,8 +19,6 @@ import java.util.Map;
 
 public interface ContactManager {
     
-    public static final int CONTACT_OPERATION_ERROR = 1;
-    
     public static interface ContactListCallback {
         
         /**
@@ -28,39 +26,6 @@ public interface ContactManager {
          * 
          * */
         public void onContactListAllRefreshed(String clientJid);
-        
-        /**
-         * callback for @Contact is removed failed
-         * @param clientJid, the client user this contact belongs to
-         * @param contact, the failed removed Contact's jid
-         * @param errorcode, fail reason
-         * */
-        public void onContactRemovedFailed(String clientJid, String contact, int errorcode);
-        
-        /**
-         * callback for @Contact is removed successfully
-         * @param clientJid, the client user this contact belongs to
-         * @param contact, the removed Contact's jid
-         * 
-         * */
-        public void onContactRemoved(String clientJid, String contact);
-        
-        /**
-         * callback for @Contact is added successfully
-         * @param clientJid, the client user this contact belongs to
-         * @param contact, the added Contact's jid
-         * 
-         * */
-        public void onContactAdded(String clientJid, String contact);
-        
-        /**
-         * callback for @Contact is added failed
-         * @param clientJid, the client user this contact belongs to
-         * @param contact, the fail added Contact's jid
-         * @param errorcode, fail reason
-         * 
-         * */
-        public void onContactAddedFailed(String clientJid, String contact, int errorcode);
         
         /**
          * callback for @ContactGroup are added
@@ -77,21 +42,6 @@ public interface ContactManager {
          * 
          * */
         public void onContactGroupsRemoved(String clientJid, Collection<String> groups);
-        
-        /**
-         * callback for @Contact' info changed
-         * @param clientJid, the client user this contact belongs to
-         * @param contact, jid of this contact
-         * */
-        public void onContactUpdated(String clientJid, String contact);
-        
-        /**
-         * callback for @Contact's presence changed
-         * @param clientJid, the client user this contact belongs to
-         * @param contact, jid of this contact
-         * 
-         * */
-        public void onContactPresenceUpdated(String clientJid, String contact);
     }
     
     /**

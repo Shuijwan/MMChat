@@ -7,6 +7,7 @@
 
 package com.aaron.mmchat.core;
 
+import android.R.interpolator;
 import android.util.Log;
 
 import com.aaron.mmchat.core.services.ContactManagerService;
@@ -34,6 +35,40 @@ import java.util.HashMap;
 
 public class ContactGroup extends BaseXmppObject {
     
+    public static final int ERROR_TIME_OUT = 1;
+    
+    public static interface ContactGroupCallback {
+        /**
+         * callback for @Contact is removed failed
+         * @param contact, the failed removed Contact's jid
+         * @param errorcode, fail reason
+         * */
+        public void onContactRemovedFailed(String contact, int errorcode);
+        
+        /**
+         * callback for @Contact is removed successfully
+         * @param contact, the removed Contact's jid
+         * 
+         * */
+        public void onContactRemoved(String contact);
+        
+        /**
+         * callback for @Contact is added successfully
+         * @param contact, the added Contact's jid
+         * 
+         * */
+        public void onContactAdded(String contact);
+        
+        /**
+         * callback for @Contact is added failed
+         * @param contact, the fail added Contact's jid
+         * @param errorcode, fail reason
+         * 
+         * */
+        public void onContactAddedFailed(String contact, int errorcode);
+    }
+    
+    private ArrayList<ContactGroupCallback> mCallbacks;
     private RosterGroup mRosterGroup;
     private ArrayList<Contact> mContacts;
     private HashMap<String, Contact> mContactMap;
@@ -45,6 +80,7 @@ public class ContactGroup extends BaseXmppObject {
         mRosterGroup = rosterGroup;
         mContacts = new ArrayList<Contact>();
         mContactMap = new HashMap<String, Contact>();
+        mCallbacks = new ArrayList<ContactGroup.ContactGroupCallback>();
         Collection<RosterEntry> entries = mRosterGroup.getEntries();
         Contact contact;
         for(RosterEntry entry : entries) {
@@ -55,8 +91,46 @@ public class ContactGroup extends BaseXmppObject {
         }
     }
     
+    public void registerContactGroupCallback(ContactGroupCallback callback) {
+        if(!mCallbacks.contains(callback)) {
+            mCallbacks.add(callback);
+        }
+    }
+    
+    public void unregisterContactGroupCallback(ContactGroupCallback callback) {
+        mCallbacks.remove(callback);
+    }
+    
+    private void notifyContactAdded(String jid) {
+        for(ContactGroupCallback callback : mCallbacks) {
+            callback.onContactAdded(jid);
+        }
+    }
+    
+    private void notifyContactAddedFailed(String jid, int errorcode) {
+        for(ContactGroupCallback callback : mCallbacks) {
+            callback.onContactAddedFailed(jid, errorcode);
+        }
+    }
+    
+    private void notifyContactRemoved(String jid) {
+        for(ContactGroupCallback callback : mCallbacks) {
+            callback.onContactRemoved(jid);
+        }
+    }
+    
+    private void notifyContactRemovedFailed(String jid, int errorcode) {
+        for(ContactGroupCallback callback : mCallbacks) {
+            callback.onContactRemovedFailed(jid, errorcode);
+        }
+    }
+    
     public ArrayList<Contact> getContacts() {
         return mContacts;
+    }
+    
+    public Contact getContact(String jid) {
+        return mContactMap.get(jid);
     }
     
     public String getName() {
@@ -70,15 +144,25 @@ public class ContactGroup extends BaseXmppObject {
         Contact contact = new Contact(rosterEntry);
         mContacts.add(contact);
         mContactMap.put(rosterEntry.getUser(), contact);
+        notifyContactAdded(rosterEntry.getUser());
         return true;
     }
     
     public boolean removeContactInternal(String jid) {
         if(mContactMap.containsKey(jid)) {
-            mContactMap.remove(jid);
+            Contact contact = mContactMap.remove(jid);
+            mContacts.remove(contact);
+            notifyContactRemoved(jid);
             return true;
         }
         return false;
+    }
+    
+    public void updateContactRosterEntry(String jid, RosterEntry entry) {
+        if(mContactMap.containsKey(jid)) {
+            Contact contact = mContactMap.get(jid);
+            contact.setRosterEntry(entry);
+        }
     }
     
     public void removeContact(final Contact contact) {
@@ -94,15 +178,15 @@ public class ContactGroup extends BaseXmppObject {
                 } catch (NoResponseException e) {
                     e.printStackTrace();
                     contactManager.removePendingRemoveContact(contact.getJid());
-                    contactManager.notifyContactRemovedFailed(mClientJid, contact.getJid(), ContactManager.CONTACT_OPERATION_ERROR);
+                    notifyContactRemovedFailed(contact.getJid(), ERROR_TIME_OUT);
                 } catch (XMPPErrorException e) {
                     e.printStackTrace();
                     contactManager.removePendingRemoveContact(contact.getJid());
-                    contactManager.notifyContactRemovedFailed(mClientJid, contact.getJid(), ContactManager.CONTACT_OPERATION_ERROR);
+                    notifyContactRemovedFailed(contact.getJid(), ERROR_TIME_OUT);
                 } catch (NotConnectedException e) {
                     e.printStackTrace();
                     contactManager.removePendingRemoveContact(contact.getJid());
-                    contactManager.notifyContactRemovedFailed(mClientJid, contact.getJid(), ContactManager.CONTACT_OPERATION_ERROR);
+                    notifyContactRemovedFailed(contact.getJid(), ERROR_TIME_OUT);
                 } 
             }
         });   

@@ -22,5 +22,30 @@ import java.util.HashMap;
  */
 
 public interface ChatManager {
-
+    
+    public static interface ChatListCallback {
+        
+    }
+    
+    public void registerChatListCallback(ChatListCallback callback);
+    
+    public void unregisterChatListCallback(ChatListCallback callback);
+    
+    public ArrayList<P2PChat> getP2PChatList();
+    
+    public ArrayList<GroupChat> getGroupChatList();
+    
+    public ArrayList<PersistentGroupChat> getPersistentGroupChatList();
+    
+    public void createP2PChat(String jid);
+    
+    public void removeP2PChat(P2PChat chat);
+    
+    public void createGroupChat(String[] jids);
+    
+    public void removeGroupChat(GroupChat chat);
+    
+    public void createPersistentGroupChat(String[] jids);
+    
+    public void removePersistentGroupChat(PersistentGroupChat chat);
 }

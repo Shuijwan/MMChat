@@ -12,6 +12,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 
+import com.aaron.mmchat.core.Contact;
 import com.aaron.mmchat.core.ContactGroup;
 import com.aaron.mmchat.core.ContactManager;
 import com.aaron.mmchat.core.LoginManager;
@@ -287,8 +288,6 @@ public class ContactManagerService extends BaseManagerService implements Contact
                     group = contactlistMap.get(groupName);
                     group.addContactInternal(roster.getEntry(jid));  
                 }
-                
-                notifyContactAdded(clientJid, jid);
             }
         }
         
@@ -310,10 +309,7 @@ public class ContactManagerService extends BaseManagerService implements Contact
                     if(group != null) {
                         group.removeContactInternal(jid);  
                     }
-                }
-                
-                notifyContactRemoved(clientJid, jid);
-                
+                }   
             }
         }
         
@@ -326,16 +322,24 @@ public class ContactManagerService extends BaseManagerService implements Contact
                 Collection<RosterGroup> groups = entry.getGroups();
                 for(RosterGroup group : groups) {
                     contactGroup = contactlistMap.get(group.getName());
-                    contactGroup.removeContactInternal(jid);
-                    contactGroup.addContactInternal(roster.getEntry(jid));
+                    contactGroup.updateContactRosterEntry(jid, entry);
                 }
-                notifyContactUpdated(clientJid, jid);
             }
         }
         
         private void handleContactPresenceUpdated(String clientJid, String jid) {
-            mRosters.get(clientJid).getEntry(jid).updatePresence();
-            notifyContactPresenceUpdated(clientJid, jid);
+            Roster roster = mRosters.get(clientJid);
+            RosterEntry entry = roster.getEntry(jid);
+         
+            Collection<RosterGroup> groups = entry.getGroups();
+            HashMap<String, ContactGroup> contactlistMap = mAllContactListsMap.get(clientJid);
+            ContactGroup contactGroup;
+            Contact contact;
+            for(RosterGroup group : groups) {
+                contactGroup = contactlistMap.get(group.getName());
+                contact = contactGroup.getContact(jid);
+                contact.updatePresence();
+            }
         }
         
         @Override
@@ -458,36 +462,6 @@ public class ContactManagerService extends BaseManagerService implements Contact
             callback.onContactListAllRefreshed(clientJid);
         }
     }
-    
-    public void notifyContactAdded(String clientJid, String contact) {
-        for(ContactListCallback callback : mCallbacks) {
-            callback.onContactAdded(clientJid, contact);
-        }
-    }
-    
-    public void notifyContactAddedFailed(String clientJid, String contact, int errorcode) {
-        for(ContactListCallback callback : mCallbacks) {
-            callback.onContactAddedFailed(clientJid, contact, errorcode);
-        }
-    }
-    
-    public void notifyContactRemoved(String clientJid, String contact) {
-        for(ContactListCallback callback : mCallbacks) {
-            callback.onContactRemoved(clientJid, contact);
-        }
-    }
-    
-    private void notifyContactUpdated(String clientJid, String contact) {
-        for(ContactListCallback callback : mCallbacks) {
-            callback.onContactUpdated(clientJid, contact);
-        }
-    }
-    
-    public void notifyContactRemovedFailed(String clientJid, String contact, int errorcode) {
-        for(ContactListCallback callback : mCallbacks) {
-            callback.onContactRemovedFailed(clientJid, contact, errorcode);
-        }
-    }
       
     public void notifyContactGroupsAdded(String clientJid, Collection<String> groups) {
         for(ContactListCallback callback : mCallbacks) {
@@ -498,12 +472,6 @@ public class ContactManagerService extends BaseManagerService implements Contact
     public void notifyContactGroupsRemoved(String clientJid, Collection<String> groups) {
         for(ContactListCallback callback : mCallbacks) {
             callback.onContactGroupsRemoved(clientJid, groups);
-        }
-    }
-    
-    private void notifyContactPresenceUpdated(String clientJid, String contact) {
-        for(ContactListCallback callback : mCallbacks) {
-            callback.onContactPresenceUpdated(clientJid, contact);
         }
     }
 
