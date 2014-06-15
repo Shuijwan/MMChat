@@ -7,21 +7,20 @@
     android:paddingRight="8dp" >
 
     <ImageView
-        android:id="@+id/imp_chat_list_item_avta_ib"
+        android:id="@+id/icon"
         android:layout_width="50dip"
         android:layout_height="50dip"
         android:layout_centerVertical="true"
         android:scaleType="fitXY" />
 
     <RelativeLayout
-        android:id="@+id/RelativeLayout1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
-        android:layout_toRightOf="@+id/imp_chat_list_item_avta_ib" >
+        android:layout_toRightOf="@id/icon" >
 
         <TextView
-            android:id="@+id/imp_chat_list_item_time_tv"
+            android:id="@+id/time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
@@ -32,12 +31,12 @@
             android:textSize="13sp" />
 
         <TextView
-            android:id="@+id/imp_chat_list_item_name_tv"
+            android:id="@+id/name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignBaseline="@id/imp_chat_list_item_time_tv"
+            android:layout_alignBaseline="@id/time"
             android:layout_alignParentBottom="false"
-            android:layout_toLeftOf="@id/imp_chat_list_item_time_tv"
+            android:layout_toLeftOf="@id/time"
             android:drawablePadding="5dip"
             android:paddingRight="10dip"
             android:singleLine="true"
@@ -46,11 +45,11 @@
             android:textSize="16sp" />
 
         <TextView
-            android:id="@+id/imp_chat_list_item_count_tv"
+            android:id="@+id/unread_message_count"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:layout_below="@id/imp_chat_list_item_time_tv"
+            android:layout_below="@id/time"
             android:background="@drawable/message_count_background"
             android:gravity="center"
             android:minWidth="18dp"
@@ -61,14 +60,14 @@
             android:textSize="13sp" />
 
         <TextView
-            android:id="@+id/imp_chat_list_item_message_tv"
+            android:id="@+id/last_message"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/imp_chat_list_item_name_tv"
-            android:layout_toLeftOf="@id/imp_chat_list_item_time_tv"
+            android:layout_below="@id/name"
+            android:layout_toLeftOf="@id/time"
             android:paddingRight="10dip"
             android:singleLine="true"
-            android:text="message(replace in code)"
+            android:text="last message"
             android:textColor="@color/contact_presence_text_selector"
             android:textSize="13sp" />
 
