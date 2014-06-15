@@ -7,11 +7,9 @@
 
 package com.aaron.mmchat.home;
 
-import android.R.interpolator;
 import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,8 +18,6 @@ import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.AbsListView.LayoutParams;
-
 import com.aaron.mmchat.R;
 import com.aaron.mmchat.core.Contact;
 import com.aaron.mmchat.core.ContactGroup;
@@ -33,7 +29,6 @@ import com.aaron.mmchat.widget.StickyHeaderExpandableListView;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -236,51 +231,51 @@ public class ContactListFragment extends Fragment {
         }
 
         @Override
-        public void onContactRemovedFailed(String contact, int errorcode) {
+        public void onContactRemovedFailed(String clientJid, String contact, int errorcode) {
             // TODO Auto-generated method stub
             
         }
 
         @Override
-        public void onContactRemoved(String contact) {
+        public void onContactRemoved(String clientJid, String contact) {
             // TODO Auto-generated method stub
             
         }
 
         @Override
-        public void onContactAdded(String contact) {
+        public void onContactAdded(String clientJid, String contact) {
             // TODO Auto-generated method stub
             
         }
 
         @Override
-        public void onContactAddedFailed(String contact, int errorcode) {
+        public void onContactAddedFailed(String clientJid, String contact, int errorcode) {
             // TODO Auto-generated method stub
             
         }
 
         @Override
-        public void onContactGroupsAdded(Collection<String> groups) {
+        public void onContactGroupsAdded(String clientJid, Collection<String> groups) {
             mSparseArray.clear();
             notifyDataSetChanged();
             
         }
 
         @Override
-        public void onContactGroupsRemoved(Collection<String> groups) {
+        public void onContactGroupsRemoved(String clientJid, Collection<String> groups) {
             mSparseArray.clear();
             notifyDataSetChanged();
             
         }
 
         @Override
-        public void onContactUpdated(String contact) {
+        public void onContactUpdated(String clientJid, String contact) {
             // TODO Auto-generated method stub
             
         }
 
         @Override
-        public void onContactPresenceUpdated(String contact) {
+        public void onContactPresenceUpdated(String clientJid, String contact) {
             // TODO Auto-generated method stub
             
         }

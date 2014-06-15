@@ -6,6 +6,11 @@
     <string name="select_account">Select Account</string>
     <string name="custom_account">Custom Account</string>
     <string name="select_account_info">Please select an account</string>
+    
+    <string name="cisco">Cisco Jabber</string>
+    <string name="gtalk">GTalk</string>
+    <string name="weibo">Sina Weibo</string>
+    
     <string name="input_account_info">Please input the username and password.</string>
     <string name="username">Account Name</string>
 	<string name="password">Password</string>

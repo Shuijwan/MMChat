@@ -203,7 +203,7 @@ public class ContactManagerService extends BaseManagerService implements Contact
             
             ContactGroup contactGroup;
             for(RosterGroup group : groups) {
-                contactGroup = new ContactGroup(group);
+                contactGroup = new ContactGroup(clientJid, group);
                 contactlist.add(contactGroup);
                 contactlistMap.put(group.getName(), contactGroup);
             }
@@ -214,7 +214,7 @@ public class ContactManagerService extends BaseManagerService implements Contact
                 for(RosterEntry entry : unfiledEntries) {
                     tmp.addEntryLocal(entry);
                 }
-                ContactGroup tmpGroup = new ContactGroup(tmp);
+                ContactGroup tmpGroup = new ContactGroup(clientJid, tmp);
                 contactlist.add(tmpGroup);
                 contactlistMap.put(tmpGroup.getName(), tmpGroup);
             }
@@ -241,11 +241,11 @@ public class ContactManagerService extends BaseManagerService implements Contact
             ContactGroup contactGroup;
             for(String groupName : addedGroups) {
                 group = roster.getGroup(groupName);
-                contactGroup = new ContactGroup(group);
+                contactGroup = new ContactGroup(clientJid, group);
                 contactlist.add(contactGroup);
                 contactlistMap.put(groupName, contactGroup);
             }
-            notifyContactGroupsAdded(addedGroups);  
+            notifyContactGroupsAdded(clientJid, addedGroups);  
         }
         
         private void handleContactGroupRemoved(String clientJid,Collection<String> removedGroups) {
@@ -267,7 +267,7 @@ public class ContactManagerService extends BaseManagerService implements Contact
                     contactlistMap.remove(groupName);
                 }
             }
-            notifyContactGroupsRemoved(removedGroups);  
+            notifyContactGroupsRemoved(clientJid, removedGroups);  
         }
         
         private void handleContactAdded(String clientJid, HashMap<String, Set<String>> addedEntries) {
@@ -288,7 +288,7 @@ public class ContactManagerService extends BaseManagerService implements Contact
                     group.addContactInternal(roster.getEntry(jid));  
                 }
                 
-                notifyContactAdded(jid);
+                notifyContactAdded(clientJid, jid);
             }
         }
         
@@ -312,7 +312,7 @@ public class ContactManagerService extends BaseManagerService implements Contact
                     }
                 }
                 
-                notifyContactRemoved(jid);
+                notifyContactRemoved(clientJid, jid);
                 
             }
         }
@@ -329,13 +329,13 @@ public class ContactManagerService extends BaseManagerService implements Contact
                     contactGroup.removeContactInternal(jid);
                     contactGroup.addContactInternal(roster.getEntry(jid));
                 }
-                notifyContactUpdated(jid);
+                notifyContactUpdated(clientJid, jid);
             }
         }
         
         private void handleContactPresenceUpdated(String clientJid, String jid) {
             mRosters.get(clientJid).getEntry(jid).updatePresence();
-            notifyContactPresenceUpdated(jid);
+            notifyContactPresenceUpdated(clientJid, jid);
         }
         
         @Override
@@ -459,51 +459,51 @@ public class ContactManagerService extends BaseManagerService implements Contact
         }
     }
     
-    public void notifyContactAdded(String contact) {
+    public void notifyContactAdded(String clientJid, String contact) {
         for(ContactListCallback callback : mCallbacks) {
-            callback.onContactAdded(contact);
+            callback.onContactAdded(clientJid, contact);
         }
     }
     
-    public void notifyContactAddedFailed(String contact, int errorcode) {
+    public void notifyContactAddedFailed(String clientJid, String contact, int errorcode) {
         for(ContactListCallback callback : mCallbacks) {
-            callback.onContactAddedFailed(contact, errorcode);
+            callback.onContactAddedFailed(clientJid, contact, errorcode);
         }
     }
     
-    public void notifyContactRemoved(String contact) {
+    public void notifyContactRemoved(String clientJid, String contact) {
         for(ContactListCallback callback : mCallbacks) {
-            callback.onContactRemoved(contact);
+            callback.onContactRemoved(clientJid, contact);
         }
     }
     
-    private void notifyContactUpdated(String contact) {
+    private void notifyContactUpdated(String clientJid, String contact) {
         for(ContactListCallback callback : mCallbacks) {
-            callback.onContactUpdated(contact);
+            callback.onContactUpdated(clientJid, contact);
         }
     }
     
-    public void notifyContactRemovedFailed(String contact, int errorcode) {
+    public void notifyContactRemovedFailed(String clientJid, String contact, int errorcode) {
         for(ContactListCallback callback : mCallbacks) {
-            callback.onContactRemovedFailed(contact, errorcode);
+            callback.onContactRemovedFailed(clientJid, contact, errorcode);
         }
     }
       
-    public void notifyContactGroupsAdded(Collection<String> groups) {
+    public void notifyContactGroupsAdded(String clientJid, Collection<String> groups) {
         for(ContactListCallback callback : mCallbacks) {
-            callback.onContactGroupsAdded(groups);
+            callback.onContactGroupsAdded(clientJid, groups);
         }
     }
     
-    public void notifyContactGroupsRemoved(Collection<String> groups) {
+    public void notifyContactGroupsRemoved(String clientJid, Collection<String> groups) {
         for(ContactListCallback callback : mCallbacks) {
-            callback.onContactGroupsRemoved(groups);
+            callback.onContactGroupsRemoved(clientJid, groups);
         }
     }
     
-    private void notifyContactPresenceUpdated(String contact) {
+    private void notifyContactPresenceUpdated(String clientJid, String contact) {
         for(ContactListCallback callback : mCallbacks) {
-            callback.onContactPresenceUpdated(contact);
+            callback.onContactPresenceUpdated(clientJid, contact);
         }
     }
 

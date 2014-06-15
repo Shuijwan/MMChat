@@ -1,10 +1,3 @@
-/**
- *
- * Copyright 2014 Cisco Inc. All rights reserved.
- * MMContext.java
- *
- */
-
 package com.aaron.mmchat.core;
 
 import android.content.Context;
@@ -16,14 +9,14 @@ import com.aaron.mmchat.core.services.LoginManagerService;
 
 import org.jivesoftware.smack.SmackAndroid;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
  *
  * @Title: MMContext.java
  * @Package: com.aaron.mmchat.core
- * @Description: 
+ * @Description: Entry for retrieving the core services,see {@link LoginManager},{@link ContactManager},{@link ChatManager}
+ * use getService(String service).
  * 
  * @Author: aaron
  * @Date: 2014-6-10
@@ -52,6 +45,10 @@ public class MMContext {
         SmackAndroid.init(appContext);
     }
     
+    /**
+     * get instance of MMContext
+     * 
+     * */
     public synchronized static MMContext getInstance(Context context) {
         if(sInstance == null) {
             sInstance = new MMContext(context);
@@ -59,10 +56,19 @@ public class MMContext {
         return sInstance;
     }
     
+    /**
+     * peek instance of MMContext, will return null if getInstance is not called before.
+     * 
+     * */
     public static MMContext peekInstance() {
         return sInstance;
     }
     
+    /**
+     * get core service according to given service name.
+     * @param service, service name, MMContext.LOGIN_SERVICE, MMContext.CONTACT_SERVICE, .etc
+     * 
+     * */
     public Object getService(String service) {
         return mServices.get(service);
     }

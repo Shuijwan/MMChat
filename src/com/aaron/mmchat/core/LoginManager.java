@@ -1,19 +1,10 @@
-/**
- *
- * Copyright 2014 Cisco Inc. All rights reserved.
- * LoginManager.java
- *
- */
-
 package com.aaron.mmchat.core;
-
-import android.R.interpolator;
 
 /**
  *
  * @Title: LoginManager.java
  * @Package: com.aaron.mmchat.core
- * @Description: 
+ * @Description: login interface, get LoginManager through {@link MMContext.getInstance(context).getService(MMContext.LOGIN_SERVICE)}
  * 
  * @Author: aaron
  * @Date: 2014-6-10
@@ -32,13 +23,13 @@ public interface LoginManager {
     /**
      * register login result callback
      * @param callback
-     * 
      */
     public void registerLoginCallback(LoginCallback callback);
     
     /**
      * unregister login result callback
      * @param callback
+     * 
      * */
     public void unregisterLoginCallback(LoginCallback callback);
     

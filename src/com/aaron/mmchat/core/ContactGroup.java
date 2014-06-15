@@ -37,9 +37,11 @@ public class ContactGroup extends BaseXmppObject {
     private RosterGroup mRosterGroup;
     private ArrayList<Contact> mContacts;
     private HashMap<String, Contact> mContactMap;
+    private String mClientJid;
     
-    public ContactGroup(RosterGroup rosterGroup) {
+    public ContactGroup(String clientJid, RosterGroup rosterGroup) {
         Log.i("TTT", "g:"+rosterGroup.getName());
+        mClientJid = clientJid;
         mRosterGroup = rosterGroup;
         mContacts = new ArrayList<Contact>();
         mContactMap = new HashMap<String, Contact>();
@@ -92,15 +94,15 @@ public class ContactGroup extends BaseXmppObject {
                 } catch (NoResponseException e) {
                     e.printStackTrace();
                     contactManager.removePendingRemoveContact(contact.getJid());
-                    contactManager.notifyContactRemovedFailed(contact.getJid(), ContactManager.CONTACT_OPERATION_ERROR);
+                    contactManager.notifyContactRemovedFailed(mClientJid, contact.getJid(), ContactManager.CONTACT_OPERATION_ERROR);
                 } catch (XMPPErrorException e) {
                     e.printStackTrace();
                     contactManager.removePendingRemoveContact(contact.getJid());
-                    contactManager.notifyContactRemovedFailed(contact.getJid(), ContactManager.CONTACT_OPERATION_ERROR);
+                    contactManager.notifyContactRemovedFailed(mClientJid, contact.getJid(), ContactManager.CONTACT_OPERATION_ERROR);
                 } catch (NotConnectedException e) {
                     e.printStackTrace();
                     contactManager.removePendingRemoveContact(contact.getJid());
-                    contactManager.notifyContactRemovedFailed(contact.getJid(), ContactManager.CONTACT_OPERATION_ERROR);
+                    contactManager.notifyContactRemovedFailed(mClientJid, contact.getJid(), ContactManager.CONTACT_OPERATION_ERROR);
                 } 
             }
         });   

@@ -25,7 +25,7 @@ import java.util.List;
  *
  * @Title: AccountType.java
  * @Package: com.aaron.mmchat.core
- * @Description: 
+ * @Description: represent a Account Type, see known_account_type.xml for known account types.
  * 
  * @Author: aaron
  * @Date: 2014-6-14
@@ -38,10 +38,12 @@ public class AccountType implements Parcelable {
     
     public String id;
     public int icon;
-    public String name;
+    public int name;
     public String domain;
     public int port;
     public boolean ssl;
+    public boolean needSrv;
+    public String description;
     
     @Override
     public int describeContents() {
@@ -51,10 +53,12 @@ public class AccountType implements Parcelable {
     public void writeToParcel(Parcel out, int flags) {
         out.writeString(id);
         out.writeInt(icon);
-        out.writeString(name);
+        out.writeInt(name);
         out.writeString(domain);
         out.writeInt(port);
         out.writeInt(ssl ? 1 : 0);
+        out.writeInt(needSrv ? 1 : 0);
+        out.writeString(description);
     }
 
     public static final Parcelable.Creator<AccountType> CREATOR
@@ -71,16 +75,23 @@ public class AccountType implements Parcelable {
     private AccountType(Parcel in) {
         id = in.readString();
         icon = in.readInt();
-        name = in.readString();
+        name = in.readInt();
         domain = in.readString();
         port = in.readInt();
         ssl = in.readInt() == 1 ;
+        needSrv = in.readInt() == 1;
+        description = in.readString();
     }
     
     public AccountType() {
         
     }
     
+    /**
+     * return @AccounType according to the account type id
+     * @param id : the account type id defined in known_account_type.xml
+     * 
+    **/
     public static AccountType getAccountTypeById(String id) {
         for(AccountType accountType : sKnownAccountTypes) {
             if(accountType.id.equals(id)) {
@@ -90,10 +101,19 @@ public class AccountType implements Parcelable {
         return null;
     }
     
+    /**
+     * return all known account types
+     * 
+    **/
     public static List<AccountType> getKnownAccountTypes() {
         return Collections.unmodifiableList(sKnownAccountTypes);
     }
     
+    /**
+     * load current known account type
+     * see res/xml/known_account_type.xml file
+     * 
+     * */
     public static void loadKnownAccoutType(Context context) {
         if(sKnownAccountTypes != null) {
             return;
@@ -111,11 +131,13 @@ public class AccountType implements Parcelable {
                     if(tagname.equals("account-type")) {
                         account = new AccountType();
                         account.id = parser.getAttributeValue(0);
-                        account.icon = getResourceId(context, parser.getAttributeValue(1));
-                        account.name = parser.getAttributeValue(2);
+                        account.icon = getResourceId(context, parser.getAttributeValue(1), "drawable");
+                        account.name = getResourceId(context, parser.getAttributeValue(2), "string");
                         account.domain = parser.getAttributeValue(3);
                         account.port = Integer.parseInt(parser.getAttributeValue(4));
                         account.ssl = Integer.parseInt(parser.getAttributeValue(5)) == 1;
+                        account.needSrv = Integer.parseInt(parser.getAttributeValue(6)) == 1;
+                        account.description = parser.getAttributeValue(7);
                         sKnownAccountTypes.add(account);
                     } 
                 }             
@@ -129,7 +151,7 @@ public class AccountType implements Parcelable {
         }  
     }
     
-    private static int getResourceId(Context context, String name) {
-        return context.getResources().getIdentifier(name, "drawable", context.getPackageName());
+    private static int getResourceId(Context context, String name, String type) {
+        return context.getResources().getIdentifier(name, type, context.getPackageName());
     }
 }

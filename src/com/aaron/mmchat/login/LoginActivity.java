@@ -7,7 +7,6 @@
 
 package com.aaron.mmchat.login;
 
-import android.accounts.Account;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -81,7 +80,12 @@ public class LoginActivity extends Activity implements OnClickListener, LoginCal
         String password = mPassword.getText().toString();
         
         if(!username.isEmpty() && !password.isEmpty()) {
-            mLoginManager.login(username, password);
+            if(mAccount.needSrv) {
+                mLoginManager.login(username, password);
+            } else {
+                mLoginManager.login(username , password, mAccount.domain, mAccount.port);
+            } 
+            
             mLoginManager.registerLoginCallback(this);
         }
         
@@ -89,11 +93,9 @@ public class LoginActivity extends Activity implements OnClickListener, LoginCal
 
     @Override
     public void onLoginSuccessed(String clientJid) {
-        runOnUiThread(new Runnable() {
-            
+        runOnUiThread(new Runnable() {       
             @Override
             public void run() {
-                // TODO Auto-generated method stub
                 Toast.makeText(LoginActivity.this, "login success", Toast.LENGTH_LONG).show();
                 HomeActivity.startHomeActivity(LoginActivity.this);
             }
