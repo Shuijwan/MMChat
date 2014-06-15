@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="60dip"
+    android:background="@drawable/list_item_selector"
+    android:paddingLeft="8dp"
+    android:paddingRight="8dp" >
+
+    <ImageView
+        android:id="@+id/imp_chat_list_item_avta_ib"
+        android:layout_width="50dip"
+        android:layout_height="50dip"
+        android:layout_centerVertical="true"
+        android:scaleType="fitXY" />
+
+    <RelativeLayout
+        android:id="@+id/RelativeLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@+id/imp_chat_list_item_avta_ib" >
+
+        <TextView
+            android:id="@+id/imp_chat_list_item_time_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="3dp"
+            android:gravity="center_vertical"
+            android:text="10:10"
+            android:textColor="@color/contact_presence_text_selector"
+            android:textSize="13sp" />
+
+        <TextView
+            android:id="@+id/imp_chat_list_item_name_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@id/imp_chat_list_item_time_tv"
+            android:layout_alignParentBottom="false"
+            android:layout_toLeftOf="@id/imp_chat_list_item_time_tv"
+            android:drawablePadding="5dip"
+            android:paddingRight="10dip"
+            android:singleLine="true"
+            android:text="Name(replace in code)"
+            android:textColor="@color/contact_display_name_text_selector"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/imp_chat_list_item_count_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/imp_chat_list_item_time_tv"
+            android:background="@drawable/message_count_background"
+            android:gravity="center"
+            android:minWidth="18dp"
+            android:paddingBottom="0dp"
+            android:paddingTop="0dp"
+            android:text="2"
+            android:textColor="#ffffff"
+            android:textSize="13sp" />
+
+        <TextView
+            android:id="@+id/imp_chat_list_item_message_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/imp_chat_list_item_name_tv"
+            android:layout_toLeftOf="@id/imp_chat_list_item_time_tv"
+            android:paddingRight="10dip"
+            android:singleLine="true"
+            android:text="message(replace in code)"
+            android:textColor="@color/contact_presence_text_selector"
+            android:textSize="13sp" />
+
+    </RelativeLayout>
+
+</RelativeLayout>

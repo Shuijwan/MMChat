@@ -25,5 +25,6 @@
     <string name="accounts">ACCOUNT:</string>
     
     <string name="empty_contact_info">No Contacts. Add contact to start chat.</string>
+    <string name="empty_chat_info">No Chats.</string>
     
 </resources>

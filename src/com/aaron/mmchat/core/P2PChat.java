@@ -7,13 +7,11 @@
 
 package com.aaron.mmchat.core;
 
-import android.telephony.gsm.SmsMessage.MessageClass;
 import android.util.Log;
 
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.SmackException.NotConnectedException;
-import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Message;
 
 import java.util.ArrayList;
