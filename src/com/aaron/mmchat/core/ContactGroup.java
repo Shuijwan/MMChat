@@ -7,15 +7,16 @@
 
 package com.aaron.mmchat.core;
 
-import android.R.interpolator;
 import android.util.Log;
 
 import com.aaron.mmchat.core.services.ContactManagerService;
 
+import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.RosterGroup;
 import org.jivesoftware.smack.SmackException.NoResponseException;
 import org.jivesoftware.smack.SmackException.NotConnectedException;
+import org.jivesoftware.smack.SmackException.NotLoggedInException;
 import org.jivesoftware.smack.XMPPException.XMPPErrorException;
 
 import java.util.ArrayList;
@@ -91,12 +92,20 @@ public class ContactGroup extends BaseXmppObject {
         }
     }
     
+    /**
+     * register callback to listen to ContactGroup changed
+     * 
+     * */
     public void registerContactGroupCallback(ContactGroupCallback callback) {
         if(!mCallbacks.contains(callback)) {
             mCallbacks.add(callback);
         }
     }
     
+    /**
+     * unregister ContactGroup callback
+     * 
+     * */
     public void unregisterContactGroupCallback(ContactGroupCallback callback) {
         mCallbacks.remove(callback);
     }
@@ -137,6 +146,11 @@ public class ContactGroup extends BaseXmppObject {
         return mRosterGroup.getName();
     }
     
+    /**
+     * add contact to ContactGroup, it is internal method called by contactmanagerservice 
+     * to update the internal data
+     * 
+     * */
     public boolean addContactInternal(RosterEntry rosterEntry) {
         if(mContactMap.containsKey(rosterEntry.getUser())) {
             return false;
@@ -148,6 +162,12 @@ public class ContactGroup extends BaseXmppObject {
         return true;
     }
     
+    
+    /**
+     * remove contact from ContactGroup, it is internal method called by contactmanagerservice 
+     * to update the internal data
+     * 
+     * */
     public boolean removeContactInternal(String jid) {
         if(mContactMap.containsKey(jid)) {
             Contact contact = mContactMap.remove(jid);
@@ -158,6 +178,11 @@ public class ContactGroup extends BaseXmppObject {
         return false;
     }
     
+    /**
+     * update contact's RosterEntry, it is internal method called by contactmanagerservice 
+     * when contact's info is changed.
+     * 
+     * */
     public void updateContactRosterEntry(String jid, RosterEntry entry) {
         if(mContactMap.containsKey(jid)) {
             Contact contact = mContactMap.get(jid);
@@ -165,6 +190,11 @@ public class ContactGroup extends BaseXmppObject {
         }
     }
     
+    /**
+     * remove a contact from this group
+     * @param contact, contact to be removed
+     * 
+     * */
     public void removeContact(final Contact contact) {
         
         enqueneTask(new Runnable() {
@@ -187,6 +217,43 @@ public class ContactGroup extends BaseXmppObject {
                     e.printStackTrace();
                     contactManager.removePendingRemoveContact(contact.getJid());
                     notifyContactRemovedFailed(contact.getJid(), ERROR_TIME_OUT);
+                } 
+            }
+        });   
+    }
+    
+    /**
+     * add a contact to this group
+     * @param contact, contact to be added
+     * 
+     * */
+    public void addContact(final String jid) {
+        
+        enqueneTask(new Runnable() {
+            
+            @Override
+            public void run() {
+                ContactManagerService contactManager = (ContactManagerService) MMContext.peekInstance().getService(MMContext.CONTACT_SERVICE);
+                try {
+                    Roster roster = contactManager.getRoster(mClientJid);
+                    roster.createEntry(jid, jid.substring(jid.lastIndexOf("@")+1), new String[] {getName()});
+                    contactManager.addPendingAddContact(jid);
+                } catch (NoResponseException e) {
+                    e.printStackTrace();
+                    contactManager.removePendingAddContact(jid);
+                    notifyContactAddedFailed(jid, ERROR_TIME_OUT);
+                } catch (XMPPErrorException e) {
+                    e.printStackTrace();
+                    contactManager.removePendingAddContact(jid);
+                    notifyContactAddedFailed(jid, ERROR_TIME_OUT);
+                } catch (NotConnectedException e) {
+                    e.printStackTrace();
+                    contactManager.removePendingAddContact(jid);
+                    notifyContactAddedFailed(jid, ERROR_TIME_OUT);
+                } catch (NotLoggedInException e) {
+                    e.printStackTrace();
+                    contactManager.removePendingAddContact(jid);
+                    notifyContactAddedFailed(jid, ERROR_TIME_OUT);
                 } 
             }
         });   

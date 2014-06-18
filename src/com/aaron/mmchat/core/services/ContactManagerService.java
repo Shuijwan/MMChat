@@ -431,6 +431,10 @@ public class ContactManagerService extends BaseManagerService implements Contact
         return contactlistMap.containsKey(groupName);
     }
     
+    public Roster getRoster(String clientJid) {
+        return mRosters.get(clientJid);
+    }
+    
     public void addPendingAddContact(String jid) {
         if(mPendingAddContacts == null) {
             mPendingAddContacts = new ArrayList<String>();

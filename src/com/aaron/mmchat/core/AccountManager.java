@@ -36,7 +36,8 @@ public class AccountManager {
     private static final String ACCOUNT_FILENAME = "accounts";
 
     public static class Account {
-        String accountTypeId;
+        public String accountTypeId;
+        public String jid;
         public String username;
         String password;
     }
@@ -61,7 +62,9 @@ public class AccountManager {
             Iterator<String> infoIterator = info.iterator();
             while(infoIterator.hasNext()) {
                 item = infoIterator.next();
-                if(item.startsWith("id:")) {
+                if(item.startsWith("jid:")) {
+                    account.jid = item.substring(4);
+                } else if(item.startsWith("id:")) {
                     account.accountTypeId = item.substring(3);
                 } else if(item.startsWith("u:")) {
                     account.username = item.substring(2);
@@ -91,22 +94,23 @@ public class AccountManager {
         return Collections.unmodifiableList(mAccounts);
     }
     
-    private boolean containAccount(String accountTypeId, String username) {
+    private Account getAccount(String jid) {
         for(Account account : mAccounts) {
-            if(account.accountTypeId.equals(accountTypeId) && account.username.equals(username)) {
-                return true;
+            if(account.jid.equals(jid)) {
+                return account;
             }
         }
-        return false;
+        return null;
     }
     
-    public void addAccount(String accountTypeId, String username, String password) {
+    public void addAccount(String jid, String accountTypeId, String username, String password) {
         
-        if(containAccount(accountTypeId, username)) {
+        if(getAccount(jid) != null) {
             return;
         }
         
         Account account = new Account();
+        account.jid = jid;
         account.accountTypeId = accountTypeId;
         account.username = username;
         account.password = password;
@@ -116,10 +120,26 @@ public class AccountManager {
         SharedPreferences sharedPreferences = mContext.getSharedPreferences(ACCOUNT_FILENAME, 0);
         Editor editor = sharedPreferences.edit();
         HashSet<String> set = new HashSet<String>();
+        
+        set.add("jid:"+jid);
         set.add("id:"+accountTypeId);
         set.add("u:"+username);
         set.add("p:"+password);
-        editor.putStringSet(accountTypeId, set);
+        
+        editor.putStringSet(jid, set);
+        editor.commit();
+    }
+    
+    public void deleteAccount(String jid) {
+        Account account;
+        if((account = getAccount(jid)) == null) {
+            return;
+        }
+        mAccounts.remove(account);
+        
+        SharedPreferences sharedPreferences = mContext.getSharedPreferences(ACCOUNT_FILENAME, 0);
+        Editor editor = sharedPreferences.edit();
+        editor.remove(jid);
         editor.commit();
     }
     

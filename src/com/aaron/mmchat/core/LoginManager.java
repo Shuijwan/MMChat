@@ -1,5 +1,7 @@
 package com.aaron.mmchat.core;
 
+import com.aaron.mmchat.core.AccountManager.Account;
+
 /**
  *
  * @Title: LoginManager.java
@@ -59,5 +61,12 @@ public interface LoginManager {
      * 
      * */
     public void login(String username, String password, String server, int port);
+    
+    /**
+     * logout the client
+     * @param clientJid
+     * 
+     * */
+    public void logout(Account account, boolean remove);
 
 }

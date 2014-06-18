@@ -11,6 +11,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.aaron.mmchat.core.AccountManager;
+import com.aaron.mmchat.core.AccountManager.Account;
 import com.aaron.mmchat.core.LoginManager;
 
 import de.duenndns.ssl.MemorizingTrustManager;
@@ -78,9 +79,8 @@ public class LoginManagerService extends BaseManagerService implements LoginMana
         con.connection = connection;
         con.configuration = configuration;
         
-        sConnections.put(email, con);
         initServiceDiscovery(connection);
-        doLogin(connection, username, password, email);
+        doLogin(con, username, password, domain);
       
     }
 
@@ -93,10 +93,10 @@ public class LoginManagerService extends BaseManagerService implements LoginMana
         con.connection = connection;
         con.configuration = configuration;
         
-        String jid = username+"@"+server;
-        sConnections.put(jid, con);
+//        String jid = username+"@"+server;
+//        sConnections.put(jid, con);
         initServiceDiscovery(connection);
-        doLogin(connection, username, password, jid);
+        doLogin(con, username, password, server);
         
     }
     
@@ -162,28 +162,29 @@ public class LoginManagerService extends BaseManagerService implements LoginMana
             }});
     }
     
-    private void doLogin(final XMPPConnection connection, final String username, final String password, final String jid) {
+    private void doLogin(final Connection connection, final String username, final String password, final String domain) {
         enqueneTask(new Runnable() {
             
             @Override
             public void run() {
+                String jid = null;
+                String id = username+"@"+domain;
                 try {
-                    connection.connect();
-                    connection.login(username, password, "MMChat");
+                    connection.connection.connect();
+                    connection.connection.login(username, password, "MMChat");
+                    jid = connection.connection.getUser();
+                    sConnections.put(jid, connection);
                     notifyLoginSuccess(jid);
-                    AccountManager.getInstance(mContext).addAccount(jid.substring(jid.lastIndexOf("@")+1), username, password);
+                    AccountManager.getInstance(mContext).addAccount(jid, domain, username, password);
                 } catch (SmackException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
-                    notifyLoginFailed(jid, LOGIN_ERROR_OTHER);
+                    notifyLoginFailed(id, LOGIN_ERROR_OTHER);
                 } catch (IOException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
-                    notifyLoginFailed(jid, LOGIN_ERROR_OTHER);
+                    notifyLoginFailed(id, LOGIN_ERROR_OTHER);
                 } catch (XMPPException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
-                    notifyLoginFailed(jid, LOGIN_ERROR_OTHER);
+                    notifyLoginFailed(id, LOGIN_ERROR_OTHER);
                 }
                 
             }
@@ -212,6 +213,12 @@ public class LoginManagerService extends BaseManagerService implements LoginMana
         for(LoginCallback callback : mCallbacks) {
             callback.onLoginFailed(clientJid, errorcode);
         }
+    }
+
+    @Override
+    public void logout(Account account, boolean remove) {
+        
+        AccountManager.getInstance(mContext).deleteAccount(account.jid);
     }
 
 }
