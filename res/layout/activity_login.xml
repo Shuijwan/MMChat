@@ -50,6 +50,7 @@
         android:layout_width="match_parent"
         android:layout_height="45dip"
         android:hint="@string/password"
+        android:inputType="textPassword"
         android:layout_below="@id/username"
         android:layout_marginTop="20dip"/>
     

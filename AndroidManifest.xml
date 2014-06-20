@@ -23,8 +23,10 @@
         </activity>
         <activity android:name=".login.LoginActivity" />
         <activity android:name=".login.ChooseAccountTypeActivity"/>
-       
+       <activity android:name=".chat.ChatActivity"/>
         <activity android:name="de.duenndns.ssl.MemorizingActivity" />
+        <provider android:name=".core.provider.ChatHistoryProvider"
+			android:authorities="com.aaron.mmchat.core.provider.ChatHistory" />
     </application>
 
 </manifest>

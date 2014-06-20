@@ -128,6 +128,10 @@ public class ChatManagerService extends BaseManagerService implements ChatManage
         
     }
 
+    public void updateMessageDeliverStatus() {
+        
+    }
+    
     private void notifyP2PChatCreated(P2PChat chat) {
         for(ChatListCallback callback : mCallbacks) {
             callback.onP2PChatCreated(chat);

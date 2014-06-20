@@ -13,6 +13,7 @@ import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.SmackException.NotConnectedException;
 import org.jivesoftware.smack.packet.Message;
+import org.jivesoftware.smackx.receipts.DeliveryReceiptRequest;
 
 import java.util.ArrayList;
 
@@ -62,6 +63,8 @@ public class P2PChat implements MessageListener {
     public void sendMessage(String text) {
         Message msg = new Message();
         msg.setBody(text);
+        msg.addExtension(new DeliveryReceiptRequest());
+        String packedId = msg.getPacketID();
         try {
             mChat.sendMessage(msg);
         } catch (NotConnectedException e) {

@@ -19,6 +19,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
@@ -48,7 +49,7 @@ import java.util.List;
  *
  */
 
-public class ChooseAccountTypeActivity extends Activity implements OnItemSelectedListener {
+public class ChooseAccountTypeActivity extends Activity implements OnItemSelectedListener, OnClickListener {
     
     public static void startChooseAccountTypeActivity(Context context) {
         Intent intent = new Intent(context, ChooseAccountTypeActivity.class);
@@ -73,6 +74,7 @@ public class ChooseAccountTypeActivity extends Activity implements OnItemSelecte
         
         mAccountSpinner = (Spinner) findViewById(R.id.account_types);
         mCustomButton = (Button) findViewById(R.id.custom_account);
+        mCustomButton.setOnClickListener(this);
         
         mAccounts = AccountType.getKnownAccountTypes();
         mAccountSpinner.setAdapter(new AccountAdapter(mAccounts));
@@ -101,7 +103,6 @@ public class ChooseAccountTypeActivity extends Activity implements OnItemSelecte
 
         @Override
         public long getItemId(int position) {
-            // TODO Auto-generated method stub
             return position;
         }
 
@@ -153,6 +154,14 @@ public class ChooseAccountTypeActivity extends Activity implements OnItemSelecte
     @Override
     public void onNothingSelected(AdapterView<?> arg0) {
         // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void onClick(View v) {
+        if(v == mCustomButton) {
+            LoginActivity.startLoginActivity(this, null);
+        }
         
     }
 }

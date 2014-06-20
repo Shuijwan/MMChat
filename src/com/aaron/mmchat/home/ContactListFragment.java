@@ -7,14 +7,20 @@ import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ExpandableListView;
+import android.widget.ExpandableListView.OnChildClickListener;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.aaron.mmchat.R;
+import com.aaron.mmchat.chat.ChatActivity;
+import com.aaron.mmchat.core.ChatManager;
 import com.aaron.mmchat.core.Contact;
 import com.aaron.mmchat.core.ContactGroup;
 import com.aaron.mmchat.core.ContactManager;
+import com.aaron.mmchat.core.P2PChat;
 import com.aaron.mmchat.core.ContactManager.ContactListCallback;
 import com.aaron.mmchat.core.MMContext;
 import com.aaron.mmchat.widget.AbstractStickyHeaderExpandableListViewAdapter;
@@ -33,15 +39,16 @@ import java.util.Map;
  * @Date: 2014-6-14
  */
 
-public class ContactListFragment extends Fragment {
+public class ContactListFragment extends Fragment implements OnChildClickListener, OnItemLongClickListener {
 
     private ExpandableListView mExpandableListView;
     private ContactListAdapter mAdapter;
+    private ChatManager mChatManager;
 
     @Override
     public void onAttach(Activity activity) {
-        // TODO Auto-generated method stub
         super.onAttach(activity);
+        mChatManager = (ChatManager) MMContext.getInstance(activity).getService(MMContext.CHAT_SERVICE);
     }
 
     @Override
@@ -55,6 +62,8 @@ public class ContactListFragment extends Fragment {
         mAdapter = new ContactListAdapter();
 
         mExpandableListView.setAdapter(mAdapter);
+        mExpandableListView.setOnChildClickListener(this);
+        mExpandableListView.setOnItemLongClickListener(this);
 
         return root;
     }
@@ -272,6 +281,23 @@ public class ContactListFragment extends Fragment {
     public void onStop() {
         // TODO Auto-generated method stub
         super.onStop();
+    }
+
+    @Override
+    public boolean onChildClick(ExpandableListView parent, View v, int groupPosition,
+            int childPosition, long id) {
+//        ContactGroup contactGroup = mAdapter.getGroup(groupPosition);
+//        Contact contact = mAdapter.getChild(groupPosition, childPosition);
+//        P2PChat p2pChat = mChatManager.getOrCreateP2PChat(contactGroup.getClientJid(), contact.getJid());
+//        p2pChat.sendMessage("Haloe");
+        ChatActivity.startChatActivity(getActivity(), "");
+        return false;
+    }
+
+    @Override
+    public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+        // TODO Auto-generated method stub
+        return false;
     }
 
 }

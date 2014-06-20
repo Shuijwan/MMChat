@@ -11,6 +11,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.aaron.mmchat.core.AccountManager;
+import com.aaron.mmchat.core.MMContext;
 import com.aaron.mmchat.core.AccountManager.Account;
 import com.aaron.mmchat.core.LoginManager;
 
@@ -49,6 +50,8 @@ import javax.net.ssl.X509TrustManager;
 
 public class LoginManagerService extends BaseManagerService implements LoginManager {
 
+    private static final String TAG = LoginManagerService.class.getSimpleName();
+    
     private static final int DEFAULT_PORT = 5222;
     
     private boolean mEntityCapInited = false;
@@ -157,8 +160,9 @@ public class LoginManagerService extends BaseManagerService implements LoginMana
         
         dm.addReceiptReceivedListener(new ReceiptReceivedListener() { // DOES NOT WORK IN CARBONS
             public void onReceiptReceived(String fromJid, String toJid, String receiptId) {
-                Log.d("TTT", "got delivery receipt for " + receiptId);
-//                changeMessageDeliveryStatus(receiptId, ChatConstants.DS_ACKED);
+                Log.i("TTT","from:"+fromJid+"   to:"+toJid+"   receiptId:"+receiptId);
+                ChatManagerService chatManagerService = (ChatManagerService) MMContext.peekInstance().getService(MMContext.CHAT_SERVICE);
+                chatManagerService.updateMessageDeliverStatus();
             }});
     }
     
@@ -175,6 +179,7 @@ public class LoginManagerService extends BaseManagerService implements LoginMana
                     jid = connection.connection.getUser();
                     sConnections.put(jid, connection);
                     notifyLoginSuccess(jid);
+                    Log.d(TAG, "login success:"+jid);
                     AccountManager.getInstance(mContext).addAccount(jid, domain, username, password);
                 } catch (SmackException e) {
                     e.printStackTrace();

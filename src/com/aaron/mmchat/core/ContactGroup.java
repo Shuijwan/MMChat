@@ -92,6 +92,10 @@ public class ContactGroup extends BaseXmppObject {
         }
     }
     
+    public String getClientJid() {
+        return mClientJid;
+    }
+    
     /**
      * register callback to listen to ContactGroup changed
      * 
