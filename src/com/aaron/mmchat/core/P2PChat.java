@@ -15,6 +15,7 @@ import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.SmackException.NotConnectedException;
 import org.jivesoftware.smack.packet.Message;
+import org.jivesoftware.smack.packet.Message.Type;
 import org.jivesoftware.smackx.receipts.DeliveryReceiptRequest;
 
 import java.util.ArrayList;
@@ -72,8 +73,10 @@ public class P2PChat extends BaseChat implements MessageListener {
         msg.setBody(text);
         msg.addExtension(new DeliveryReceiptRequest());
         String packedId = msg.getPacketID();
+        Log.i("TTT","packetId:"+packedId);
         try {
             mChat.sendMessage(msg);
+            Log.i("TTT", "threadId:"+msg.getThread());
             addMessage(new InstantMessage(msg, true));
             notifyMessageSent();
         } catch (NotConnectedException e) {
@@ -85,9 +88,11 @@ public class P2PChat extends BaseChat implements MessageListener {
     
     @Override
     public void processMessage(Chat chat, Message message) {
-        Log.i("TTT", "msg:"+message.toString());
-        addMessage(new InstantMessage(message, false));
-        notifyMessageReceived();
+        Log.i("TTT", "msg:"+message.toString()+" type:"+message.getType());
+        if(message.getType() == Type.chat) {
+            addMessage(new InstantMessage(message, false));
+            notifyMessageReceived();
+        }
         
     }
 

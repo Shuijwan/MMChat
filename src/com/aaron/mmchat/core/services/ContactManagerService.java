@@ -421,10 +421,6 @@ public class ContactManagerService extends BaseManagerService implements Contact
         return Collections.unmodifiableList(mAllContactLists.get(clientJid));
     }
     
-    public HashMap<String, Contact> getContactsMap(String clientJid) {
-        return mAllContactsMap.get(clientJid);
-    }
-    
     public Contact getOrCreateContact(String clientJid, RosterEntry entry) {
         HashMap<String, Contact> map = mAllContactsMap.get(clientJid);
         if(map == null) {

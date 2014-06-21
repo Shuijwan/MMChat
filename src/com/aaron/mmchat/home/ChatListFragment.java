@@ -13,12 +13,16 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.aaron.mmchat.R;
+import com.aaron.mmchat.chat.ChatActivity;
 import com.aaron.mmchat.core.ChatManager;
 import com.aaron.mmchat.core.GroupChat;
 import com.aaron.mmchat.core.MMContext;
@@ -37,7 +41,7 @@ import java.util.ArrayList;
  *
  */
 
-public class ChatListFragment extends Fragment {
+public class ChatListFragment extends Fragment implements OnItemClickListener, OnItemLongClickListener {
 
     private ChatListAdapter mAdapter;
     
@@ -56,6 +60,8 @@ public class ChatListFragment extends Fragment {
         mAdapter = new ChatListAdapter();
         listView.setAdapter(mAdapter);
         
+        listView.setOnItemClickListener(this);
+        listView.setOnItemLongClickListener(this);
         return view;
     }
 
@@ -118,7 +124,6 @@ public class ChatListFragment extends Fragment {
 
         @Override
         public long getItemId(int position) {
-            // TODO Auto-generated method stub
             return position;
         }
 
@@ -142,7 +147,6 @@ public class ChatListFragment extends Fragment {
             Object item = getItem(position);
             if(item instanceof P2PChat) {
                 P2PChat p2pChat = (P2PChat) item;
-                holder.icon.setImageResource(R.drawable.default_avatar);
                 holder.name.setText(p2pChat.getParticipantName());
                 holder.lastMessage.setText("fsdfds");
                 holder.time.setText("10:10");
@@ -161,5 +165,17 @@ public class ChatListFragment extends Fragment {
         TextView lastMessage;
         TextView time;
         TextView unreadCount;
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+        P2PChat chat = (P2PChat) mAdapter.getItem(arg2);
+        ChatActivity.startP2PChatActivity(getActivity(), chat.getClientJid(), chat.getParticipantJid());
+    }
+
+    @Override
+    public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+        // TODO Auto-generated method stub
+        return false;
     }
 }

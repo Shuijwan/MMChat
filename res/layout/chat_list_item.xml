@@ -4,14 +4,17 @@
     android:layout_height="60dip"
     android:background="@drawable/list_item_selector"
     android:paddingLeft="8dp"
-    android:paddingRight="8dp" >
+    android:paddingRight="8dp" 
+    android:paddingTop="5dip"
+    android:paddingBottom="5dip">
 
     <ImageView
         android:id="@+id/icon"
         android:layout_width="50dip"
         android:layout_height="50dip"
         android:layout_centerVertical="true"
-        android:scaleType="fitXY" />
+        android:layout_marginRight="8dp"
+        android:src="@drawable/default_avatar"/>
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -24,7 +27,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:layout_marginTop="3dp"
             android:gravity="center_vertical"
             android:text="10:10"
             android:textColor="@color/contact_presence_text_selector"

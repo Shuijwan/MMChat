@@ -9,6 +9,8 @@ package com.aaron.mmchat.core.services;
 
 import com.aaron.mmchat.core.ChatManager;
 import com.aaron.mmchat.core.GroupChat;
+import com.aaron.mmchat.core.LoginManager;
+import com.aaron.mmchat.core.LoginManager.LoginCallback;
 import com.aaron.mmchat.core.P2PChat;
 import com.aaron.mmchat.core.PersistentGroupChat;
 
@@ -30,18 +32,22 @@ import java.util.Set;
  *
  */
 
-public class ChatManagerService extends BaseManagerService implements ChatManager {
+public class ChatManagerService extends BaseManagerService implements ChatManager, LoginCallback {
     
     private ArrayList<P2PChat> mP2pChats;
     private ArrayList<GroupChat> mGroupChats;
     private ArrayList<PersistentGroupChat> mPersistentGroupChats;
     private Set<ChatListCallback> mCallbacks;
+    
+    private LoginManager mLoginManager;
 
-    public ChatManagerService() {
+    public ChatManagerService(LoginManager manager) {
         mP2pChats = new ArrayList<P2PChat>();
         mGroupChats = new ArrayList<GroupChat>();
         mPersistentGroupChats = new ArrayList<PersistentGroupChat>();
         mCallbacks = new HashSet<ChatManager.ChatListCallback>();
+        mLoginManager = manager;
+        mLoginManager.registerLoginCallback(this);
     }
 
     @Override
@@ -90,7 +96,7 @@ public class ChatManagerService extends BaseManagerService implements ChatManage
         
         XMPPConnection connection = getXmppConnection(clientJid);
         org.jivesoftware.smack.ChatManager chatManager = org.jivesoftware.smack.ChatManager.getInstanceFor(connection);
-        chatManager.addChatListener(new ChatCreatedListener(clientJid));
+   
         Chat chat = chatManager.createChat(jid, null);
         P2PChat p2pChat = new P2PChat(clientJid, chat);
         mP2pChats.add(p2pChat);
@@ -100,8 +106,8 @@ public class ChatManagerService extends BaseManagerService implements ChatManage
 
     @Override
     public void removeP2PChat(P2PChat chat) {
-        // TODO Auto-generated method stub
-        
+        mP2pChats.remove(chat);
+        notifyP2PChatRemoved(chat);
     }
 
     @Override
@@ -138,6 +144,12 @@ public class ChatManagerService extends BaseManagerService implements ChatManage
         }
     }
     
+    private void notifyP2PChatRemoved(P2PChat chat) {
+        for(ChatListCallback callback : mCallbacks) {
+            callback.onP2PChatRemoved(chat);
+        }
+    }
+    
     class ChatCreatedListener implements ChatManagerListener {
 
         private String mClientJid;
@@ -155,6 +167,19 @@ public class ChatManagerService extends BaseManagerService implements ChatManage
             mP2pChats.add(p2pChat);
             notifyP2PChatCreated(p2pChat);
         }
+        
+    }
+
+    @Override
+    public void onLoginSuccessed(String clientJid) {
+        XMPPConnection connection = getXmppConnection(clientJid);
+        org.jivesoftware.smack.ChatManager chatManager = org.jivesoftware.smack.ChatManager.getInstanceFor(connection);
+        chatManager.addChatListener(new ChatCreatedListener(clientJid));
+    }
+
+    @Override
+    public void onLoginFailed(String clientJid, int errorcode) {
+        // TODO Auto-generated method stub
         
     }
 }

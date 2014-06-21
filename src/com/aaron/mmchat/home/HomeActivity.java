@@ -28,6 +28,7 @@ public class HomeActivity extends Activity implements MenuCallback {
 
     public static void startHomeActivity(Context context) {
         Intent intent = new Intent(context, HomeActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         context.startActivity(intent);
     }
 
@@ -119,6 +120,10 @@ public class HomeActivity extends Activity implements MenuCallback {
         fragmentTransaction.commitAllowingStateLoss();
     }
 
+    public void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+    }
+    
     @Override
     public final boolean onOptionsItemSelected(MenuItem item) {
         if(item.getItemId() == android.R.id.home) {

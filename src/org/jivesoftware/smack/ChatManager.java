@@ -260,7 +260,7 @@ public class ChatManager extends Manager{
         String userJID = message.getFrom();
         // According to RFC6120 8.1.2.1 4. messages without a 'from' attribute are valid, but they
         // are of no use in this case for ChatManager
-        if (userJID == null) {
+        if (userJID == null || !userJID.contains("@")) {
             return null;
         }
         String threadID = message.getThread();

@@ -40,7 +40,7 @@ public class MMContext {
         LoginManagerService loginManagerService = new LoginManagerService(appContext);
         mServices.put(LOGIN_SERVICE, loginManagerService);
         mServices.put(CONTACT_SERVICE, new ContactManagerService(loginManagerService));
-        mServices.put(CHAT_SERVICE, new ChatManagerService());
+        mServices.put(CHAT_SERVICE, new ChatManagerService(loginManagerService));
         
         SmackAndroid.init(appContext);
     }

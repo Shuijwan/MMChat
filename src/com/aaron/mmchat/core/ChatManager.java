@@ -26,6 +26,7 @@ public interface ChatManager {
     public static interface ChatListCallback {
         
         public void onP2PChatCreated(P2PChat chat);
+        public void onP2PChatRemoved(P2PChat chat);
         
     }
     

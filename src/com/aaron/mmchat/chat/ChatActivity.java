@@ -67,6 +67,12 @@ public class ChatActivity extends Activity implements OnRefreshListener, OnClick
         context.startActivity(intent);
     }
     
+    public static void startGroupChatActivity(Context context, String clientJid, String jid) {
+        Intent intent = new Intent(context, ChatActivity.class);
+        intent.putExtra("clientJid", clientJid);
+        intent.putExtra("jid", jid);
+        context.startActivity(intent);
+    }
 
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private ListView mListView;
