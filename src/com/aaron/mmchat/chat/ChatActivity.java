@@ -47,6 +47,8 @@ import com.aaron.mmchat.core.P2PChat;
 import com.aaron.mmchat.home.ContactListFragment.ViewHolder;
 import com.aaron.mmchat.utils.ViewUtils;
 
+import java.util.ArrayList;
+
 /**
  *
  * @Title: ChatActivity.java
@@ -127,6 +129,10 @@ public class ChatActivity extends Activity implements OnRefreshListener, OnClick
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
         mChatSessionListAdapter = new ChatSessionListAdapter();
         actionBar.setListNavigationCallbacks(mChatSessionListAdapter, this);
+        
+        ArrayList<P2PChat> list = mChatManager.getP2PChatList();
+        actionBar.setSelectedNavigationItem(list.indexOf(mCurrentChat));
+        
     }
     
     @Override

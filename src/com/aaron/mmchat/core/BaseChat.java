@@ -14,7 +14,7 @@ import java.util.LinkedList;
  *
  * @Title: BaseChat.java
  * @Package: com.aaron.mmchat.core
- * @Description: 
+ * @Description: Base class for P2PChat and GroupChat
  * 
  * @Author: aaron
  * @Date: 2014-6-21
@@ -80,6 +80,10 @@ public abstract class BaseChat {
     
     protected void addMessage(Message msg) {
         mMessages.add(msg);
+    }
+    
+    public Message getLastMessage() {
+        return mMessages.peekLast();
     }
     
     public abstract void sendMessage(String text);

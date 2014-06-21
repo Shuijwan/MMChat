@@ -7,8 +7,6 @@
 
 package com.aaron.mmchat.core;
 
-import android.util.Log;
-
 import com.aaron.mmchat.core.services.ContactManagerService;
 
 import org.jivesoftware.smack.Chat;
@@ -18,14 +16,11 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Message.Type;
 import org.jivesoftware.smackx.receipts.DeliveryReceiptRequest;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  *
  * @Title: P2PChat.java
  * @Package: com.aaron.mmchat.core
- * @Description: 
+ * @Description: a P2P chat session
  * 
  * @Author: aaron
  * @Date: 2014-6-15
@@ -34,8 +29,8 @@ import java.util.List;
 
 public class P2PChat extends BaseChat implements MessageListener {
     
-    private Chat mChat;
-    private Contact mContact;
+    private Chat mChat;      //internal smack Chat object
+    private Contact mContact;//peer contact, may be null, if it is not in our buddylist
     
     public P2PChat(String clientJid, Chat chat) {
         super(clientJid);
@@ -45,8 +40,12 @@ public class P2PChat extends BaseChat implements MessageListener {
         mContact = contactManager.getContact(clientJid, chat.getParticipant());
     }
     
+    /**
+     * get Participant display name, if it is in buddylist, return Contact's name,
+     * otherwise return the jid.
+     * 
+     * */
     public String getParticipantName() {
-        
         if(mContact != null) {
             return mContact.getName();
         }
@@ -57,10 +56,18 @@ public class P2PChat extends BaseChat implements MessageListener {
         return null;
     }
     
+    /**
+     * return related Contact object of this participant, may be null if not in buddylist
+     * 
+     * */
     public Contact getParticipantContact() {
         return mContact;
     }
     
+    /**
+     * return the participant's jid
+     * 
+     * */
     public String getParticipantJid() {
         if(mChat != null) {
             return mChat.getParticipant();
@@ -68,15 +75,18 @@ public class P2PChat extends BaseChat implements MessageListener {
         return null;
     }
     
+    /**
+     * send IM message
+     * @param text, the message content
+     * 
+     * */
     public void sendMessage(String text) {
         Message msg = new Message();
         msg.setBody(text);
         msg.addExtension(new DeliveryReceiptRequest());
-        String packedId = msg.getPacketID();
-        Log.i("TTT","packetId:"+packedId);
+
         try {
-            mChat.sendMessage(msg);
-            Log.i("TTT", "threadId:"+msg.getThread());
+            mChat.sendMessage(msg);            
             addMessage(new InstantMessage(msg, true));
             notifyMessageSent();
         } catch (NotConnectedException e) {
@@ -88,7 +98,6 @@ public class P2PChat extends BaseChat implements MessageListener {
     
     @Override
     public void processMessage(Chat chat, Message message) {
-        Log.i("TTT", "msg:"+message.toString()+" type:"+message.getType());
         if(message.getType() == Type.chat) {
             addMessage(new InstantMessage(message, false));
             notifyMessageReceived();
