@@ -18,14 +18,20 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnFocusChangeListener;
 import android.view.View.OnTouchListener;
+import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
+import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ListView;
 
 import com.aaron.mmchat.R;
+import com.aaron.mmchat.core.BaseChat;
+import com.aaron.mmchat.core.ChatManager;
+import com.aaron.mmchat.core.InstantMessage;
+import com.aaron.mmchat.core.MMContext;
 import com.aaron.mmchat.utils.ViewUtils;
 
 /**
@@ -41,8 +47,9 @@ import com.aaron.mmchat.utils.ViewUtils;
 
 public class ChatActivity extends Activity implements OnRefreshListener, OnClickListener {
     
-    public static void startChatActivity(Context context, String jid) {
+    public static void startP2PChatActivity(Context context, String clientJid, String jid) {
         Intent intent = new Intent(context, ChatActivity.class);
+        intent.putExtra("clientJid", clientJid);
         intent.putExtra("jid", jid);
         context.startActivity(intent);
     }
@@ -53,6 +60,9 @@ public class ChatActivity extends Activity implements OnRefreshListener, OnClick
     private ImageView mMultiMediaButton;
     private GridView mMultiMediaPanel;
     private EditText mTextInput;
+    private MessageAdapter mAdapter;
+    private BaseChat mCurrentChat;
+    private ChatManager mChatManager;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +82,13 @@ public class ChatActivity extends Activity implements OnRefreshListener, OnClick
         mMultiMediaButton.setOnClickListener(this);
         mTextInput.setOnClickListener(this);
  
+        mChatManager = (ChatManager) MMContext.peekInstance().getService(MMContext.CHAT_SERVICE);
+        String clientJid = getIntent().getStringExtra("clientJid");
+        String jid = getIntent().getStringExtra("jid");
         
+        mCurrentChat = mChatManager.getOrCreateP2PChat(clientJid, jid);
+        mAdapter = new MessageAdapter();
+        mListView.setAdapter(mAdapter);
     }
 
     @Override
@@ -113,12 +129,36 @@ public class ChatActivity extends Activity implements OnRefreshListener, OnClick
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        hideMultiMediaPanel();
-        ViewUtils.hideKeyboard(this);
-        return false;
+        if(event.getAction() == MotionEvent.ACTION_DOWN) {
+            hideMultiMediaPanel();
+            ViewUtils.hideKeyboard(this);
+        }
+        return super.onTouchEvent(event);
     }
     
-    
-    
-    
+    class MessageAdapter extends BaseAdapter {
+
+        @Override
+        public int getCount() {
+            return mCurrentChat.getMessageList().size();
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return mCurrentChat.getMessageList().get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            InstantMessage msg = (InstantMessage) getItem(position);
+            
+            return null;
+        }
+        
+    }
 }

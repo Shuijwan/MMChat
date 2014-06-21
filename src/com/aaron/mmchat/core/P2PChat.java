@@ -28,25 +28,39 @@ import java.util.ArrayList;
  *
  */
 
-public class P2PChat implements MessageListener {
+public class P2PChat extends BaseChat implements MessageListener {
     
     public static interface P2PChatCallback {
         public void onMessageSent();
         public void onMessageSentFailed();
+        public void onMessageReceived();
     }
     
     private Chat mChat;
     private ArrayList<P2PChatCallback> mCallbacks;
-    private String mClientJid; 
     
     public P2PChat(String clientJid, Chat chat) {
-        mClientJid = clientJid;
+        super(clientJid);
         mChat = chat;
         mChat.addMessageListener(this);
     }
     
     private void notifyMessageSentFailed() {
-        
+        for(P2PChatCallback callback : mCallbacks) {
+            callback.onMessageSentFailed();
+        }
+    }
+    
+    private void notifyMessageSent() {
+        for(P2PChatCallback callback : mCallbacks) {
+            callback.onMessageSent();
+        }
+    }
+    
+    private void notifyMessageReceived() {
+        for(P2PChatCallback callback : mCallbacks) {
+            callback.onMessageReceived();
+        }
     }
     
     public String getParticipant() {
@@ -56,10 +70,6 @@ public class P2PChat implements MessageListener {
         return null;
     }
     
-    public String getClientJid() {
-        return mClientJid;
-    }
-    
     public void sendMessage(String text) {
         Message msg = new Message();
         msg.setBody(text);
@@ -67,15 +77,20 @@ public class P2PChat implements MessageListener {
         String packedId = msg.getPacketID();
         try {
             mChat.sendMessage(msg);
+            addMessage(new InstantMessage(msg, true));
+            notifyMessageSent();
         } catch (NotConnectedException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
+            notifyMessageSentFailed();
         }
     }
-
+    
     @Override
     public void processMessage(Chat chat, Message message) {
         Log.i("TTT", "msg:"+message.toString());
+        addMessage(new InstantMessage(message, false));
+        notifyMessageReceived();
         
     }
 

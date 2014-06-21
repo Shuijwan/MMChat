@@ -7,6 +7,8 @@
 
 package com.aaron.mmchat.core;
 
+import android.R.bool;
+
 /**
  *
  * @Title: Message.java
@@ -18,6 +20,28 @@ package com.aaron.mmchat.core;
  *
  */
 
-public class Message {
-
+public abstract class Message {
+    protected String mFrom;
+    protected String mDate;
+    protected boolean mSelfMessage;
+    
+    public Message(String from, String date, boolean self) {
+        mFrom = from;
+        mDate = date;
+        mSelfMessage = self;
+    }
+    
+    public abstract Object getContent();
+    
+    public String getDate() {
+        return mDate;
+    }
+    
+    public String getFrom() {
+        return mFrom;
+    }
+    
+    public boolean isSelfMessage() {
+        return mSelfMessage;
+    }
 }

@@ -5,4 +5,17 @@
     <color name="contact_group_bg_normal">#E6FAFAFA</color>
     <color name="contact_group_bg_pressed">#E6EEEEEE</color>
     <color name="list_item_pressed_or_activated">#00ABF4</color>
+    
+    
+     <!-- text color -->
+    <color name="text_color_c1">#333333</color>
+    <color name="text_color_c2">#666666</color>
+    <color name="text_color_c3">#999999</color>
+    <color name="text_color_c4">#CCCCCC</color>
+    <color name="text_color_c5">#FFFFFF</color>
+    <color name="text_color_c6">#BFFFFFFF</color>
+    <color name="text_color_c7">#EF2016</color>
+    <color name="text_color_c8">#00A1E0</color>
+    <color name="text_color_c9">#BFEF2016</color>
+    <color name="text_color_c10">#B4B4B4</color>
 </resources>

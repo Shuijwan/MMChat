@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<!-- text size static -->
+    <dimen name="text_size_static_s0">11dp</dimen>
+    <dimen name="text_size_static_s1">11dp</dimen>
+    <dimen name="text_size_static_s11">12dp</dimen>
+    <dimen name="text_size_static_s2">13dp</dimen>
+    <dimen name="text_size_static_s3">14dp</dimen>
+    <dimen name="text_size_static_s4">15dp</dimen>
+    <dimen name="text_size_static_s5">16dp</dimen>
+    <dimen name="text_size_static_s6">18dp</dimen>
+    <dimen name="text_size_static_s7">20dp</dimen>
+    <dimen name="text_size_static_s8">24dp</dimen>
+    <dimen name="text_size_static_s9">30dp</dimen>
+    <dimen name="text_size_static_s10">47dp</dimen>
+    
+    <!-- text size dynamic -->
+    <dimen name="text_size_dynamic_s0">11sp</dimen>
+    <dimen name="text_size_dynamic_s1">11sp</dimen>
+    <dimen name="text_size_dynamic_s11">12sp</dimen>
+    <dimen name="text_size_dynamic_s2">13sp</dimen>
+    <dimen name="text_size_dynamic_s3">14sp</dimen>
+    <dimen name="text_size_dynamic_s4">15sp</dimen>
+    <dimen name="text_size_dynamic_s5">16sp</dimen>
+    <dimen name="text_size_dynamic_s6">18sp</dimen>
+    <dimen name="text_size_dynamic_s7">20sp</dimen>
+    <dimen name="text_size_dynamic_s8">24sp</dimen>
+    <dimen name="text_size_dynamic_s9">30sp</dimen>
+    <dimen name="text_size_dynamic_s10">47sp</dimen>    
+</resources>

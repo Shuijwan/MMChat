@@ -286,11 +286,11 @@ public class ContactListFragment extends Fragment implements OnChildClickListene
     @Override
     public boolean onChildClick(ExpandableListView parent, View v, int groupPosition,
             int childPosition, long id) {
-//        ContactGroup contactGroup = mAdapter.getGroup(groupPosition);
-//        Contact contact = mAdapter.getChild(groupPosition, childPosition);
+        ContactGroup contactGroup = mAdapter.getGroup(groupPosition);
+        Contact contact = mAdapter.getChild(groupPosition, childPosition);
 //        P2PChat p2pChat = mChatManager.getOrCreateP2PChat(contactGroup.getClientJid(), contact.getJid());
 //        p2pChat.sendMessage("Haloe");
-        ChatActivity.startChatActivity(getActivity(), "");
+        ChatActivity.startP2PChatActivity(getActivity(), contactGroup.getClientJid(), contact.getJid());
         return false;
     }
 
