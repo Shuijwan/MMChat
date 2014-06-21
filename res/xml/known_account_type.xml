@@ -12,4 +12,5 @@
 	<account-type id="cisco jabber" icon="cisco" name="cisco" domain="cisco.com" port="5222" ssl="1" needsrv="1" description="username@cisco.com"/>
 	<account-type id="gtalk" icon="gtalk" name="gtalk" domain="gmail.com" port="5222" ssl="1" needsrv="1" description="username@gmail.com"/>
 	<account-type id="weibo" icon="weibo" name="weibo" domain="xmpp.weibo.com" port="5222" ssl="1" needsrv="0" description="weibo account name"/>
+	<account-type id="renrern" icon="renren" name="renren" domain="talk.renren.com" port="5222" ssl="1" needsrv="0" description="renren account name"/>
 </known-account-type>

@@ -10,6 +10,7 @@
     <string name="cisco">Cisco Jabber</string>
     <string name="gtalk">GTalk</string>
     <string name="weibo">Sina Weibo</string>
+    <string name="renren">RenRen</string>
     
     <string name="input_account_info">Please input the username and password.</string>
     <string name="username">Account Name</string>
