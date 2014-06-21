@@ -85,7 +85,8 @@ public class ContactGroup extends BaseXmppObject {
         Collection<RosterEntry> entries = mRosterGroup.getEntries();
         Contact contact;
         for(RosterEntry entry : entries) {
-            contact = new Contact(entry);
+            ContactManagerService contactManager = (ContactManagerService) MMContext.peekInstance().getService(MMContext.CONTACT_SERVICE);
+            contact = contactManager.getOrCreateContact(mClientJid, entry);
             mContacts.add(contact);
             mContactMap.put(entry.getUser(), contact);
             Log.i("TTT", "c:"+entry.getUser());
@@ -159,7 +160,9 @@ public class ContactGroup extends BaseXmppObject {
         if(mContactMap.containsKey(rosterEntry.getUser())) {
             return false;
         }
-        Contact contact = new Contact(rosterEntry);
+        
+        ContactManagerService contactManager = (ContactManagerService) MMContext.peekInstance().getService(MMContext.CONTACT_SERVICE);
+        Contact contact = contactManager.getOrCreateContact(mClientJid, rosterEntry);
         mContacts.add(contact);
         mContactMap.put(rosterEntry.getUser(), contact);
         notifyContactAdded(rosterEntry.getUser());

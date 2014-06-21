@@ -9,6 +9,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
+import android.view.MenuItem;
+
 import com.aaron.mmchat.R;
 import com.aaron.mmchat.core.AccountManager;
 import com.aaron.mmchat.home.MenuFragment.MenuCallback;
@@ -117,6 +119,14 @@ public class HomeActivity extends Activity implements MenuCallback {
         fragmentTransaction.commitAllowingStateLoss();
     }
 
+    @Override
+    public final boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId() == android.R.id.home) {
+            mDrawerToggle.onOptionsItemSelected(item);
+        }
+        return true;
+    }
+    
     @Override
     public void onActiveMenuChanged(int menuId) {
         switchFragmentTo(menuId);

@@ -72,7 +72,7 @@ public class ChatManagerService extends BaseManagerService implements ChatManage
     @Override
     public P2PChat getP2PChat(String clientJid, String jid) {
         for(P2PChat chat : mP2pChats) {
-            if(clientJid.equals(chat.getClientJid()) && jid.equals(chat.getParticipant())) {
+            if(clientJid.equals(chat.getClientJid()) && jid.equals(chat.getParticipantJid())) {
                 return chat;
             }
         }
@@ -83,7 +83,7 @@ public class ChatManagerService extends BaseManagerService implements ChatManage
     public P2PChat getOrCreateP2PChat(String clientJid, String jid) {
         
         for(P2PChat chat : mP2pChats) {
-            if(clientJid.equals(chat.getClientJid()) && jid.equals(chat.getParticipant())) {
+            if(clientJid.equals(chat.getClientJid()) && jid.equals(chat.getParticipantJid())) {
                 return chat;
             }
         }

@@ -11,6 +11,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -68,6 +69,9 @@ public class LoginActivity extends Activity implements OnClickListener, LoginCal
         
         mAccountTypeIcon.setImageResource(mAccount.icon);
         mAccountTypeName.setText(mAccount.name);
+        if(!TextUtils.isEmpty(mAccount.description)) {
+            mUserName.setHint(mAccount.description);
+        }
         
         mLogin.setOnClickListener(this);
         

@@ -9,6 +9,8 @@ package com.aaron.mmchat.core;
 
 import android.util.Log;
 
+import com.aaron.mmchat.core.services.ContactManagerService;
+
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.SmackException.NotConnectedException;
@@ -16,6 +18,7 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smackx.receipts.DeliveryReceiptRequest;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -30,40 +33,34 @@ import java.util.ArrayList;
 
 public class P2PChat extends BaseChat implements MessageListener {
     
-    public static interface P2PChatCallback {
-        public void onMessageSent();
-        public void onMessageSentFailed();
-        public void onMessageReceived();
-    }
-    
     private Chat mChat;
-    private ArrayList<P2PChatCallback> mCallbacks;
+    private Contact mContact;
     
     public P2PChat(String clientJid, Chat chat) {
         super(clientJid);
         mChat = chat;
         mChat.addMessageListener(this);
+        ContactManagerService contactManager = (ContactManagerService) MMContext.peekInstance().getService(MMContext.CONTACT_SERVICE);
+        mContact = contactManager.getContact(clientJid, chat.getParticipant());
     }
     
-    private void notifyMessageSentFailed() {
-        for(P2PChatCallback callback : mCallbacks) {
-            callback.onMessageSentFailed();
+    public String getParticipantName() {
+        
+        if(mContact != null) {
+            return mContact.getName();
         }
-    }
-    
-    private void notifyMessageSent() {
-        for(P2PChatCallback callback : mCallbacks) {
-            callback.onMessageSent();
+        
+        if(mChat != null) {
+            return mChat.getParticipant();
         }
+        return null;
     }
     
-    private void notifyMessageReceived() {
-        for(P2PChatCallback callback : mCallbacks) {
-            callback.onMessageReceived();
-        }
+    public Contact getParticipantContact() {
+        return mContact;
     }
     
-    public String getParticipant() {
+    public String getParticipantJid() {
         if(mChat != null) {
             return mChat.getParticipant();
         }

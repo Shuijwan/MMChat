@@ -7,12 +7,19 @@
 
 package com.aaron.mmchat.chat;
 
+import android.R.mipmap;
+import android.app.ActionBar;
+import android.app.ActionBar.OnNavigationListener;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -25,13 +32,19 @@ import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.aaron.mmchat.R;
 import com.aaron.mmchat.core.BaseChat;
+import com.aaron.mmchat.core.BaseChat.ChatCallback;
 import com.aaron.mmchat.core.ChatManager;
+import com.aaron.mmchat.core.Contact;
 import com.aaron.mmchat.core.InstantMessage;
 import com.aaron.mmchat.core.MMContext;
+import com.aaron.mmchat.core.P2PChat;
+import com.aaron.mmchat.home.ContactListFragment.ViewHolder;
 import com.aaron.mmchat.utils.ViewUtils;
 
 /**
@@ -45,7 +58,7 @@ import com.aaron.mmchat.utils.ViewUtils;
  *
  */
 
-public class ChatActivity extends Activity implements OnRefreshListener, OnClickListener {
+public class ChatActivity extends Activity implements OnRefreshListener, OnClickListener, ChatCallback, TextWatcher, OnNavigationListener {
     
     public static void startP2PChatActivity(Context context, String clientJid, String jid) {
         Intent intent = new Intent(context, ChatActivity.class);
@@ -63,6 +76,8 @@ public class ChatActivity extends Activity implements OnRefreshListener, OnClick
     private MessageAdapter mAdapter;
     private BaseChat mCurrentChat;
     private ChatManager mChatManager;
+    private LayoutInflater mInflater;
+    private ChatSessionListAdapter mChatSessionListAdapter;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,16 +96,41 @@ public class ChatActivity extends Activity implements OnRefreshListener, OnClick
         
         mMultiMediaButton.setOnClickListener(this);
         mTextInput.setOnClickListener(this);
+        mTextInput.addTextChangedListener(this);
  
         mChatManager = (ChatManager) MMContext.peekInstance().getService(MMContext.CHAT_SERVICE);
         String clientJid = getIntent().getStringExtra("clientJid");
         String jid = getIntent().getStringExtra("jid");
         
         mCurrentChat = mChatManager.getOrCreateP2PChat(clientJid, jid);
+        mCurrentChat.registerChatCallback(this);
+        
+        mInflater = LayoutInflater.from(this);
+        
         mAdapter = new MessageAdapter();
         mListView.setAdapter(mAdapter);
+        
+        initActionBar();
+        
     }
 
+    private void initActionBar() {
+        ActionBar actionBar = getActionBar();
+        actionBar.setDisplayShowTitleEnabled(false);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+        mChatSessionListAdapter = new ChatSessionListAdapter();
+        actionBar.setListNavigationCallbacks(mChatSessionListAdapter, this);
+    }
+    
+    @Override
+    public final boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId() == android.R.id.home) {
+            finish();
+        }
+        return true;
+    }
+    
     @Override
     public void onRefresh() {
         
@@ -100,21 +140,35 @@ public class ChatActivity extends Activity implements OnRefreshListener, OnClick
     @Override
     public void onClick(View v) {
         if(v == mMultiMediaButton) {
-            int visibility = mMultiMediaPanel.getVisibility();
-            if(visibility == View.GONE) {
-                ViewUtils.hideKeyboard(this);
-                showMultiMedialPanel();             
+            if(mTextInput.getText().length() > 0) {
+                sendMessage(mTextInput.getText().toString());
             } else {
-                hideMultiMediaPanel();
-                ViewUtils.showKeyboard(this, mTextInput);
-                
+                switchMultiMediaPanel();
             }
+            
         } else if(v == mTextInput) {
             hideMultiMediaPanel();
         }
         
     }
 
+    private void sendMessage(String text) {
+        mCurrentChat.sendMessage(text);
+        mTextInput.setText("");
+    }
+    
+    private void switchMultiMediaPanel() {
+        int visibility = mMultiMediaPanel.getVisibility();
+        if(visibility == View.GONE) {
+            ViewUtils.hideKeyboard(this);
+            showMultiMedialPanel();             
+        } else {
+            hideMultiMediaPanel();
+            ViewUtils.showKeyboard(this, mTextInput);
+            
+        }
+    }
+    
     private void hideMultiMediaPanel() {
         if(mMultiMediaPanel.getVisibility() != View.GONE) {
             mMultiMediaPanel.setVisibility(View.GONE);
@@ -136,7 +190,88 @@ public class ChatActivity extends Activity implements OnRefreshListener, OnClick
         return super.onTouchEvent(event);
     }
     
+    class ChatSessionListAdapter extends BaseAdapter {
+
+        @Override
+        public View getDropDownView(int position, View convertView, ViewGroup parent) {
+           if(convertView == null) {
+               convertView = new TextView(ChatActivity.this);
+           }
+           P2PChat chat = (P2PChat) getItem(position);
+
+           ((TextView)convertView).setText(chat.getParticipantName());
+           return convertView;
+        }
+
+        @Override
+        public int getCount() {
+            return mChatManager.getP2PChatList().size();
+        }
+
+        @Override
+        public Object getItem(int position) {
+            // TODO Auto-generated method stub
+            return mChatManager.getP2PChatList().get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            // TODO Auto-generated method stub
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            ViewHolder holder;
+
+            if (convertView == null) {
+                convertView = mInflater.inflate(R.layout.item_contact_list_contact, parent, false);
+
+                holder = new ViewHolder();
+
+                holder.avator = (ImageView) convertView.findViewById(R.id.contact_avatar);
+
+                holder.name = (TextView) convertView.findViewById(R.id.contact_display_name);
+                holder.presence = (TextView) convertView.findViewById(R.id.contact_presence_text);
+
+                convertView.setTag(holder);
+            } else {
+                holder = (ViewHolder) convertView.getTag();
+            }
+
+            final P2PChat chat = (P2PChat) mCurrentChat;
+
+            holder.name.setText(chat.getParticipantName());
+            holder.presence.setText("");
+            return convertView;
+        }
+        
+    }
+    
+    static class ViewHolder {
+        ImageView avator;
+        TextView name;
+        TextView presence;
+    }
+    
     class MessageAdapter extends BaseAdapter {
+
+        private static final int MESSAGE_TYPE_SELF = 0;
+        private static final int MESSAGE_TYPE_REMOTE = 1;
+        
+        @Override
+        public int getItemViewType(int position) {
+            InstantMessage msg = (InstantMessage) getItem(position);
+            if(msg.isSelfMessage()) {
+                return MESSAGE_TYPE_SELF;
+            }
+            return MESSAGE_TYPE_REMOTE;
+        }
+
+        @Override
+        public int getViewTypeCount() {
+            return 2;
+        }
 
         @Override
         public int getCount() {
@@ -156,9 +291,98 @@ public class ChatActivity extends Activity implements OnRefreshListener, OnClick
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             InstantMessage msg = (InstantMessage) getItem(position);
+            int type = getItemViewType(position);
+            switch (type) {
+                case MESSAGE_TYPE_SELF:
+                    SelfMessageViewHolder holder;
+                    if(convertView == null) {
+                        convertView = mInflater.inflate(R.layout.instant_message_self, null);
+                        holder = new SelfMessageViewHolder();
+                        holder.content = (TextView) convertView.findViewById(R.id.message);
+                        
+                        convertView.setTag(holder);
+                    } else {
+                        holder = (SelfMessageViewHolder) convertView.getTag();
+                    }
+                    
+                    holder.content.setText(msg.getContent());
+                    break;
+                case MESSAGE_TYPE_REMOTE:
+                    RemoteMessageViewHolder holder2;
+                    if(convertView == null) {
+                        convertView = mInflater.inflate(R.layout.instant_message_remote, null);
+                        holder2 = new RemoteMessageViewHolder();
+                        holder2.name = (TextView) convertView.findViewById(R.id.username);
+                        holder2.content = (TextView) convertView.findViewById(R.id.message);
+                        
+                        convertView.setTag(holder2);
+                    } else {
+                        holder2 = (RemoteMessageViewHolder) convertView.getTag();
+                    }
+                    
+                    holder2.name.setText(msg.getFrom());
+                    holder2.content.setText(msg.getContent());
+                    break;
+                
+                default:
+                    break;
+            }
             
-            return null;
+            return convertView;
         }
         
+    }
+
+    static class SelfMessageViewHolder {
+        TextView content;
+    }
+    
+    static class RemoteMessageViewHolder {
+        TextView name;
+        TextView content;
+    }
+    
+    @Override
+    public void onMessageSent() {
+        mAdapter.notifyDataSetChanged();
+        
+    }
+
+    @Override
+    public void onMessageSentFailed() {
+        mAdapter.notifyDataSetChanged();
+        
+    }
+
+    @Override
+    public void onMessageReceived() {
+        mAdapter.notifyDataSetChanged();
+        
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+        int resId = s.length() > 0 ? android.R.drawable.ic_menu_send : android.R.drawable.ic_input_add;
+        mMultiMediaButton.setImageResource(resId);
+    }
+
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(int itemPosition, long itemId) {
+        mCurrentChat = (BaseChat) mChatSessionListAdapter.getItem(itemPosition);
+        mAdapter.notifyDataSetChanged();
+        mChatSessionListAdapter.notifyDataSetChanged();
+        return true;
     }
 }

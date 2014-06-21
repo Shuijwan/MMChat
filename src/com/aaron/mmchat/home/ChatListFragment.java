@@ -143,7 +143,7 @@ public class ChatListFragment extends Fragment {
             if(item instanceof P2PChat) {
                 P2PChat p2pChat = (P2PChat) item;
                 holder.icon.setImageResource(R.drawable.default_avatar);
-                holder.name.setText(p2pChat.getParticipant());
+                holder.name.setText(p2pChat.getParticipantName());
                 holder.lastMessage.setText("fsdfds");
                 holder.time.setText("10:10");
                 holder.unreadCount.setText("1");

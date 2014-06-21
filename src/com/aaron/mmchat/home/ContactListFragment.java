@@ -195,22 +195,23 @@ public class ContactListFragment extends Fragment implements OnChildClickListene
         @Override
         public View getChildView(int groupPosition, int childPosition, boolean isLastChild,
                 View convertView, ViewGroup parent) {
-            View view = convertView;
+
             ViewHolder holder;
 
-            if (view instanceof LinearLayout) {
-                holder = (ViewHolder) view.getTag();
-            } else {
-                view = mLayoutInflater.inflate(R.layout.item_contact_list_contact, parent, false);
+            if (convertView == null) {
+                convertView = mLayoutInflater.inflate(R.layout.item_contact_list_contact, parent, false);
 
                 holder = new ViewHolder();
 
-                holder.avator = (ImageView) view.findViewById(R.id.contact_avatar);
+                holder.avator = (ImageView) convertView.findViewById(R.id.contact_avatar);
 
-                holder.name = (TextView) view.findViewById(R.id.contact_display_name);
-                holder.presence = (TextView) view.findViewById(R.id.contact_presence_text);
+                holder.name = (TextView) convertView.findViewById(R.id.contact_display_name);
+                holder.presence = (TextView) convertView.findViewById(R.id.contact_presence_text);
 
-                view.setTag(holder);
+                convertView.setTag(holder);
+                
+            } else {
+                holder = (ViewHolder) convertView.getTag();
             }
 
             final Contact data = getChild(groupPosition, childPosition);
@@ -218,7 +219,7 @@ public class ContactListFragment extends Fragment implements OnChildClickListene
             holder.name.setText(data.getName());
             holder.presence.setText(data.getPresenceStatus());
 
-            return view;
+            return convertView;
         }
 
         @Override
@@ -247,7 +248,7 @@ public class ContactListFragment extends Fragment implements OnChildClickListene
         }
     }
 
-    static class ViewHolder {
+    public static class ViewHolder {
         ImageView avator;
         TextView name;
         TextView presence;

@@ -167,6 +167,7 @@ public class ContactManagerService extends BaseManagerService implements Contact
     private HashMap<String, HashMap<String, ContactGroup>> mAllContactListsMap;
     private HashMap<String, ArrayList<ContactGroup>> mAllContactLists;
     private HashMap<String, Roster> mRosters;
+    private HashMap<String, HashMap<String,Contact>> mAllContactsMap;
     private ArrayList<ContactListCallback> mCallbacks;
     private LoginManager mLoginManager;
     private ArrayList<String> mPendingAddContacts;
@@ -384,6 +385,7 @@ public class ContactManagerService extends BaseManagerService implements Contact
         mRosters = new HashMap<String, Roster>();
         mAllContactLists = new HashMap<String, ArrayList<ContactGroup>>();
         mAllContactListsMap = new HashMap<String, HashMap<String,ContactGroup>>();
+        mAllContactsMap = new HashMap<String, HashMap<String,Contact>>();
         mLoginManager = manager;
         mLoginManager.registerLoginCallback(this);
     }
@@ -403,6 +405,29 @@ public class ContactManagerService extends BaseManagerService implements Contact
     @Override
     public List<ContactGroup> getContactList(String clientJid) {
         return Collections.unmodifiableList(mAllContactLists.get(clientJid));
+    }
+    
+    public HashMap<String, Contact> getContactsMap(String clientJid) {
+        return mAllContactsMap.get(clientJid);
+    }
+    
+    public Contact getOrCreateContact(String clientJid, RosterEntry entry) {
+        HashMap<String, Contact> map = mAllContactsMap.get(clientJid);
+        if(map == null) {
+            map = new HashMap<String, Contact>();
+            mAllContactsMap.put(clientJid, map);
+        }
+        Contact contact = map.get(entry.getUser());
+        if(contact == null) {
+            contact = new Contact(entry);
+            map.put(entry.getUser(), contact);
+        }
+        return contact;
+    }
+    
+    public Contact getContact(String clientJid, String jid) {
+        HashMap<String, Contact> map = mAllContactsMap.get(clientJid);
+        return map.get(jid);
     }
     
     @Override

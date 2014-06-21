@@ -7,6 +7,7 @@
 
 package com.aaron.mmchat.core;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 
 /**
@@ -22,12 +23,47 @@ import java.util.LinkedList;
 
 public abstract class BaseChat {
     
+    
+    public static interface ChatCallback {
+        public void onMessageSent();
+        public void onMessageSentFailed();
+        public void onMessageReceived();
+    }
+    
     protected String mClientJid;
     protected LinkedList<Message> mMessages;
+    private HashSet<ChatCallback> mCallbacks;
     
     public BaseChat(String clientJid) {
         mClientJid = clientJid;
         mMessages = new LinkedList<Message>();
+        mCallbacks = new HashSet<ChatCallback>();
+    }
+    
+    public void registerChatCallback(ChatCallback callback) {
+        mCallbacks.add(callback);
+    }
+    
+    public void unregisterChatCallback(ChatCallback callback) {
+        mCallbacks.remove(callback);
+    }
+    
+    protected void notifyMessageSentFailed() {
+        for(ChatCallback callback : mCallbacks) {
+            callback.onMessageSentFailed();
+        }
+    }
+    
+    protected void notifyMessageSent() {
+        for(ChatCallback callback : mCallbacks) {
+            callback.onMessageSent();
+        }
+    }
+    
+    protected void notifyMessageReceived() {
+        for(ChatCallback callback : mCallbacks) {
+            callback.onMessageReceived();
+        }
     }
     
     public String getClientJid() {
@@ -38,11 +74,13 @@ public abstract class BaseChat {
         return mMessages;
     }
     
-    public void removeMessage(Message msg) {
+    protected void removeMessage(Message msg) {
         mMessages.remove(msg);
     }
     
-    public void addMessage(Message msg) {
+    protected void addMessage(Message msg) {
         mMessages.add(msg);
     }
+    
+    public abstract void sendMessage(String text);
 }
