@@ -7,7 +7,6 @@
 
 package com.aaron.mmchat.core;
 
-import android.R.bool;
 import android.database.Cursor;
 
 /**

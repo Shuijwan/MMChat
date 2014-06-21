@@ -321,10 +321,16 @@ public class ContactManagerService extends BaseManagerService implements Contact
             for(String jid : addresses) {
                 RosterEntry entry = roster.getEntry(jid);
                 Collection<RosterGroup> groups = entry.getGroups();
-                for(RosterGroup group : groups) {
-                    contactGroup = contactlistMap.get(group.getName());
-                    contactGroup.updateContactRosterEntry(jid, entry);
+                if(groups.size() > 0) { // same entry share same contact, so just update 1 group
+                    Iterator<RosterGroup> groupIterator = groups.iterator();
+                    contactGroup = contactlistMap.get(groupIterator.next().getName());
+                    contactGroup.updateContactRosterEntry(jid, entry);  
                 }
+                
+//                for(RosterGroup group : groups) {
+//                    contactGroup = contactlistMap.get(group.getName());
+//                    contactGroup.updateContactRosterEntry(jid, entry);  
+//                }
             }
         }
         
@@ -336,11 +342,19 @@ public class ContactManagerService extends BaseManagerService implements Contact
             HashMap<String, ContactGroup> contactlistMap = mAllContactListsMap.get(clientJid);
             ContactGroup contactGroup;
             Contact contact;
-            for(RosterGroup group : groups) {
-                contactGroup = contactlistMap.get(group.getName());
+            
+            if(groups.size() > 0) { // same entry share same contact, so just update 1 group
+                Iterator<RosterGroup> groupIterator = groups.iterator();
+                contactGroup = contactlistMap.get(groupIterator.next().getName());
                 contact = contactGroup.getContact(jid);
                 contact.updatePresence();
             }
+            
+//            for(RosterGroup group : groups) {
+//                contactGroup = contactlistMap.get(group.getName());
+//                contact = contactGroup.getContact(jid);
+//                contact.updatePresence();
+//            }
         }
         
         @Override
