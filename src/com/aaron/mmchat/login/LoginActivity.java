@@ -12,6 +12,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -76,8 +77,19 @@ public class LoginActivity extends Activity implements OnClickListener, LoginCal
         mLogin.setOnClickListener(this);
         
         mLoginManager = (LoginManager) MMContext.getInstance(this).getService(MMContext.LOGIN_SERVICE);
+        
+        getActionBar().setDisplayHomeAsUpEnabled(true);
+        getActionBar().setDisplayShowHomeEnabled(true);
     }
 
+    @Override
+    public final boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId() == android.R.id.home) {
+            finish();
+        }
+        return true;
+    }
+    
     @Override
     public void onClick(View v) {
         String username = mUserName.getText().toString();

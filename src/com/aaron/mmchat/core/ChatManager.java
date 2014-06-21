@@ -53,4 +53,6 @@ public interface ChatManager {
     public void createPersistentGroupChat(String[] jids);
     
     public void removePersistentGroupChat(PersistentGroupChat chat);
+    
+    public void removeEmptyChats();
 }

@@ -22,7 +22,7 @@
     <string name="message">Message</string>
     <string name="contact">Contact</string>
     <string name="setting">Setting</string>
-    <string name="accounts">ACCOUNT:</string>
+    <string name="accounts">ACCOUNT</string>
     
     <string name="empty_contact_info">No Contacts. Add contact to start chat.</string>
     <string name="empty_chat_info">No Chats.</string>

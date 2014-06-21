@@ -397,4 +397,9 @@ public class ChatActivity extends Activity implements OnRefreshListener, OnClick
         mChatSessionListAdapter.notifyDataSetChanged();
         return true;
     }
+    
+    public void onDestroy() {
+        super.onDestroy();
+        mChatManager.removeEmptyChats();
+    }
 }

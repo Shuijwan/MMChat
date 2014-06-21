@@ -25,6 +25,7 @@ import com.aaron.mmchat.R;
 import com.aaron.mmchat.chat.ChatActivity;
 import com.aaron.mmchat.core.ChatManager;
 import com.aaron.mmchat.core.GroupChat;
+import com.aaron.mmchat.core.InstantMessage;
 import com.aaron.mmchat.core.MMContext;
 import com.aaron.mmchat.core.P2PChat;
 
@@ -49,6 +50,7 @@ public class ChatListFragment extends Fragment implements OnItemClickListener, O
     public void onAttach(Activity activity) {
         // TODO Auto-generated method stub
         super.onAttach(activity);
+        
     }
 
     @Override
@@ -62,6 +64,8 @@ public class ChatListFragment extends Fragment implements OnItemClickListener, O
         
         listView.setOnItemClickListener(this);
         listView.setOnItemLongClickListener(this);
+        
+        getActivity().getActionBar().setTitle(R.string.message);
         return view;
     }
 
@@ -148,7 +152,12 @@ public class ChatListFragment extends Fragment implements OnItemClickListener, O
             if(item instanceof P2PChat) {
                 P2PChat p2pChat = (P2PChat) item;
                 holder.name.setText(p2pChat.getParticipantName());
-                holder.lastMessage.setText("fsdfds");
+                InstantMessage last = (InstantMessage) p2pChat.getLastMessage();
+                if(last != null) {
+                    holder.lastMessage.setText(last.getContent());
+                } else {
+                    holder.lastMessage.setText("");
+                }
                 holder.time.setText("10:10");
                 holder.unreadCount.setText("1");
             } else {

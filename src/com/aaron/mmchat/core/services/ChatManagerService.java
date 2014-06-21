@@ -19,6 +19,7 @@ import org.jivesoftware.smack.ChatManagerListener;
 import org.jivesoftware.smack.XMPPConnection;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -180,6 +181,20 @@ public class ChatManagerService extends BaseManagerService implements ChatManage
     @Override
     public void onLoginFailed(String clientJid, int errorcode) {
         // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void removeEmptyChats() {
+        Iterator<P2PChat> iterator = mP2pChats.iterator();
+        P2PChat p2pChat;
+        while(iterator.hasNext()) {
+            p2pChat = iterator.next();
+            if(p2pChat.getLastMessage() == null) {
+                iterator.remove();
+                notifyP2PChatRemoved(p2pChat);
+            }
+        }
         
     }
 }
