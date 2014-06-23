@@ -8,6 +8,7 @@
 package com.aaron.mmchat.login;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -27,6 +28,7 @@ import com.aaron.mmchat.core.LoginManager;
 import com.aaron.mmchat.core.LoginManager.LoginCallback;
 import com.aaron.mmchat.core.MMContext;
 import com.aaron.mmchat.home.HomeActivity;
+import com.aaron.mmchat.utils.DialogUtils;
 
 /**
  *
@@ -54,6 +56,7 @@ public class LoginActivity extends Activity implements OnClickListener, LoginCal
     
     private AccountType mAccount;
     private LoginManager mLoginManager;
+    private Dialog mSigninDialog;
     
     public void onCreate(Bundle savedBundle) {
         super.onCreate(savedBundle);
@@ -85,7 +88,7 @@ public class LoginActivity extends Activity implements OnClickListener, LoginCal
     @Override
     public final boolean onOptionsItemSelected(MenuItem item) {
         if(item.getItemId() == android.R.id.home) {
-            finish();
+            onBackPressed();
         }
         return true;
     }
@@ -103,33 +106,31 @@ public class LoginActivity extends Activity implements OnClickListener, LoginCal
             } 
             
             mLoginManager.registerLoginCallback(this);
+            mSigninDialog = DialogUtils.showLoginingDialog(this);
         }
         
     }
 
     @Override
     public void onLoginSuccessed(String clientJid) {
-        runOnUiThread(new Runnable() {       
-            @Override
-            public void run() {
-                Toast.makeText(LoginActivity.this, "login success", Toast.LENGTH_LONG).show();
-                HomeActivity.startHomeActivity(LoginActivity.this);
-            }
-        });
-        
-        
+      
+        Toast.makeText(LoginActivity.this, "login success", Toast.LENGTH_LONG).show();
+        mSigninDialog.dismiss();
+        mLoginManager.unregisterLoginCallback(this);
+        finish();
+        HomeActivity.startHomeActivity(LoginActivity.this);
     }
 
     @Override
     public void onLoginFailed(String clientJid, int errorcode) {
-        runOnUiThread(new Runnable() {
-            
-            @Override
-            public void run() {
-                // TODO Auto-generated method stub
-                Toast.makeText(LoginActivity.this, "login faild", Toast.LENGTH_LONG).show();
-            }
-        });
-        
+      
+        Toast.makeText(LoginActivity.this, "login faild", Toast.LENGTH_LONG).show();
+        mSigninDialog.dismiss();
+        mLoginManager.unregisterLoginCallback(this);
+    }
+    
+    public void onBackPressed() {
+        ChooseAccountTypeActivity.startChooseAccountTypeActivity(this);
+        finish();
     }
 }

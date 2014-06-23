@@ -16,6 +16,12 @@
     <string name="username">Account Name</string>
 	<string name="password">Password</string>
 	<string name="login">Login</string>
+	<string name="logout">Logout</string>
+	<string name="delete">Delete</string>
+	<string name="presence">Presence</string>
+	<string name="account">Account</string>
+	
+	<string name="signing_in">Signing in ...</string>
 	
 	<string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
@@ -24,8 +30,15 @@
     <string name="contact">Contact</string>
     <string name="setting">Setting</string>
     <string name="accounts">ACCOUNT</string>
+    <string name="create_new_account">Create a New Account . . .</string>
     
     <string name="empty_contact_info">No Contacts. Add contact to start chat.</string>
     <string name="empty_chat_info">No Chats.</string>
     
+    <string-array name="presence_status_array">
+        <item >Available</item>
+        <item >Away</item>
+        <item >Do not disturb</item>
+        <item >Unavailable</item>
+    </string-array>
 </resources>

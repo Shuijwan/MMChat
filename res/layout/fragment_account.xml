@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" 
+    android:paddingTop="25dip"
+    android:paddingLeft="25dip"
+    android:paddingRight="25dip">
+    
+    <TextView 
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/presence"
+        android:textSize="16sp"
+        android:textStyle="bold"/>
+    <View 
+        android:layout_width="match_parent"
+        android:layout_height="2dip"
+        android:background="@android:color/darker_gray"
+        android:layout_marginTop="10dip"
+        android:layout_marginBottom="10dip"/>
+    <RelativeLayout 
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <Spinner 
+            android:id="@+id/presence_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:entries="@array/presence_status_array"/>
+        <EditText 
+            android:id="@+id/presence_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/presence_status"/>
+    </RelativeLayout>
+    
+     <TextView 
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="25dip"
+        android:text="@string/account"
+        android:textSize="16sp"
+        android:textStyle="bold"/>
+    <View 
+        android:layout_width="match_parent"
+        android:layout_height="2dip"
+        android:background="@android:color/darker_gray"
+        android:layout_marginTop="10dip"
+        android:layout_marginBottom="10dip"/>
+    <EditText 
+        android:id="@+id/username"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:enabled="false"
+        android:layout_marginTop="10dip"/>
+     <EditText 
+        android:id="@+id/password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textPassword"
+        android:text="******"
+        android:layout_marginTop="15dip"/>
+     <Button 
+         android:id="@+id/login"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:text="@string/login"
+         android:layout_marginTop="20dip"/>
+
+     <Button 
+         android:id="@+id/delete"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:text="@string/delete"
+         android:layout_marginTop="15dip"/>
+
+</LinearLayout>

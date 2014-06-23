@@ -94,7 +94,7 @@ public class AccountType implements Parcelable {
     **/
     public static AccountType getAccountTypeById(String id) {
         for(AccountType accountType : sKnownAccountTypes) {
-            if(accountType.id.equals(id)) {
+            if(accountType.domain.equals(id)) {
                 return accountType;
             }
         }

@@ -1,5 +1,6 @@
 package com.aaron.mmchat.home;
 
+import android.R.interpolator;
 import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
@@ -15,7 +16,9 @@ import android.widget.ListView;
 
 import com.aaron.mmchat.R;
 import com.aaron.mmchat.core.AccountManager;
+import com.aaron.mmchat.core.AccountType;
 import com.aaron.mmchat.core.AccountManager.Account;
+import com.aaron.mmchat.login.ChooseAccountTypeActivity;
 
 import java.util.List;
 
@@ -61,6 +64,7 @@ public class MenuFragment extends Fragment implements OnItemClickListener {
     private MenuAdapter mAdapter;
     private MenuCallback mActiveMenuChangedCallback;
     private int mCurrentActiveMenuId = 0;
+    private ListView mMenuListView;
 
     @Override
     public void onAttach(Activity activity) {
@@ -73,9 +77,11 @@ public class MenuFragment extends Fragment implements OnItemClickListener {
         View view = inflater.inflate(R.layout.fragment_menu, container, false);
         ListView listView = (ListView) view.findViewById(R.id.list_view);
         listView.setOnItemClickListener(this);
-
+        mMenuListView = listView;
+         
         mAdapter = new MenuAdapter();
         listView.setAdapter(mAdapter);
+       
         return view;
     }
 
@@ -111,16 +117,35 @@ public class MenuFragment extends Fragment implements OnItemClickListener {
 
     @Override
     public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+        if(arg2 == mAdapter.getCount() - 1) {
+            createNewAccount();
+            return;
+        }
+        
         if(mCurrentActiveMenuId != arg2) {
+            clearLastActivedMenu();
             if(arg2 < NORMAL_MENU_COUNT) {
                 mActiveMenuChangedCallback.onActiveMenuChanged(arg2);
             } else if(arg2 >= MENU_ACCOUNT) {
                 mActiveMenuChangedCallback.onActiveMenuChanged(arg2);
             }
             mCurrentActiveMenuId = arg2;
+            updateActivedMenu();
         }
         mActiveMenuChangedCallback.onMenuClicked();
         
+    }
+    
+    private void createNewAccount() {
+        ChooseAccountTypeActivity.startChooseAccountTypeActivity(getActivity());
+    }
+    
+    private void updateActivedMenu() {
+        mMenuListView.getChildAt(mCurrentActiveMenuId).setActivated(true);
+    }
+    
+    private void clearLastActivedMenu() {
+        mMenuListView.getChildAt(mCurrentActiveMenuId).setActivated(false);
     }
 
     class MenuAdapter extends BaseAdapter {
@@ -128,6 +153,7 @@ public class MenuFragment extends Fragment implements OnItemClickListener {
         private static final int NORMAL = 0;
         private static final int ACCOUNT_DIVIDER = 1;
         private static final int ACCOUNT = 2;
+        private static final int CREATE_NEW_ACCOUNT = 3;
 
         private List<Account> mAccounts;
         private LayoutInflater mInflater;
@@ -144,18 +170,21 @@ public class MenuFragment extends Fragment implements OnItemClickListener {
             }
             if (position == NORMAL_MENU_COUNT) {
                 return ACCOUNT_DIVIDER;
+            } 
+            if(position == NORMAL_MENU_COUNT + mAccounts.size() + 1) {
+                return CREATE_NEW_ACCOUNT;
             }
             return ACCOUNT;
         }
 
         @Override
         public int getViewTypeCount() {
-            return 3;
+            return 4;
         }
 
         @Override
         public int getCount() {
-            return NORMAL_MENU_COUNT + mAccounts.size() + 1;
+            return NORMAL_MENU_COUNT + mAccounts.size() + 2;
         }
 
         @Override
@@ -165,6 +194,7 @@ public class MenuFragment extends Fragment implements OnItemClickListener {
                 case NORMAL:
                     return NORMAL_MENUS[position];
                 case ACCOUNT_DIVIDER:
+                case CREATE_NEW_ACCOUNT:
                     return null;
                 default:
                     return mAccounts.get(position - NORMAL_MENU_COUNT - 1);
@@ -182,12 +212,22 @@ public class MenuFragment extends Fragment implements OnItemClickListener {
             Object item = getItem(position);
             switch (type) {
                 case NORMAL:
-                    return getNormalMenuView(convertView, (NormalMenu)item);
+                     convertView = getNormalMenuView(convertView, (NormalMenu)item);
+                     break;
                 case ACCOUNT_DIVIDER:
                     return getAccountDividerView();
+                case CREATE_NEW_ACCOUNT:
+                    return getCreateAccountView();
                 default:
-                    return getAccountView(convertView, mAccounts.get(position - NORMAL_MENU_COUNT - 1));
+                    convertView = getAccountView(convertView, mAccounts.get(position - NORMAL_MENU_COUNT - 1));
+                    break;
             }
+            if(position == mCurrentActiveMenuId) {
+                convertView.setActivated(true);
+            } else {
+                convertView.setActivated(false);
+            }
+            return convertView;
         }
 
         private View getAccountView(View convertView, Account account) {
@@ -196,18 +236,28 @@ public class MenuFragment extends Fragment implements OnItemClickListener {
                 convertView = mInflater.inflate(R.layout.item_account_menu, null);
                 holder = new AccountMenuHolder();
                 holder.textView = ((TextView)convertView.findViewById(R.id.account_name));
+                holder.iconView = (ImageView) convertView.findViewById(R.id.account_icon);
                 convertView.setTag(holder);
             } else {
                 holder = (AccountMenuHolder) convertView.getTag();
             }
            
             holder.textView.setText(account.username);
-            
+            AccountType accountType = AccountType.getAccountTypeById(account.accountTypeId);
+            if(accountType != null) {
+                holder.iconView.setImageResource(accountType.icon);
+            } else {
+                holder.iconView.setImageResource(R.drawable.app_logo); 
+            }
             return convertView;
         }
         
         private View getAccountDividerView() {
             return mInflater.inflate(R.layout.item_account_divider_menu, null);
+        }
+        
+        private View getCreateAccountView() {
+            return mInflater.inflate(R.layout.add_new_account_menu, null);
         }
         
         private View getNormalMenuView(View convertView, NormalMenu item) {
@@ -239,5 +289,6 @@ public class MenuFragment extends Fragment implements OnItemClickListener {
     
     static class AccountMenuHolder {
         TextView textView;
+        ImageView iconView;
     }
 }

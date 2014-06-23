@@ -68,5 +68,12 @@ public interface LoginManager {
      * 
      * */
     public void logout(Account account, boolean remove);
+    
+    /**
+     * is clientJid signed in
+     * @param clientJid
+     * 
+     * */
+    public boolean isSignedIn(String clientJid);
 
 }

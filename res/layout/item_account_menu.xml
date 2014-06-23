@@ -3,8 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:minHeight="40dip"
-    android:orientation="vertical"
     android:paddingLeft="15dp" 
+    android:paddingRight="15dp" 
     android:background="@drawable/nav_background_selector">
 
     <TextView
@@ -15,5 +15,11 @@
         android:paddingTop="10dp"
         android:textColor="#BFFFFFFF"
         android:textSize="14sp" />
+    <ImageView 
+        android:id="@+id/account_icon"
+        android:layout_width="20dip"
+        android:layout_height="20dip"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"/>
 
 </RelativeLayout>

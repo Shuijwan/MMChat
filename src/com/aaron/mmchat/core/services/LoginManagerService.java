@@ -8,6 +8,7 @@
 package com.aaron.mmchat.core.services;
 
 import android.content.Context;
+import android.os.Handler;
 import android.util.Log;
 
 import com.aaron.mmchat.core.AccountManager;
@@ -54,10 +55,33 @@ public class LoginManagerService extends BaseManagerService implements LoginMana
     
     private static final int DEFAULT_PORT = 5222;
     
+    private static final int MSG_LOGIN_SUCCESS = 0;
+    private static final int MSG_LOGIN_FAIL = 1;
+    
     private boolean mEntityCapInited = false;
     private Context mContext;
     
     private ArrayList<LoginCallback> mCallbacks;
+    
+    private Handler mUIHandler = new Handler() {
+        
+        @Override
+        public void handleMessage(android.os.Message msg) {
+            String jid = (String) msg.obj;
+            switch (msg.what) {
+                case MSG_LOGIN_SUCCESS:
+                    Log.d(TAG, "login success:"+jid);
+                    notifyLoginSuccess(jid);
+                    break;
+                case MSG_LOGIN_FAIL:
+                    Log.d(TAG, "login failed:"+jid);
+                    notifyLoginFailed(jid, msg.arg1);
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
     
     public LoginManagerService(Context context) {
         mContext = context;
@@ -72,7 +96,6 @@ public class LoginManagerService extends BaseManagerService implements LoginMana
     @Override
     public void login(String email, String password) {
         int index = email.lastIndexOf("@");
-        String username = email.substring(0, index);
         String domain = email.substring(index+1);
         
         ConnectionConfiguration configuration = initConfiguration(domain);
@@ -83,7 +106,7 @@ public class LoginManagerService extends BaseManagerService implements LoginMana
         con.configuration = configuration;
         
         initServiceDiscovery(connection);
-        doLogin(con, username, password, domain);
+        doLoginByDisCovery(con, email, password);
       
     }
 
@@ -166,36 +189,82 @@ public class LoginManagerService extends BaseManagerService implements LoginMana
             }});
     }
     
+    private void doLoginByDisCovery(final Connection connection, final String email, final String password) {
+        enqueneTask(new Runnable() {
+            
+            @Override
+            public void run() {
+                String rawJid = null;
+                int index = email.lastIndexOf("@");
+                String username = email.substring(0, index);
+                String domain = email.substring(index+1);
+                try {
+                    connection.connection.connect();
+                    connection.connection.login(username, password, "MMChat");
+                    rawJid = connection.connection.getUser();
+                    int resIndex = rawJid.indexOf("/");
+                    String bareJid = rawJid.substring(0, resIndex);
+                    sConnections.put(bareJid, connection);
+                    AccountManager.getInstance(mContext).addAccount(bareJid, domain, email, password);
+                    
+                    sendLoginSuccessMsg(bareJid);
+                } catch (SmackException e) {
+                    e.printStackTrace();
+                    sendLoginFailMsg(email, LOGIN_ERROR_OTHER);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    sendLoginFailMsg(email, LOGIN_ERROR_OTHER);
+                } catch (XMPPException e) {
+                    e.printStackTrace();
+                    sendLoginFailMsg(email, LOGIN_ERROR_OTHER);
+                }
+                
+            }
+        });
+    }
+    
     private void doLogin(final Connection connection, final String username, final String password, final String domain) {
         enqueneTask(new Runnable() {
             
             @Override
             public void run() {
-                String jid = null;
+                String rawjid = null;
                 String id = username+"@"+domain;
                 try {
                     connection.connection.connect();
                     connection.connection.login(username, password, "MMChat");
-                    jid = connection.connection.getUser();
-                    sConnections.put(jid, connection);
-                    notifyLoginSuccess(jid);
-                    Log.d(TAG, "login success:"+jid);
-                    AccountManager.getInstance(mContext).addAccount(jid, domain, username, password);
+                    rawjid = connection.connection.getUser();
+                    int index = rawjid.indexOf("/");
+                    String bareJid = rawjid.substring(0, index);
+                    sConnections.put(bareJid, connection);
+                    AccountManager.getInstance(mContext).addAccount(bareJid, domain, username, password);
+                    
+                    sendLoginSuccessMsg(bareJid);
                 } catch (SmackException e) {
                     e.printStackTrace();
-                    notifyLoginFailed(id, LOGIN_ERROR_OTHER);
+                    sendLoginFailMsg(id, LOGIN_ERROR_OTHER);
                 } catch (IOException e) {
                     e.printStackTrace();
-                    notifyLoginFailed(id, LOGIN_ERROR_OTHER);
+                    sendLoginFailMsg(id, LOGIN_ERROR_OTHER);
                 } catch (XMPPException e) {
                     e.printStackTrace();
-                    notifyLoginFailed(id, LOGIN_ERROR_OTHER);
+                    sendLoginFailMsg(id, LOGIN_ERROR_OTHER);
                 }
                 
             }
         });
     }
 
+    private void sendLoginSuccessMsg(String jid) {
+       android.os.Message msg = android.os.Message.obtain(mUIHandler, MSG_LOGIN_SUCCESS, jid);
+       msg.sendToTarget();
+    }
+    
+    private void sendLoginFailMsg(String jid, int reason) {
+        android.os.Message msg = android.os.Message.obtain(mUIHandler, MSG_LOGIN_FAIL, reason, 0 , jid);
+        msg.sendToTarget();
+     }
+    
     @Override
     public void registerLoginCallback(LoginCallback callback) {
         if(!mCallbacks.contains(callback)) {
@@ -224,6 +293,15 @@ public class LoginManagerService extends BaseManagerService implements LoginMana
     public void logout(Account account, boolean remove) {
         
         AccountManager.getInstance(mContext).deleteAccount(account.jid);
+    }
+
+    @Override
+    public boolean isSignedIn(String clientJid) {
+        Connection connection = sConnections.get(clientJid);
+        if(connection != null) {
+            return connection.connection.isConnected() && connection.connection.isAuthenticated();
+        }
+        return false;
     }
 
 }

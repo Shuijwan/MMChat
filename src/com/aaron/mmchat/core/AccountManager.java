@@ -10,6 +10,7 @@ package com.aaron.mmchat.core;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,13 +34,15 @@ import java.util.Set;
 
 public class AccountManager {
     
+    private static final String TAG = AccountManager.class.getSimpleName();
+    
     private static final String ACCOUNT_FILENAME = "accounts";
 
     public static class Account {
         public String accountTypeId;
         public String jid;
         public String username;
-        String password;
+        public String password;
     }
     
     private AccountManager(Context context) {
@@ -104,7 +107,7 @@ public class AccountManager {
     }
     
     public void addAccount(String jid, String accountTypeId, String username, String password) {
-        
+        Log.i(TAG,"addAccount:"+jid);
         if(getAccount(jid) != null) {
             return;
         }

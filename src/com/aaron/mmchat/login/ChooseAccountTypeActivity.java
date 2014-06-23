@@ -64,6 +64,7 @@ public class ChooseAccountTypeActivity extends Activity implements OnItemSelecte
         public void handleMessage(Message msg) {
             AccountType account = (AccountType) msg.obj;
             LoginActivity.startLoginActivity(ChooseAccountTypeActivity.this, account);
+            finish();
         }
     };
     
