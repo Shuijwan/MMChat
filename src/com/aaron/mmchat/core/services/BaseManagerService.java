@@ -42,4 +42,8 @@ public abstract class BaseManagerService extends BaseXmppObject {
     public XMPPConnection getXmppConnection(String clientJid) {
         return sConnections.get(clientJid).connection;
     }
+    
+    public Connection getConnection(String clientJid) {
+        return sConnections.get(clientJid);
+    }
 }

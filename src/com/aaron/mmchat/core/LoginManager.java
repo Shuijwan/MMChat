@@ -20,6 +20,7 @@ public interface LoginManager {
     public static interface LoginCallback {
         public void onLoginSuccessed(String clientJid);
         public void onLoginFailed(String clientJid, int errorcode);
+        public void onLogoutFinished(String clientJid, boolean remove);
     }
     
     /**
@@ -61,6 +62,12 @@ public interface LoginManager {
      * 
      * */
     public void login(String username, String password, String server, int port);
+    
+    /**
+     * relogin
+     * @param account
+     * */
+    public void relogin(Account account);
     
     /**
      * logout the client

@@ -460,11 +460,6 @@ public class ContactManagerService extends BaseManagerService implements Contact
             return false;
         }
     }
-
-    private boolean containGroup(String clientJid, String groupName) {
-        HashMap<String, ContactGroup> contactlistMap = mAllContactListsMap.get(clientJid);
-        return contactlistMap.containsKey(groupName);
-    }
     
     public Roster getRoster(String clientJid) {
         return mRosters.get(clientJid);
@@ -528,6 +523,18 @@ public class ContactManagerService extends BaseManagerService implements Contact
     @Override
     public void onLoginFailed(String clientJid, int errorcode) {
         
+        
+    }
+
+    @Override
+    public void onLogoutFinished(String clientJid, boolean remove) {
+        if(remove) {
+            mRosters.remove(clientJid);
+            mAllContactLists.remove(clientJid);
+            mAllContactListsMap.remove(clientJid);
+            mAllContactsMap.remove(clientJid);
+            notifyContactListAllRefreshed(clientJid);
+        }
         
     }
 }

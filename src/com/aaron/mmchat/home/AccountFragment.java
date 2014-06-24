@@ -104,14 +104,7 @@ public class AccountFragment extends Fragment implements OnClickListener, LoginC
             if(mLoginManager.isSignedIn(mAccount.jid)) {
                 
             } else {
-                AccountType accountType = AccountType.getAccountTypeById(mAccount.accountTypeId);
-                
-                if(accountType.needSrv) {
-                    mLoginManager.login(mAccount.username, mAccount.password);
-                } else {
-                    mLoginManager.login(mAccount.username , mAccount.password, accountType.domain, accountType.port);
-                } 
-                
+                mLoginManager.relogin(mAccount);
                 mLoginManager.registerLoginCallback(this);
                 mSigninDialog = DialogUtils.showLoginingDialog(getActivity());
             }
@@ -130,6 +123,12 @@ public class AccountFragment extends Fragment implements OnClickListener, LoginC
     public void onLoginFailed(String clientJid, int errorcode) {
         mLoginManager.unregisterLoginCallback(this);
         mSigninDialog.dismiss();
+        
+    }
+
+    @Override
+    public void onLogoutFinished(String clientJid, boolean remove) {
+        // TODO Auto-generated method stub
         
     }
 

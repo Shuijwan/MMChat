@@ -133,4 +133,10 @@ public class LoginActivity extends Activity implements OnClickListener, LoginCal
         ChooseAccountTypeActivity.startChooseAccountTypeActivity(this);
         finish();
     }
+
+    @Override
+    public void onLogoutFinished(String clientJid, boolean remove) {
+        // TODO Auto-generated method stub
+        
+    }
 }

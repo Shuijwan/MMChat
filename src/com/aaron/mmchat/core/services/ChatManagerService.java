@@ -107,8 +107,10 @@ public class ChatManagerService extends BaseManagerService implements ChatManage
 
     @Override
     public void removeP2PChat(P2PChat chat) {
+        ArrayList<P2PChat> chats = new ArrayList<P2PChat>();
+        chats.add(chat);
         mP2pChats.remove(chat);
-        notifyP2PChatRemoved(chat);
+        notifyP2PChatsRemoved(chats);
     }
 
     @Override
@@ -145,9 +147,9 @@ public class ChatManagerService extends BaseManagerService implements ChatManage
         }
     }
     
-    private void notifyP2PChatRemoved(P2PChat chat) {
+    private void notifyP2PChatsRemoved(ArrayList<P2PChat> chats) {
         for(ChatListCallback callback : mCallbacks) {
-            callback.onP2PChatRemoved(chat);
+            callback.onP2PChatsRemoved(chats);
         }
     }
     
@@ -188,12 +190,42 @@ public class ChatManagerService extends BaseManagerService implements ChatManage
     public void removeEmptyChats() {
         Iterator<P2PChat> iterator = mP2pChats.iterator();
         P2PChat p2pChat;
+        ArrayList<P2PChat> chats = null;
         while(iterator.hasNext()) {
             p2pChat = iterator.next();
             if(p2pChat.getLastMessage() == null) {
                 iterator.remove();
-                notifyP2PChatRemoved(p2pChat);
+                if(chats == null) {
+                    chats = new ArrayList<P2PChat>();
+                }
+                chats.add(p2pChat);
             }
+        }
+        if(chats != null) {
+            notifyP2PChatsRemoved(chats);
+        }
+    }
+
+    @Override
+    public void onLogoutFinished(String clientJid, boolean remove) {
+        if(remove) {
+           ArrayList<P2PChat> chats = null;
+           Iterator<P2PChat> iterator = mP2pChats.iterator();
+           P2PChat p2pChat;
+
+           while(iterator.hasNext()) {
+               p2pChat = iterator.next();
+               if(p2pChat.getClientJid().equals(clientJid)) {
+                   iterator.remove();
+                   if(chats == null) {
+                       chats = new ArrayList<P2PChat>();
+                   }
+                   chats.add(p2pChat);
+               }
+           }
+           if(chats != null) {
+               notifyP2PChatsRemoved(chats);
+           }
         }
         
     }

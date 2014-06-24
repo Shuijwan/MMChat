@@ -7,11 +7,14 @@
 
 package com.aaron.mmchat.core.services;
 
+import android.R.anim;
 import android.content.Context;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import com.aaron.mmchat.core.AccountManager;
+import com.aaron.mmchat.core.AccountType;
 import com.aaron.mmchat.core.MMContext;
 import com.aaron.mmchat.core.AccountManager.Account;
 import com.aaron.mmchat.core.LoginManager;
@@ -20,6 +23,7 @@ import de.duenndns.ssl.MemorizingTrustManager;
 
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.SmackException.NotConnectedException;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
@@ -57,13 +61,14 @@ public class LoginManagerService extends BaseManagerService implements LoginMana
     
     private static final int MSG_LOGIN_SUCCESS = 0;
     private static final int MSG_LOGIN_FAIL = 1;
+    private static final int MSG_SIGNOUT_FINISHED = 2;
     
     private boolean mEntityCapInited = false;
     private Context mContext;
     
     private ArrayList<LoginCallback> mCallbacks;
     
-    private Handler mUIHandler = new Handler() {
+    private Handler mUIHandler = new Handler(Looper.getMainLooper()) {
         
         @Override
         public void handleMessage(android.os.Message msg) {
@@ -76,6 +81,14 @@ public class LoginManagerService extends BaseManagerService implements LoginMana
                 case MSG_LOGIN_FAIL:
                     Log.d(TAG, "login failed:"+jid);
                     notifyLoginFailed(jid, msg.arg1);
+                    break;
+                case MSG_SIGNOUT_FINISHED:
+                    boolean remove = msg.arg1 == 1;
+                    if(remove) {
+                        AccountManager.getInstance(mContext).deleteAccount(jid);
+                        sConnections.remove(jid);
+                    }
+                    notifyLogoutFinished(jid, remove);
                     break;
                 default:
                     break;
@@ -118,9 +131,7 @@ public class LoginManagerService extends BaseManagerService implements LoginMana
         Connection con = new Connection();
         con.connection = connection;
         con.configuration = configuration;
-        
-//        String jid = username+"@"+server;
-//        sConnections.put(jid, con);
+
         initServiceDiscovery(connection);
         doLogin(con, username, password, server);
         
@@ -265,6 +276,11 @@ public class LoginManagerService extends BaseManagerService implements LoginMana
         msg.sendToTarget();
      }
     
+    private void sendLogoutFinishedMsg(String jid, boolean remove) {
+        android.os.Message msg = android.os.Message.obtain(mUIHandler, MSG_SIGNOUT_FINISHED, remove ? 1 : 0, 0, jid);
+        msg.sendToTarget();
+    }
+    
     @Override
     public void registerLoginCallback(LoginCallback callback) {
         if(!mCallbacks.contains(callback)) {
@@ -276,6 +292,12 @@ public class LoginManagerService extends BaseManagerService implements LoginMana
     public void unregisterLoginCallback(LoginCallback callback) {
         mCallbacks.remove(callback);
     }  
+    
+    private void notifyLogoutFinished(String clientJid, boolean remove) {
+        for(LoginCallback callback : mCallbacks) {
+            callback.onLogoutFinished(clientJid, remove);
+        }
+    }
     
     private void notifyLoginSuccess(String clientJid) {
         for(LoginCallback callback : mCallbacks) {
@@ -290,9 +312,23 @@ public class LoginManagerService extends BaseManagerService implements LoginMana
     }
 
     @Override
-    public void logout(Account account, boolean remove) {
-        
-        AccountManager.getInstance(mContext).deleteAccount(account.jid);
+    public void logout(final Account account, final boolean remove) {
+        enqueneTask(new Runnable() {
+            
+            @Override
+            public void run() {
+                Connection connection = getConnection(account.jid);
+                try {
+                    connection.configuration.setReconnectionAllowed(false);
+                    connection.connection.disconnect();
+                } catch (NotConnectedException e) {
+                    e.printStackTrace();
+                }
+                
+                sendLogoutFinishedMsg(account.jid, remove);
+            }
+        });
+
     }
 
     @Override
@@ -302,6 +338,42 @@ public class LoginManagerService extends BaseManagerService implements LoginMana
             return connection.connection.isConnected() && connection.connection.isAuthenticated();
         }
         return false;
+    }
+
+    @Override
+    public void relogin(final Account account) {
+        final Connection connection = sConnections.get(account.jid);
+        if(connection != null) {
+            enqueneTask(new Runnable() {
+                
+                @Override
+                public void run() {
+                    connection.configuration.setReconnectionAllowed(true);
+                    try {
+                        connection.connection.connect();
+                        sendLoginSuccessMsg(account.jid);
+                    } catch (SmackException e) {
+                        e.printStackTrace();
+                        sendLoginFailMsg(account.jid, LOGIN_ERROR_OTHER);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        sendLoginFailMsg(account.jid, LOGIN_ERROR_OTHER);
+                    } catch (XMPPException e) {
+                        e.printStackTrace();
+                        sendLoginFailMsg(account.jid, LOGIN_ERROR_OTHER);
+                    }
+                    
+                }
+            });
+        } else {
+            AccountType accountType = AccountType.getAccountTypeById(account.accountTypeId);
+            if(accountType.needSrv) {
+                login(account.username, account.password);
+            } else {
+                login(account.username , account.password, accountType.domain, accountType.port);
+            } 
+        }
+        
     }
 
 }
