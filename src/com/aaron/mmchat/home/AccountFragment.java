@@ -66,7 +66,6 @@ public class AccountFragment extends Fragment implements OnClickListener, LoginC
         AccountManager accountManager = AccountManager.getInstance(getActivity());
         Account account = accountManager.getAccounts().get(index);
         getActivity().getActionBar().setTitle(account.username);
-        mAccount = account;
         
         View view = inflater.inflate(R.layout.fragment_account, null);
         
@@ -74,7 +73,7 @@ public class AccountFragment extends Fragment implements OnClickListener, LoginC
         mPresenceMessage = (EditText) view.findViewById(R.id.presence_message);
         
         TextView username = (TextView) view.findViewById(R.id.username);
-        username.setText(mAccount.username);
+        username.setText(account.username);
         
         mPassword = (EditText) view.findViewById(R.id.password);
         
@@ -89,6 +88,9 @@ public class AccountFragment extends Fragment implements OnClickListener, LoginC
         mLogin.setOnClickListener(this);
         
         mDelete = (Button) view.findViewById(R.id.delete);
+        mDelete.setOnClickListener(this);
+        
+        mAccount = account;
         return view;
     }
 
@@ -102,12 +104,17 @@ public class AccountFragment extends Fragment implements OnClickListener, LoginC
     public void onClick(View v) {
         if(v == mLogin) {
             if(mLoginManager.isSignedIn(mAccount.jid)) {
-                
+                mLoginManager.logout(mAccount, false);
             } else {
-                mLoginManager.relogin(mAccount);
-                mLoginManager.registerLoginCallback(this);
-                mSigninDialog = DialogUtils.showLoginingDialog(getActivity());
+                mLoginManager.relogin(mAccount);   
             }
+            mLoginManager.registerLoginCallback(this);
+            mSigninDialog = DialogUtils.showLoginingDialog(getActivity());
+            
+        } else if(v == mDelete) {
+            mLoginManager.logout(mAccount, true);
+            mLoginManager.registerLoginCallback(this);
+            mSigninDialog = DialogUtils.showLoginingDialog(getActivity());
         }
         
     }
@@ -128,8 +135,16 @@ public class AccountFragment extends Fragment implements OnClickListener, LoginC
 
     @Override
     public void onLogoutFinished(String clientJid, boolean remove) {
-        // TODO Auto-generated method stub
-        
+        mLoginManager.unregisterLoginCallback(this);
+        mSigninDialog.dismiss();
+        mLogin.setText(R.string.login);
+        if(remove) {
+            if(AccountManager.getInstance(getActivity()).getAccounts().size() == 0) {
+                getActivity().finish();
+            } else {
+                //TODO
+            }
+        }
     }
 
 }

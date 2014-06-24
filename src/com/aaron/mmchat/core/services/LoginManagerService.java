@@ -318,13 +318,14 @@ public class LoginManagerService extends BaseManagerService implements LoginMana
             @Override
             public void run() {
                 Connection connection = getConnection(account.jid);
-                try {
-                    connection.configuration.setReconnectionAllowed(false);
-                    connection.connection.disconnect();
-                } catch (NotConnectedException e) {
-                    e.printStackTrace();
+                if(connection != null) {
+                    try {
+                        connection.configuration.setReconnectionAllowed(false);
+                        connection.connection.disconnect();
+                    } catch (NotConnectedException e) {
+                        e.printStackTrace();
+                    }   
                 }
-                
                 sendLogoutFinishedMsg(account.jid, remove);
             }
         });
