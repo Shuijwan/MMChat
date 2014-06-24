@@ -147,6 +147,17 @@ public class MenuFragment extends Fragment implements OnItemClickListener {
     private void clearLastActivedMenu() {
         mMenuListView.getChildAt(mCurrentActiveMenuId).setActivated(false);
     }
+    
+    public void onAccountDeleted() {
+ 
+        clearLastActivedMenu();
+        mActiveMenuChangedCallback.onActiveMenuChanged(MENU_CHATLIST);
+        mCurrentActiveMenuId = MENU_CHATLIST;
+        updateActivedMenu();
+        
+        mActiveMenuChangedCallback.onMenuClicked();
+        mAdapter.notifyDataSetChanged();
+    }
 
     class MenuAdapter extends BaseAdapter {
 

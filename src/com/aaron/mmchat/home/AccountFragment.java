@@ -142,7 +142,7 @@ public class AccountFragment extends Fragment implements OnClickListener, LoginC
             if(AccountManager.getInstance(getActivity()).getAccounts().size() == 0) {
                 getActivity().finish();
             } else {
-                //TODO
+                ((HomeActivity)getActivity()).onAccountDelete();
             }
         }
     }

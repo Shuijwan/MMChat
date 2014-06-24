@@ -146,4 +146,9 @@ public class HomeActivity extends Activity implements MenuCallback {
     public void onMenuClicked() {
         drawerLayout.closeDrawers();
     }
+    
+    public void onAccountDelete() {
+        MenuFragment fragment = (MenuFragment) getFragmentManager().findFragmentById(R.id.menu_frame);
+        fragment.onAccountDeleted();
+    }
 }
