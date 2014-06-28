@@ -2,6 +2,7 @@ package com.aaron.mmchat.core;
 
 import android.content.Context;
 
+import com.aaron.mmchat.core.services.BaseManagerService;
 import com.aaron.mmchat.core.services.ChatManagerService;
 import com.aaron.mmchat.core.services.ContactManagerService;
 import com.aaron.mmchat.core.services.LoginManagerService;
@@ -33,11 +34,11 @@ public class MMContext {
     
     private static MMContext sInstance; 
     
-    private HashMap<String, Object> mServices;
+    private HashMap<String, BaseManagerService> mServices;
       
     private MMContext(Context context) {
         Context appContext = context.getApplicationContext();
-        mServices = new HashMap<String, Object>();
+        mServices = new HashMap<String, BaseManagerService>();
         LoginManagerService loginManagerService = new LoginManagerService(appContext);
         mServices.put(LOGIN_SERVICE, loginManagerService);
         mServices.put(CONTACT_SERVICE, new ContactManagerService(loginManagerService));
@@ -71,7 +72,7 @@ public class MMContext {
      * @param service, service name, MMContext.LOGIN_SERVICE, MMContext.CONTACT_SERVICE, .etc
      * 
      * */
-    public Object getService(String service) {
+    public BaseManagerService getService(String service) {
         return mServices.get(service);
     }
 
