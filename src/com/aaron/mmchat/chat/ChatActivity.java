@@ -7,7 +7,6 @@
 
 package com.aaron.mmchat.chat;
 
-import android.R.mipmap;
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
 import android.app.Activity;
@@ -23,28 +22,24 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.View.OnFocusChangeListener;
-import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.AbsListView.OnScrollListener;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
 
 import com.aaron.mmchat.R;
 import com.aaron.mmchat.core.BaseChat;
 import com.aaron.mmchat.core.BaseChat.ChatCallback;
 import com.aaron.mmchat.core.ChatManager;
-import com.aaron.mmchat.core.Contact;
 import com.aaron.mmchat.core.InstantMessage;
 import com.aaron.mmchat.core.MMContext;
+import com.aaron.mmchat.core.Message;
 import com.aaron.mmchat.core.P2PChat;
-import com.aaron.mmchat.home.ContactListFragment.ViewHolder;
 import com.aaron.mmchat.utils.ViewUtils;
 
 import java.util.ArrayList;
@@ -206,12 +201,29 @@ public class ChatActivity extends Activity implements OnRefreshListener, OnClick
 
         @Override
         public View getDropDownView(int position, View convertView, ViewGroup parent) {
+            
+            SessionViewHolder holder;
            if(convertView == null) {
-               convertView = new TextView(ChatActivity.this);
+               convertView = mInflater.inflate(R.layout.chat_session_dropdown_item, null);
+               holder = new SessionViewHolder();
+               
+               holder.name = (TextView) convertView.findViewById(R.id.username);
+               holder.lastmessage = (TextView) convertView.findViewById(R.id.last_message);
+               holder.unreadcount = (TextView) convertView.findViewById(R.id.unread_message_count);
+               convertView.setTag(holder);
+           } else {
+               holder = (SessionViewHolder) convertView.getTag();
            }
+           
            P2PChat chat = (P2PChat) getItem(position);
 
-           ((TextView)convertView).setText(chat.getParticipantName());
+           holder.name.setText(chat.getParticipantName());
+           Message lastMessage = chat.getLastMessage();
+           if(lastMessage != null) {
+               holder.lastmessage.setText((String)lastMessage.getContent());
+           } else {
+               holder.lastmessage.setText("");
+           }
            return convertView;
         }
 
@@ -222,13 +234,11 @@ public class ChatActivity extends Activity implements OnRefreshListener, OnClick
 
         @Override
         public Object getItem(int position) {
-            // TODO Auto-generated method stub
             return mChatManager.getP2PChatList().get(position);
         }
 
         @Override
         public long getItemId(int position) {
-            // TODO Auto-generated method stub
             return position;
         }
 
@@ -238,7 +248,7 @@ public class ChatActivity extends Activity implements OnRefreshListener, OnClick
 
             if (convertView == null) {
                 convertView = mInflater.inflate(R.layout.item_contact_list_contact, parent, false);
-
+                
                 holder = new ViewHolder();
 
                 holder.avator = (ImageView) convertView.findViewById(R.id.contact_avatar);
@@ -264,6 +274,12 @@ public class ChatActivity extends Activity implements OnRefreshListener, OnClick
         ImageView avator;
         TextView name;
         TextView presence;
+    }
+    
+    static class SessionViewHolder {
+        TextView name;
+        TextView lastmessage;
+        TextView unreadcount;
     }
     
     class MessageAdapter extends BaseAdapter {

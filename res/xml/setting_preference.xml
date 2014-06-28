@@ -9,7 +9,13 @@
             android:defaultValue="true"
             android:key="vibrate"
             android:title="@string/vibrate" />
+        <SwitchPreference 
+            android:defaultValue="true"
+            android:key="bootstart"
+            android:title="@string/bootstart"
+            />
     </PreferenceCategory>
+    
     <PreferenceCategory android:title="@string/about" >
         <Preference
             android:key="about"
