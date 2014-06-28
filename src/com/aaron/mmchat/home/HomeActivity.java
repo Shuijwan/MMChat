@@ -93,7 +93,11 @@ public class HomeActivity extends Activity implements MenuCallback {
 
         if (mFragmentName != null
                 && (fragment = fragmentManager.findFragmentByTag(mFragmentName)) != null) {
-            fragmentTransaction.detach(fragment);
+            if(mFragmentName.equals(AccountFragment.class.getName())) {
+                fragmentTransaction.hide(fragment);
+            } else {
+                fragmentTransaction.detach(fragment);
+            }
         }
 
         mFragmentName = fragmentClassName;
@@ -113,11 +117,13 @@ public class HomeActivity extends Activity implements MenuCallback {
             if(itemId >= MenuFragment.MENU_ACCOUNT) {
                 int accountIndex = itemId - MenuFragment.MENU_ACCOUNT;
                 bundle.putInt("accountIndex", accountIndex);
+                fragmentTransaction.show(fragment);
+            } else {
+                fragmentTransaction.attach(fragment);
             }
-            fragmentTransaction.attach(fragment);
         }
-
-        fragmentTransaction.commitAllowingStateLoss();
+        
+        fragmentTransaction.commit();
     }
 
     public void onNewIntent(Intent intent) {

@@ -8,6 +8,7 @@
 package com.aaron.mmchat.core.services;
 
 import com.aaron.mmchat.core.BaseXmppObject;
+import com.aaron.mmchat.core.ReconnectManager;
 
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.XMPPConnection;
@@ -33,7 +34,7 @@ public abstract class BaseManagerService extends BaseXmppObject {
         ConnectionConfiguration configuration;
     }
     
-    protected static HashMap<String, Connection> sConnections;
+    private static HashMap<String, Connection> sConnections;
     
     static {
         sConnections = new HashMap<String, Connection>();
@@ -45,5 +46,17 @@ public abstract class BaseManagerService extends BaseXmppObject {
     
     public Connection getConnection(String clientJid) {
         return sConnections.get(clientJid);
+    }
+    
+    public void addConnection(String clientJid, Connection connection) {
+        sConnections.put(clientJid, connection);
+        connection.connection.addConnectionListener(ReconnectManager.getInstance().getReconnectListener(clientJid));
+    }
+    
+    public void removeConnection(String clientJid) {
+        Connection connection = sConnections.remove(clientJid);
+        if(connection != null) {
+            connection.connection.removeConnectionListener(ReconnectManager.getInstance().getReconnectListener(clientJid));
+        }
     }
 }

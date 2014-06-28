@@ -24,9 +24,11 @@ import com.aaron.mmchat.R;
 import com.aaron.mmchat.core.AccountManager;
 import com.aaron.mmchat.core.AccountType;
 import com.aaron.mmchat.core.LoginManager;
+import com.aaron.mmchat.core.ReconnectManager;
 import com.aaron.mmchat.core.LoginManager.LoginCallback;
 import com.aaron.mmchat.core.MMContext;
 import com.aaron.mmchat.core.AccountManager.Account;
+import com.aaron.mmchat.core.ReconnectManager.ReconnectCallback;
 import com.aaron.mmchat.utils.DialogUtils;
 
 /**
@@ -40,8 +42,11 @@ import com.aaron.mmchat.utils.DialogUtils;
  *
  */
 
-public class AccountFragment extends Fragment implements OnClickListener, LoginCallback {
+public class AccountFragment extends Fragment implements OnClickListener, LoginCallback, ReconnectCallback {
 
+    
+    private View mContentView;
+    private EditText mUsername;
     private EditText mPassword;
     private Button mLogin;
     private Button mDelete;
@@ -52,52 +57,68 @@ public class AccountFragment extends Fragment implements OnClickListener, LoginC
     private LoginManager mLoginManager;
     private Account mAccount;
     private Dialog mSigninDialog;
+    private ReconnectManager mReconnectManager;
+    
     
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         mLoginManager = (LoginManager) MMContext.peekInstance().getService(MMContext.LOGIN_SERVICE);
+        mReconnectManager = ReconnectManager.getInstance();
+        mReconnectManager.registerReconnectCallback(this);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         
-        int index = getArguments().getInt("accountIndex");
-        AccountManager accountManager = AccountManager.getInstance(getActivity());
-        Account account = accountManager.getAccounts().get(index);
-        getActivity().getActionBar().setTitle(account.username);
+        mContentView = inflater.inflate(R.layout.fragment_account, container, false);
+     
+        mPresenceStatus = (Spinner) mContentView.findViewById(R.id.presence_status);
+        mPresenceMessage = (EditText) mContentView.findViewById(R.id.presence_message);
         
-        View view = inflater.inflate(R.layout.fragment_account, null);
+        mUsername = (EditText) mContentView.findViewById(R.id.account_name);    
+        mPassword = (EditText) mContentView.findViewById(R.id.password);
         
-        mPresenceStatus = (Spinner) view.findViewById(R.id.presence_status);
-        mPresenceMessage = (EditText) view.findViewById(R.id.presence_message);
-        
-        TextView username = (TextView) view.findViewById(R.id.username);
-        username.setText(account.username);
-        
-        mPassword = (EditText) view.findViewById(R.id.password);
-        
-        mLogin = (Button) view.findViewById(R.id.login);
-        
-        if(mLoginManager.isSignedIn(account.jid)) {
-            mLogin.setText(R.string.logout);
-        } else {
-            mLogin.setText(R.string.login);
-        }
-        
+        mLogin = (Button) mContentView.findViewById(R.id.login);      
         mLogin.setOnClickListener(this);
         
-        mDelete = (Button) view.findViewById(R.id.delete);
+        mDelete = (Button) mContentView.findViewById(R.id.delete);
         mDelete.setOnClickListener(this);
-        
-        mAccount = account;
-        return view;
+
+
+        return mContentView;
+    }
+
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        if(!hidden) {
+            int index = getArguments().getInt("accountIndex");
+            AccountManager accountManager = AccountManager.getInstance(getActivity());
+            Account account = accountManager.getAccounts().get(index);
+            getActivity().getActionBar().setTitle(account.username);
+            
+            mUsername.setText(account.username);
+            
+            if(mLoginManager.isSignedIn(account.jid)) {
+                mLogin.setText(R.string.logout);
+            } else {
+                mLogin.setText(R.string.login);
+            }
+                   
+            mAccount = account;
+        }
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
     }
 
     @Override
     public void onDetach() {
-        // TODO Auto-generated method stub
         super.onDetach();
+        mReconnectManager.unregisterReconnectCallback(this);
     }
 
     @Override
@@ -144,6 +165,21 @@ public class AccountFragment extends Fragment implements OnClickListener, LoginC
             } else {
                 ((HomeActivity)getActivity()).onAccountDelete();
             }
+        }
+    }
+
+    @Override
+    public void onConnected(String clientJid) {
+        if(clientJid.equals(mAccount.jid)) {
+            mLogin.setText(R.string.logout);
+        }
+        
+    }
+
+    @Override
+    public void onDisconnected(String clientJid) {
+        if(clientJid.equals(mAccount.jid)) {
+            mLogin.setText(R.string.login);
         }
     }
 

@@ -8,6 +8,7 @@ import com.aaron.mmchat.core.services.LoginManagerService;
 
 
 import org.jivesoftware.smack.SmackAndroid;
+import org.jivesoftware.smack.SmackConfiguration;
 
 import java.util.HashMap;
 
@@ -43,6 +44,7 @@ public class MMContext {
         mServices.put(CHAT_SERVICE, new ChatManagerService(loginManagerService));
         
         SmackAndroid.init(appContext);
+        SmackConfiguration.DEBUG_ENABLED = true;
     }
     
     /**

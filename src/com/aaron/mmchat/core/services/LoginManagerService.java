@@ -86,7 +86,7 @@ public class LoginManagerService extends BaseManagerService implements LoginMana
                     boolean remove = msg.arg1 == 1;
                     if(remove) {
                         AccountManager.getInstance(mContext).deleteAccount(jid);
-                        sConnections.remove(jid);
+                        removeConnection(jid);
                     }
                     notifyLogoutFinished(jid, remove);
                     break;
@@ -215,7 +215,7 @@ public class LoginManagerService extends BaseManagerService implements LoginMana
                     rawJid = connection.connection.getUser();
                     int resIndex = rawJid.indexOf("/");
                     String bareJid = rawJid.substring(0, resIndex);
-                    sConnections.put(bareJid, connection);
+                    addConnection(bareJid, connection);
                     AccountManager.getInstance(mContext).addAccount(bareJid, domain, email, password);
                     
                     sendLoginSuccessMsg(bareJid);
@@ -247,7 +247,7 @@ public class LoginManagerService extends BaseManagerService implements LoginMana
                     rawjid = connection.connection.getUser();
                     int index = rawjid.indexOf("/");
                     String bareJid = rawjid.substring(0, index);
-                    sConnections.put(bareJid, connection);
+                    addConnection(bareJid, connection);
                     AccountManager.getInstance(mContext).addAccount(bareJid, domain, username, password);
                     
                     sendLoginSuccessMsg(bareJid);
@@ -334,7 +334,7 @@ public class LoginManagerService extends BaseManagerService implements LoginMana
 
     @Override
     public boolean isSignedIn(String clientJid) {
-        Connection connection = sConnections.get(clientJid);
+        Connection connection = getConnection(clientJid);
         if(connection != null) {
             return connection.connection.isConnected() && connection.connection.isAuthenticated();
         }
@@ -343,7 +343,7 @@ public class LoginManagerService extends BaseManagerService implements LoginMana
 
     @Override
     public void relogin(final Account account) {
-        final Connection connection = sConnections.get(account.jid);
+        final Connection connection = getConnection(account.jid);
         if(connection != null) {
             enqueneTask(new Runnable() {
                 

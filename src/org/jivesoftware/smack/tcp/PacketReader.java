@@ -33,7 +33,6 @@ import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.SmackException.NoResponseException;
 import org.jivesoftware.smack.SmackException.SecurityRequiredException;
 import org.jivesoftware.smack.XMPPException.StreamErrorException;
-import org.xmlpull.v1.XmlPullParserFactory;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -131,8 +130,7 @@ class PacketReader {
      */
     private void resetParser() throws SmackException {
         try {
-            parser = XmlPullParserFactory.newInstance().newPullParser();
-            parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, true);
+            parser = PacketParserUtils.newXmppParser();
             parser.setInput(connection.getReader());
         }
         catch (XmlPullParserException e) {
@@ -148,6 +146,7 @@ class PacketReader {
     private void parsePackets(Thread thread) {
         try {
             int eventType = parser.getEventType();
+            
             do {
                 if (eventType == XmlPullParser.START_TAG) {
                     int parserDepth = parser.getDepth();
@@ -282,6 +281,7 @@ class PacketReader {
             } while (!done && eventType != XmlPullParser.END_DOCUMENT && thread == readerThread);
         }
         catch (Exception e) {
+            e.printStackTrace();
             // The exception can be ignored if the the connection is 'done'
             // or if the it was caused because the socket got closed
             if (!(done || connection.isSocketClosed())) {

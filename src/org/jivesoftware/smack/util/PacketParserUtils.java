@@ -44,6 +44,7 @@ import org.jivesoftware.smack.provider.ProviderManager;
 import org.jivesoftware.smack.sasl.SASLMechanism.SASLFailure;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
+import org.xmlpull.v1.XmlPullParserFactory;
 
 /**
  * Utility class that helps to parse packets. Any parsing packets method that must be shared
@@ -53,6 +54,33 @@ import org.xmlpull.v1.XmlPullParserException;
  */
 public class PacketParserUtils {
     private static final Logger LOGGER = Logger.getLogger(PacketParserUtils.class.getName());
+
+    private static final String XPP_FEATURE_XML_ROUNDTRIP = "http://xmlpull.org/v1/doc/features.html#xml-roundtrip";
+    /**
+     * Creates a new XmlPullParser suitable for parsing XMPP. This means in particular that
+     * FEATURE_PROCESS_NAMESPACES is enabled. This method also tries to set XML Roundtrip, but not
+     * all XmlPullParser implementations support this. Which means that we have to query if this
+     * feature is supported, if we rely on <code>XmlPullParser.getText()</code> returning text for
+     * START_TAG and END_TAG.
+     * 
+     * @return A suitable XmlPullParser for XMPP parsing
+     * @throws XmlPullParserException
+     * @see <a href="http://xmlpull.org/v1/doc/features.html#xml-roundtrip">XML Roundtrip feature of
+     *      XmlPullParser</a>
+     */
+    public static XmlPullParser newXmppParser() throws XmlPullParserException {
+        XmlPullParser parser = XmlPullParserFactory.newInstance().newPullParser();
+        parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, true);
+        try {
+            // There seems to be no constant for this String in the XmlPullParser API, so we have to
+            // hardcode this string.
+            parser.setFeature(XPP_FEATURE_XML_ROUNDTRIP, true);
+        }
+        catch (XmlPullParserException e) {
+            // Ignore. For example Android's KXmlParser does not support xml-roundtrip.
+        }
+        return parser;
+    }
 
     /**
      * Parses a message packet.
@@ -154,11 +182,23 @@ public class PacketParserUtils {
     }
 
     public static String parseContentDepth(XmlPullParser parser, int depth) throws XmlPullParserException, IOException {
+        final boolean xmlRoundtripParsingNotAvailable = parser.getFeature(XPP_FEATURE_XML_ROUNDTRIP);
         StringBuilder content = new StringBuilder();
         while (!(parser.next() == XmlPullParser.END_TAG && parser.getDepth() == depth)) {
             String text = parser.getText();
             if (text == null) {
-                throw new IllegalStateException("Parser should never return 'null' on getText() here");
+                if (xmlRoundtripParsingNotAvailable) {
+                    // As getText() will return null if the parser is on START_TAG or END_TAG and
+                    // xml-roundtrip is not available. All we can do here is continue parsing this
+                    // stanza, but we are not able to retrieve the full stanza as String.
+                    continue;
+                } else {
+                    // Something unexpected happened. xml-roundtrip is available and we are
+                    // certainly not on START_DOCUMENT or END_DOCUMENT, which are the only tokens
+                    // where getText() with xml-roundtrip enabled is allowed to return null. Throw
+                    // an IllegalStateException and disconnect the connection with an error.
+                    throw new IllegalStateException("Parser should never return 'null' on getText() here. Content so far\"" + content.toString() + '"');
+                }
             }
             content.append(text);
         }
