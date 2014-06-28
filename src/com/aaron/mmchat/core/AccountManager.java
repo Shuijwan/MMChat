@@ -1,10 +1,3 @@
-/**
- *
- * Copyright 2014 Cisco Inc. All rights reserved.
- * AccountManager.java
- *
- */
-
 package com.aaron.mmchat.core;
 
 import android.content.Context;

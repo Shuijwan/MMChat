@@ -38,6 +38,8 @@
     <string name="create_new_account">Create a New Account . . .</string>
     
     <string name="empty_contact_info">No Contacts. Add contact to start chat.</string>
+    <string name="search">Search</string>
+    <string name="start_groupchat">Start a GroupChat</string>
     <string name="empty_chat_info">No Chats.</string>
     
     <string-array name="presence_status_array">

@@ -1,25 +1,24 @@
-/**
- *
- * Copyright 2014 Cisco Inc. All rights reserved.
- * AccountType.java
- *
- */
-
 package com.aaron.mmchat.core;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.content.res.XmlResourceParser;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.aaron.mmchat.R;
-
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+import java.util.Map.Entry;
 
 /**
  *
@@ -34,7 +33,10 @@ import java.util.List;
 
 public class AccountType implements Parcelable {
     
+    private static final String CUSTOM_ACCOUNT_TYPES_FILENAME = "custom_accounttype";
+    
     private static ArrayList<AccountType> sKnownAccountTypes;
+    private static ArrayList<AccountType> sCustomAccountTypes;
     
     public String id;//there is no use
     public int icon;
@@ -98,6 +100,11 @@ public class AccountType implements Parcelable {
                 return accountType;
             }
         }
+        for(AccountType accountType : sCustomAccountTypes) {
+            if(accountType.domain.equals(id)) {
+                return accountType;
+            }
+        }
         return null;
     }
     
@@ -110,11 +117,79 @@ public class AccountType implements Parcelable {
     }
     
     /**
+     * load all AcountType, include known & custom AccountType
+     * 
+     * */
+    public static void loadAllAccountType(Context context) {
+        loadKnownAccoutType(context);
+        loadCustomAccountType(context);
+    }
+    
+    /**
+     * add a custom AccountType
+     * @param domain, the server domain
+     * @param port
+     * @param ssl
+     * 
+     * */
+    public static void addCusteomAccountType(Context context, String domain, int port, boolean ssl) {
+        if(getAccountTypeById(domain) != null) {
+            return;
+        }
+        
+        SharedPreferences sharedPreferences = context.getSharedPreferences(CUSTOM_ACCOUNT_TYPES_FILENAME, 0);
+        Editor editor = sharedPreferences.edit();
+        HashSet<String> set = new HashSet<String>();
+        
+        set.add("server:"+domain);
+        set.add("port:"+port);
+        set.add("ssl:"+ssl);
+        
+        editor.putStringSet(domain, set);
+        editor.commit();
+    }
+    
+    private static void loadCustomAccountType(Context context) {
+        if(sCustomAccountTypes != null) {
+            return;
+        }
+        
+        sCustomAccountTypes = new ArrayList<AccountType>();
+        SharedPreferences sharedPreferences = context.getSharedPreferences(CUSTOM_ACCOUNT_TYPES_FILENAME, 0);
+        HashMap<String, HashSet<String>> accounts = (HashMap<String, HashSet<String>>) sharedPreferences.getAll();
+        Set<Entry<String, HashSet<String>>> entrys = accounts.entrySet();
+        Iterator<Entry<String, HashSet<String>>> iterator = entrys.iterator();
+        Entry<String, HashSet<String>> entry;
+        HashSet<String> info;
+        AccountType accountType;
+        String item;
+        while(iterator.hasNext()) {
+            entry = iterator.next();
+            accountType = new AccountType();
+            info = entry.getValue();
+            Iterator<String> infoIterator = info.iterator();
+            while(infoIterator.hasNext()) {
+                item = infoIterator.next();
+                if(item.startsWith("server:")) {
+                    accountType.domain = item.substring(7);
+                } else if(item.startsWith("port:")) {
+                    accountType.port = Integer.parseInt(item.substring(5));
+                } else if(item.startsWith("ssl:")) {
+                    accountType.ssl = Boolean.parseBoolean(item.substring(4));
+                } 
+            }
+            
+            sCustomAccountTypes.add(accountType);
+        }
+        
+    }
+    
+    /**
      * load current known account type
      * see res/xml/known_account_type.xml file
      * 
      * */
-    public static void loadKnownAccoutType(Context context) {
+    private static void loadKnownAccoutType(Context context) {
         if(sKnownAccountTypes != null) {
             return;
         }

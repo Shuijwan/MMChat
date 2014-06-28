@@ -26,6 +26,6 @@ public class MMChatApplication extends Application {
 
     public void onCreate() {
         super.onCreate();
-        AccountType.loadKnownAccoutType(this);
+        AccountType.loadAllAccountType(this);
     }
 }

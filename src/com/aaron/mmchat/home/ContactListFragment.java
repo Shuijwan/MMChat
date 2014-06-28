@@ -1,10 +1,15 @@
 package com.aaron.mmchat.home;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Fragment;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -12,7 +17,6 @@ import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnChildClickListener;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.aaron.mmchat.R;
 import com.aaron.mmchat.chat.ChatActivity;
@@ -20,12 +24,10 @@ import com.aaron.mmchat.core.ChatManager;
 import com.aaron.mmchat.core.Contact;
 import com.aaron.mmchat.core.ContactGroup;
 import com.aaron.mmchat.core.ContactManager;
-import com.aaron.mmchat.core.P2PChat;
 import com.aaron.mmchat.core.ContactManager.ContactListCallback;
 import com.aaron.mmchat.core.MMContext;
 import com.aaron.mmchat.widget.AbstractStickyHeaderExpandableListViewAdapter;
 import com.aaron.mmchat.widget.StickyHeaderExpandableListView;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -49,6 +51,7 @@ public class ContactListFragment extends Fragment implements OnChildClickListene
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         mChatManager = (ChatManager) MMContext.getInstance(activity).getService(MMContext.CHAT_SERVICE);
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -216,6 +219,7 @@ public class ContactListFragment extends Fragment implements OnChildClickListene
 
             final Contact data = getChild(groupPosition, childPosition);
 
+            holder.avator.setTag(data);
             holder.name.setText(data.getName());
             holder.presence.setText(data.getPresenceStatus());
 
@@ -254,6 +258,27 @@ public class ContactListFragment extends Fragment implements OnChildClickListene
         TextView presence;
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.contactlist_menu, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.contactlist_menu_search:
+                
+                break;
+            case R.id.contactlist_menu_groupchat:
+                break;
+            default:
+                break;
+        }
+
+        return true;
+    }
+    
     @Override
     public void onDetach() {
         // TODO Auto-generated method stub
@@ -295,8 +320,47 @@ public class ContactListFragment extends Fragment implements OnChildClickListene
 
     @Override
     public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-        // TODO Auto-generated method stub
-        return false;
+        ExpandableListView listView = (ExpandableListView) arg0;
+        long packedPos = mExpandableListView.getExpandableListPosition(arg2);
+        int type = ExpandableListView.getPackedPositionType(packedPos);
+        int firstViewPos = listView.getFirstVisiblePosition();
+        if (type == ExpandableListView.PACKED_POSITION_TYPE_CHILD)  {
+            int groupPos = ExpandableListView.getPackedPositionGroup(packedPos);
+            ContactGroup group = mAdapter.getGroup(groupPos);
+            View view = mExpandableListView.getChildAt(arg2 - firstViewPos);
+            ViewHolder holder = (ViewHolder) view.getTag();
+            Contact contact = (Contact) holder.avator.getTag();
+            showContactOperationDialog(group, contact);
+        }
+            
+        return true;
     }
 
+    private void showContactOperationDialog(final ContactGroup group, final Contact contact) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle(contact.getName());
+        String[] operations;
+        boolean available = contact.getPresence() == Contact.AVAILABLE;
+        if(available) {
+            operations = new String[1];
+            operations[0] = "delete";
+        } else {
+            operations = new String[2];
+            operations[0] = "delete";
+            operations[1] = "need him(her)";
+        }
+        builder.setItems(operations, new DialogInterface.OnClickListener() {
+            
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if(which == 0) {
+                    group.removeContact(contact);
+                } else if(which == 1) {
+                    
+                }
+                
+            }
+        });
+        builder.show();
+    }
 }

@@ -217,7 +217,7 @@ public class LoginManagerService extends BaseManagerService implements LoginMana
                     String bareJid = rawJid.substring(0, resIndex);
                     addConnection(bareJid, connection);
                     AccountManager.getInstance(mContext).addAccount(bareJid, domain, email, password);
-                    
+                    AccountType.addCusteomAccountType(mContext, domain, connection.configuration.getHostAddresses().get(0).getPort(), true);
                     sendLoginSuccessMsg(bareJid);
                 } catch (SmackException e) {
                     e.printStackTrace();
@@ -249,7 +249,8 @@ public class LoginManagerService extends BaseManagerService implements LoginMana
                     String bareJid = rawjid.substring(0, index);
                     addConnection(bareJid, connection);
                     AccountManager.getInstance(mContext).addAccount(bareJid, domain, username, password);
-                    
+                   
+                    AccountType.addCusteomAccountType(mContext, domain, connection.configuration.getHostAddresses().get(0).getPort(), true);
                     sendLoginSuccessMsg(bareJid);
                 } catch (SmackException e) {
                     e.printStackTrace();
@@ -371,11 +372,13 @@ public class LoginManagerService extends BaseManagerService implements LoginMana
             });
         } else {
             AccountType accountType = AccountType.getAccountTypeById(account.accountTypeId);
+            
             if(accountType.needSrv) {
                 login(account.username, account.password);
             } else {
                 login(account.username , account.password, accountType.domain, accountType.port);
             } 
+           
         }
         
     }
