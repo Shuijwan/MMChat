@@ -7,8 +7,6 @@
 
 package com.aaron.mmchat.core;
 
-import android.R.bool;
-
 /**
  *
  * @Title: Message.java
@@ -24,11 +22,13 @@ public abstract class Message {
     protected String mFrom;
     protected String mDate;
     protected boolean mSelfMessage;
+    protected boolean mReaded;
     
     public Message(String from, String date, boolean self) {
         mFrom = from;
         mDate = date;
         mSelfMessage = self;
+        mReaded = self;
     }
     
     public abstract Object getContent();
@@ -43,5 +43,13 @@ public abstract class Message {
     
     public boolean isSelfMessage() {
         return mSelfMessage;
+    }
+    
+    public boolean isReaded() {
+        return mReaded;
+    }
+    
+    public void markAsReaded() {
+        mReaded = true;
     }
 }

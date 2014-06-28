@@ -15,6 +15,7 @@ import com.aaron.mmchat.R;
 import com.aaron.mmchat.core.AccountManager;
 import com.aaron.mmchat.home.MenuFragment.MenuCallback;
 import com.aaron.mmchat.login.ChooseAccountTypeActivity;
+import com.aaron.mmchat.service.MMChatService;
 
 /**
  * @Title: HomeActivity.java
@@ -52,6 +53,8 @@ public class HomeActivity extends Activity implements MenuCallback {
         initDrawerLayout();
 
         switchFragmentTo(MenuFragment.MENU_CHATLIST);
+        
+        MMChatService.startMMChatService(this);
     }
 
     private void initDrawerLayout() {

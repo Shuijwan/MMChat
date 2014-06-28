@@ -343,6 +343,9 @@ public class LoginManagerService extends BaseManagerService implements LoginMana
 
     @Override
     public void relogin(final Account account) {
+        if(isSignedIn(account.jid)) {
+            return;
+        }
         final Connection connection = getConnection(account.jid);
         if(connection != null) {
             enqueneTask(new Runnable() {

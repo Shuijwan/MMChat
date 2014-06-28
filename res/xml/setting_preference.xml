@@ -1,0 +1,23 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <PreferenceCategory android:title="@string/general" >
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="sound"
+            android:title="@string/sound" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="vibrate"
+            android:title="@string/vibrate" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/about" >
+        <Preference
+            android:key="about"
+            android:title="@string/app_name" />
+        <Preference
+            android:key="feedback"
+            android:summary="@string/sendemail"
+            android:title="@string/feedback" />
+    </PreferenceCategory>
+
+</PreferenceScreen>
