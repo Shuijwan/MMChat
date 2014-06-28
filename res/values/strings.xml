@@ -15,6 +15,11 @@
     <string name="input_account_info">Please input the username and password.</string>
     <string name="username">Account Name</string>
 	<string name="password">Password</string>
+	<string name="server">Server address</string>
+	<string name="advanced">Advanced Setting</string>
+	<string name="port">Port:</string>
+	<string name="default_port">5222</string>
+	<string name="ssl">Need SSL</string>
 	<string name="login">Login</string>
 	<string name="logout">Logout</string>
 	<string name="delete">Delete</string>

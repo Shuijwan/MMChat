@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#bde4f8"
+    android:background="#bde4f8">
+<RelativeLayout 
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:padding="20dip"
     android:gravity="center">
     
@@ -53,12 +56,74 @@
         android:inputType="textPassword"
         android:layout_below="@id/username"
         android:layout_marginTop="20dip"/>
+    <EditText 
+        android:id="@+id/server"
+        android:layout_width="match_parent"
+        android:layout_height="45dip"
+        android:hint="@string/server"
+        android:layout_below="@id/password"
+        android:layout_marginTop="20dip"
+        android:visibility="gone"/>
+    <TextView 
+        android:id="@+id/advanced_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/advanced"
+        android:textSize="14sp"
+        android:textColor="@android:color/darker_gray"
+        android:layout_below="@id/server"
+        android:layout_marginTop="20dip"
+        android:paddingLeft="10dip"
+        android:visibility="gone"/>
+    <View 
+        android:id="@+id/advanced_dash"
+        android:layout_width="match_parent"
+        android:layout_height="2dip"
+        android:background="@drawable/dash"
+        android:layout_below="@id/advanced_title"
+        android:layout_marginTop="4dip"
+        android:visibility="gone"/>
+    <RelativeLayout 
+        android:id="@+id/advanced_wrapper"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dip"
+        android:layout_below="@id/advanced_dash"
+        android:visibility="gone"
+        >
+    <TextView 
+        android:id="@+id/port_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/port"
+        android:textSize="18sp"
+        android:layout_centerVertical="true"/>
+    <EditText 
+        android:id="@+id/port"
+        android:layout_width="wrap_content"
+        android:layout_height="45dip"
+        android:hint="@string/default_port"
+        android:text="@string/default_port"
+ 		android:inputType="text|number"
+        android:layout_toRightOf="@id/port_title"
+        android:layout_marginRight="30dip"
+        android:layout_marginLeft="5dip"
+        />
     
+    <CheckBox 
+        android:id="@+id/ssl"
+        android:layout_width="wrap_content"
+        android:layout_height="45dip"
+        android:text="@string/ssl"
+        android:layout_toRightOf="@id/port"
+        android:layout_alignParentRight="true"/>
+    </RelativeLayout>
     <Button 
         android:id="@+id/login"
         android:layout_width="match_parent"
         android:layout_height="60dip"
         android:text="@string/login"
-        android:layout_below="@id/password"
-        android:layout_marginTop="60dip"/>
+        android:layout_below="@id/advanced_wrapper"
+        android:layout_marginTop="30dip"/>
 </RelativeLayout>
+</ScrollView>

@@ -7,16 +7,12 @@
 
 package com.aaron.mmchat.login;
 
-import android.R.interpolator;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.XmlResourceParser;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -32,10 +28,6 @@ import android.widget.TextView;
 import com.aaron.mmchat.R;
 import com.aaron.mmchat.core.AccountType;
 
-import org.xmlpull.v1.XmlPullParserException;
-
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -162,6 +154,7 @@ public class ChooseAccountTypeActivity extends Activity implements OnItemSelecte
     public void onClick(View v) {
         if(v == mCustomButton) {
             LoginActivity.startLoginActivity(this, null);
+            finish();
         }
         
     }
