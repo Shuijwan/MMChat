@@ -29,6 +29,7 @@ public class InviteGroupchatActivity extends Activity {
     public static void startInviteGroupchatActivity(Context context, String clientJid) {
         Intent intent = new Intent(context, InviteGroupchatActivity.class);
         intent.putExtra("clientJid", clientJid);
+        context.startActivity(intent);
     }
     
     private Account mAccount;

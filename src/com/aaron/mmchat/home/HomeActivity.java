@@ -7,6 +7,7 @@ import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
 import android.view.MenuItem;
@@ -142,8 +143,15 @@ public class HomeActivity extends Activity implements MenuCallback {
     }
     
     @Override
-    public void onActiveMenuChanged(int menuId) {
-        switchFragmentTo(menuId);
+    public void onActiveMenuChanged(final int menuId) {
+        new Handler().postDelayed(new Runnable() {
+            
+            @Override
+            public void run() {
+                switchFragmentTo(menuId);
+            }
+        }, 250);
+        
     }
 
     private boolean hasValidAccount() {

@@ -11,6 +11,11 @@
             android:title="@string/vibrate" />
         <SwitchPreference 
             android:defaultValue="true"
+            android:key="show_offline_contact"
+            android:title="@string/show_offline_contact"
+            />
+        <SwitchPreference 
+            android:defaultValue="true"
             android:key="bootstart"
             android:title="@string/bootstart"
             />

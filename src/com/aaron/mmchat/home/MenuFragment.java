@@ -1,5 +1,6 @@
 package com.aaron.mmchat.home;
 
+import android.R.anim;
 import android.R.interpolator;
 import android.app.Activity;
 import android.app.Fragment;
@@ -17,7 +18,12 @@ import android.widget.ListView;
 import com.aaron.mmchat.R;
 import com.aaron.mmchat.core.AccountManager;
 import com.aaron.mmchat.core.AccountType;
+import com.aaron.mmchat.core.LoginManager.LoginCallback;
+import com.aaron.mmchat.core.MMContext;
 import com.aaron.mmchat.core.AccountManager.Account;
+import com.aaron.mmchat.core.LoginManager;
+import com.aaron.mmchat.core.ReconnectManager;
+import com.aaron.mmchat.core.ReconnectManager.ReconnectCallback;
 import com.aaron.mmchat.login.ChooseAccountTypeActivity;
 
 import java.util.List;
@@ -83,6 +89,13 @@ public class MenuFragment extends Fragment implements OnItemClickListener {
         listView.setAdapter(mAdapter);
        
         return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        // TODO Auto-generated method stub
+        super.onDestroyView();
+        mAdapter.unregisterAccountStatusListener();
     }
 
     @Override
@@ -159,7 +172,7 @@ public class MenuFragment extends Fragment implements OnItemClickListener {
         mAdapter.notifyDataSetChanged();
     }
 
-    class MenuAdapter extends BaseAdapter {
+    class MenuAdapter extends BaseAdapter implements LoginCallback, ReconnectCallback {
 
         private static final int NORMAL = 0;
         private static final int ACCOUNT_DIVIDER = 1;
@@ -168,12 +181,21 @@ public class MenuFragment extends Fragment implements OnItemClickListener {
 
         private List<Account> mAccounts;
         private LayoutInflater mInflater;
+        private LoginManager mLoginManager;
 
         public MenuAdapter() {
             mAccounts = AccountManager.getInstance(getActivity()).getAccounts();
             mInflater = LayoutInflater.from(getActivity());
+            mLoginManager = (LoginManager) MMContext.getInstance(getActivity()).getService(MMContext.LOGIN_SERVICE);
+            mLoginManager.registerLoginCallback(this);
+            ReconnectManager.getInstance().registerReconnectCallback(this);
         }
 
+        public void unregisterAccountStatusListener() {
+            mLoginManager.unregisterLoginCallback(this);
+            ReconnectManager.getInstance().unregisterReconnectCallback(this);
+        }
+        
         @Override
         public int getItemViewType(int position) {
             if (position < NORMAL_MENU_COUNT) {
@@ -248,6 +270,7 @@ public class MenuFragment extends Fragment implements OnItemClickListener {
                 holder = new AccountMenuHolder();
                 holder.textView = ((TextView)convertView.findViewById(R.id.account_name));
                 holder.iconView = (ImageView) convertView.findViewById(R.id.account_icon);
+                holder.statusView = (ImageView) convertView.findViewById(R.id.account_status);
                 convertView.setTag(holder);
             } else {
                 holder = (AccountMenuHolder) convertView.getTag();
@@ -259,6 +282,11 @@ public class MenuFragment extends Fragment implements OnItemClickListener {
                 holder.iconView.setImageResource(accountType.icon);
             } else {
                 holder.iconView.setImageResource(R.drawable.app_logo); 
+            }
+            if(mLoginManager.isSignedIn(account.jid)) {
+                holder.statusView.setVisibility(View.GONE);
+            } else {
+                holder.statusView.setImageResource(android.R.drawable.ic_dialog_alert);
             }
             return convertView;
         }
@@ -288,9 +316,36 @@ public class MenuFragment extends Fragment implements OnItemClickListener {
             
             return convertView;
         }
-        
-        
 
+        @Override
+        public void onLoginSuccessed(String clientJid) {
+            notifyDataSetChanged();
+            
+        }
+
+        @Override
+        public void onLoginFailed(String clientJid, int errorcode) {
+            // TODO Auto-generated method stub
+            notifyDataSetChanged();
+        }
+
+        @Override
+        public void onLogoutFinished(String clientJid, boolean remove) {
+            // TODO Auto-generated method stub
+            notifyDataSetChanged();
+        }
+
+        @Override
+        public void onConnected(String clientJid) {
+            // TODO Auto-generated method stub
+            notifyDataSetChanged();
+        }
+
+        @Override
+        public void onDisconnected(String clientJid) {
+            // TODO Auto-generated method stub
+            notifyDataSetChanged();
+        }
     }
     
     static class NormalMenuHolder {
@@ -301,5 +356,6 @@ public class MenuFragment extends Fragment implements OnItemClickListener {
     static class AccountMenuHolder {
         TextView textView;
         ImageView iconView;
+        ImageView statusView;
     }
 }

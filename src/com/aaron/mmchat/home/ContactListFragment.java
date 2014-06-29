@@ -25,6 +25,7 @@ import com.aaron.mmchat.core.AccountManager.Account;
 import com.aaron.mmchat.core.ChatManager;
 import com.aaron.mmchat.core.Contact;
 import com.aaron.mmchat.core.ContactGroup;
+import com.aaron.mmchat.core.ContactGroup.ContactGroupCallback;
 import com.aaron.mmchat.core.ContactManager;
 import com.aaron.mmchat.core.ContactManager.ContactListCallback;
 import com.aaron.mmchat.core.MMContext;
@@ -75,7 +76,7 @@ public class ContactListFragment extends Fragment implements OnChildClickListene
         return root;
     }
 
-    private class ContactListAdapter extends AbstractStickyHeaderExpandableListViewAdapter implements ContactListCallback {
+    private class ContactListAdapter extends AbstractStickyHeaderExpandableListViewAdapter implements ContactListCallback, ContactGroupCallback {
 
         private LayoutInflater mLayoutInflater;
         private Map<String, ArrayList<ContactGroup>> mAllContactList;
@@ -127,6 +128,7 @@ public class ContactListFragment extends Fragment implements OnChildClickListene
                 } else {
                     ContactGroup group = groups.get(groupPosition - current);
                     mSparseArray.put(groupPosition, group);
+                    group.registerContactGroupCallback(this);
                     return group;
                 }
             }
@@ -254,6 +256,36 @@ public class ContactListFragment extends Fragment implements OnChildClickListene
             notifyDataSetChanged();
             
         }
+
+        @Override
+        public void onContactRemovedFailed(String contact, int errorcode) {
+            
+        }
+
+        @Override
+        public void onContactRemoved(String contact) {
+            notifyDataSetChanged();
+            
+        }
+
+        @Override
+        public void onContactAdded(String contact) {
+            notifyDataSetChanged();
+            
+        }
+
+        @Override
+        public void onContactAddedFailed(String contact, int errorcode) {
+            
+        }
+        
+        public void unregisterContactListCallback() {
+            mContactManager.unregisterContactListCallback(this);
+            int size = mSparseArray.size();
+            for(int i=0; i<size; i++) {
+                mSparseArray.valueAt(i).registerContactGroupCallback(this);
+            }
+        }
     }
 
     public static class ViewHolder {
@@ -291,31 +323,32 @@ public class ContactListFragment extends Fragment implements OnChildClickListene
     
     @Override
     public void onDetach() {
-        // TODO Auto-generated method stub
         super.onDetach();
     }
 
     @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        mAdapter.unregisterContactListCallback();
+    }
+
+    @Override
     public void onPause() {
-        // TODO Auto-generated method stub
         super.onPause();
     }
 
     @Override
     public void onResume() {
-        // TODO Auto-generated method stub
         super.onResume();
     }
 
     @Override
     public void onStart() {
-        // TODO Auto-generated method stub
         super.onStart();
     }
 
     @Override
     public void onStop() {
-        // TODO Auto-generated method stub
         super.onStop();
     }
 
