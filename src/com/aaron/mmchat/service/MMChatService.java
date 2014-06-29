@@ -16,6 +16,7 @@ import com.aaron.mmchat.core.AccountManager;
 import com.aaron.mmchat.core.AccountManager.Account;
 import com.aaron.mmchat.core.LoginManager;
 import com.aaron.mmchat.core.MMContext;
+import com.aaron.mmchat.utils.NetWorkUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,12 +41,7 @@ public class MMChatService extends Service {
 
     public void onCreate() {
         super.onCreate();
-        AccountManager accountManager = AccountManager.getInstance(this);
-        List<Account> accounts = accountManager.getAccounts();
-        LoginManager loginManager = (LoginManager) MMContext.getInstance(this).getService(MMContext.LOGIN_SERVICE);
-        for(Account account : accounts) {
-            loginManager.relogin(account);
-        }
+        login();
     }
     
     @Override
@@ -57,4 +53,15 @@ public class MMChatService extends Service {
         return Service.START_STICKY;
     }
 
+    private void login() {
+        if(NetWorkUtils.isNetworkAvailable(this)) {
+            AccountManager accountManager = AccountManager.getInstance(this);
+            List<Account> accounts = accountManager.getAccounts();
+            LoginManager loginManager = (LoginManager) MMContext.getInstance(this).getService(MMContext.LOGIN_SERVICE);
+            for(Account account : accounts) {
+                loginManager.relogin(account);
+            }
+        }
+        
+    }
 }
