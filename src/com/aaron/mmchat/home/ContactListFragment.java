@@ -20,17 +20,21 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import com.aaron.mmchat.R;
 import com.aaron.mmchat.chat.ChatActivity;
+import com.aaron.mmchat.core.AccountManager;
+import com.aaron.mmchat.core.AccountManager.Account;
 import com.aaron.mmchat.core.ChatManager;
 import com.aaron.mmchat.core.Contact;
 import com.aaron.mmchat.core.ContactGroup;
 import com.aaron.mmchat.core.ContactManager;
 import com.aaron.mmchat.core.ContactManager.ContactListCallback;
 import com.aaron.mmchat.core.MMContext;
+import com.aaron.mmchat.invitegroupchat.InviteGroupchatActivity;
 import com.aaron.mmchat.widget.AbstractStickyHeaderExpandableListViewAdapter;
 import com.aaron.mmchat.widget.StickyHeaderExpandableListView;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -271,6 +275,12 @@ public class ContactListFragment extends Fragment implements OnChildClickListene
                 
                 break;
             case R.id.contactlist_menu_groupchat:
+                List<Account> accounts = AccountManager.getInstance(getActivity()).getAccounts();
+                if(accounts.size() == 1) {
+                    InviteGroupchatActivity.startInviteGroupchatActivity(getActivity(), accounts.get(0).jid);
+                } else {
+                    showSelectAccountDialog();
+                }
                 break;
             default:
                 break;
@@ -336,6 +346,25 @@ public class ContactListFragment extends Fragment implements OnChildClickListene
         return true;
     }
 
+    private void showSelectAccountDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        final List<Account> accounts = AccountManager.getInstance(getActivity()).getAccounts();
+        builder.setTitle(R.string.select_account);
+        
+        String[] items = new String[accounts.size()];
+        for(int i=0; i<accounts.size(); i++) {
+            items[i] = accounts.get(i).username;
+        }
+        builder.setItems(items, new DialogInterface.OnClickListener() {
+            
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Account account = accounts.get(which);
+                InviteGroupchatActivity.startInviteGroupchatActivity(getActivity(), account.jid);
+            }
+        }).show();
+    }
+    
     private void showContactOperationDialog(final ContactGroup group, final Contact contact) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(contact.getName());

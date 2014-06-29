@@ -90,7 +90,7 @@ public class AccountManager {
         return Collections.unmodifiableList(mAccounts);
     }
     
-    private Account getAccount(String jid) {
+    public Account getAccount(String jid) {
         for(Account account : mAccounts) {
             if(account.jid.equals(jid)) {
                 return account;
