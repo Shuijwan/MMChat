@@ -7,7 +7,6 @@
 
 package com.aaron.mmchat.core.services;
 
-import android.R.anim;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
@@ -26,10 +25,14 @@ import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.SmackException.NotConnectedException;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smack.packet.Presence.Mode;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
+import org.jivesoftware.smack.util.StringUtils;
 
 import org.jivesoftware.smackx.caps.EntityCapsManager;
 import org.jivesoftware.smackx.caps.cache.SimpleDirectoryPersistentCache;
+import org.jivesoftware.smackx.carbons.CarbonManager;
 import org.jivesoftware.smackx.disco.ServiceDiscoveryManager;
 import org.jivesoftware.smackx.ping.PingManager;
 import org.jivesoftware.smackx.receipts.DeliveryReceiptManager;
@@ -187,7 +190,6 @@ public class LoginManagerService extends BaseManagerService implements LoginMana
         PingManager.setDefaultPingInterval(10*1000);
         PingManager.getInstanceFor(connection).setPingInterval(10*1000);
         
-
         // reference DeliveryReceiptManager, add listener
         DeliveryReceiptManager dm = DeliveryReceiptManager.getInstanceFor(connection);
         dm.enableAutoReceipts();
@@ -205,31 +207,10 @@ public class LoginManagerService extends BaseManagerService implements LoginMana
             
             @Override
             public void run() {
-                String rawJid = null;
-                int index = email.lastIndexOf("@");
-                String username = email.substring(0, index);
-                String domain = email.substring(index+1);
-                try {
-                    connection.connection.connect();
-                    connection.connection.login(username, password, "MMChat");
-                    rawJid = connection.connection.getUser();
-                    int resIndex = rawJid.indexOf("/");
-                    String bareJid = rawJid.substring(0, resIndex);
-                    addConnection(bareJid, connection);
-                    AccountManager.getInstance(mContext).addAccount(bareJid, domain, email, password);
-                    AccountType.addCusteomAccountType(mContext, domain, connection.configuration.getHostAddresses().get(0).getPort(), true);
-                    sendLoginSuccessMsg(bareJid);
-                } catch (SmackException e) {
-                    e.printStackTrace();
-                    sendLoginFailMsg(email, LOGIN_ERROR_OTHER);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    sendLoginFailMsg(email, LOGIN_ERROR_OTHER);
-                } catch (XMPPException e) {
-                    e.printStackTrace();
-                    sendLoginFailMsg(email, LOGIN_ERROR_OTHER);
-                }
+                String username = StringUtils.parseName(email);
+                String domain = StringUtils.parseServer(email);
                 
+                doLoginInternal(connection, email, username, password, domain, true);
             }
         });
     }
@@ -239,32 +220,51 @@ public class LoginManagerService extends BaseManagerService implements LoginMana
             
             @Override
             public void run() {
-                String rawjid = null;
                 String id = username+"@"+domain;
-                try {
-                    connection.connection.connect();
-                    connection.connection.login(username, password, "MMChat");
-                    rawjid = connection.connection.getUser();
-                    int index = rawjid.indexOf("/");
-                    String bareJid = rawjid.substring(0, index);
-                    addConnection(bareJid, connection);
-                    AccountManager.getInstance(mContext).addAccount(bareJid, domain, username, password);
-                   
-                    AccountType.addCusteomAccountType(mContext, domain, connection.configuration.getHostAddresses().get(0).getPort(), true);
-                    sendLoginSuccessMsg(bareJid);
-                } catch (SmackException e) {
-                    e.printStackTrace();
-                    sendLoginFailMsg(id, LOGIN_ERROR_OTHER);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    sendLoginFailMsg(id, LOGIN_ERROR_OTHER);
-                } catch (XMPPException e) {
-                    e.printStackTrace();
-                    sendLoginFailMsg(id, LOGIN_ERROR_OTHER);
-                }
-                
+                doLoginInternal(connection, id, username, password, domain, false);
             }
         });
+    }
+    
+    private void doLoginInternal(Connection connection, String email, String username, String password, String domain, boolean discovery) {
+        try {
+            connection.connection.connect();
+            connection.connection.login(username, password, "MMChat");
+            String rawjid = connection.connection.getUser();
+            int index = rawjid.indexOf("/");
+            String bareJid = rawjid.substring(0, index);
+            addConnection(bareJid, connection);
+            
+            AccountManager.getInstance(mContext).addAccount(bareJid, domain, discovery ? email : username, password);
+            AccountType.addCusteomAccountType(mContext, domain, connection.configuration.getHostAddresses().get(0).getPort(), true);
+            
+            setSelfPresenceAvailable(connection.connection);
+            
+            sendLoginSuccessMsg(bareJid);
+            
+        } catch (SmackException e) {
+            e.printStackTrace();
+            sendLoginFailMsg(email, LOGIN_ERROR_OTHER);
+        } catch (IOException e) {
+            e.printStackTrace();
+            sendLoginFailMsg(email, LOGIN_ERROR_OTHER);
+        } catch (XMPPException e) {
+            e.printStackTrace();
+            sendLoginFailMsg(email, LOGIN_ERROR_OTHER);
+        }
+    }
+    
+    private void setSelfPresenceAvailable(XMPPConnection connection) {
+        Presence presence = new Presence(Presence.Type.available);
+        presence.setMode(Mode.available);
+        presence.setStatus("Available");
+        presence.setPriority(127);
+        try {
+            connection.sendPacket(presence);
+        } catch (NotConnectedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     private void sendLoginSuccessMsg(String jid) {

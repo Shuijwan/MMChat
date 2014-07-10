@@ -16,7 +16,12 @@ import com.aaron.mmchat.core.PersistentGroupChat;
 
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.ChatManagerListener;
+import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.SmackException.NotConnectedException;
+import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smackx.carbons.CarbonManager;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -176,10 +181,38 @@ public class ChatManagerService extends BaseManagerService implements ChatManage
     @Override
     public void onLoginSuccessed(String clientJid) {
         XMPPConnection connection = getXmppConnection(clientJid);
+        
+        enableCarbons(connection);
+        
         org.jivesoftware.smack.ChatManager chatManager = org.jivesoftware.smack.ChatManager.getInstanceFor(connection);
         chatManager.addChatListener(new ChatCreatedListener(clientJid));
     }
 
+    private void enableCarbons(final XMPPConnection connection) {
+        enqueneTask(new Runnable() {
+            
+            @Override
+            public void run() {
+                try {
+                    if(CarbonManager.getInstanceFor(connection).isSupportedByServer()) {
+                        CarbonManager.getInstanceFor(connection).sendCarbonsEnabled(true);
+                    }
+                } catch (NotConnectedException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (XMPPException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (SmackException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                
+            }
+        });
+        
+    }
+    
     @Override
     public void onLoginFailed(String clientJid, int errorcode) {
         // TODO Auto-generated method stub

@@ -26,6 +26,7 @@ import org.jivesoftware.smack.SmackException.NotConnectedException;
 import org.jivesoftware.smack.SmackException.NotLoggedInException;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smack.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -156,7 +157,7 @@ public class ContactManagerService extends BaseManagerService implements Contact
         public void presenceChanged(Presence presence) {
             String[] param = new String[2];
             param[0] = clientJid;
-            param[1] = presence.getFrom();
+            param[1] = StringUtils.parseBareAddress(presence.getFrom());
             
             Message msg = Message.obtain(mUIHandler, MSG_CONTACT_PRESENCE_UPDATED, param);
             msg.sendToTarget();
@@ -335,9 +336,16 @@ public class ContactManagerService extends BaseManagerService implements Contact
         }
         
         private void handleContactPresenceUpdated(String clientJid, String jid) {
+            if(clientJid.equals(jid.split("/")[0])) {
+                return;
+            }
+            
             Roster roster = mRosters.get(clientJid);
             RosterEntry entry = roster.getEntry(jid);
-         
+            
+            if(entry == null) {
+                return;
+            }
             Collection<RosterGroup> groups = entry.getGroups();
             HashMap<String, ContactGroup> contactlistMap = mAllContactListsMap.get(clientJid);
             ContactGroup contactGroup;
