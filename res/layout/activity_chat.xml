@@ -65,6 +65,7 @@
             android:paddingLeft="10dip"
             android:paddingRight="10dip"
             android:divider="@android:color/transparent"
+            android:listSelector="@android:color/transparent"
              >
         </ListView>
     </android.support.v4.widget.SwipeRefreshLayout>

@@ -52,6 +52,7 @@
     <string name="sound">Sound</string>
     <string name="vibrate">Vibrate</string>
     <string name="show_offline_contact">Show Offline Contact</string>
+    <string name="show_in_statusbar">Show in Statusbar</string>
     <string name="bootstart">Boot Start</string>
     <string name="about">About</string>
     <string name="feedback">Feedback</string>

@@ -348,6 +348,11 @@ public class ContactManagerService extends BaseManagerService implements Contact
             }
             Collection<RosterGroup> groups = entry.getGroups();
             HashMap<String, ContactGroup> contactlistMap = mAllContactListsMap.get(clientJid);
+            
+            if(contactlistMap == null) {//contact list has not been constructed yet.
+                return;
+            }
+            
             ContactGroup contactGroup;
             Contact contact;
             

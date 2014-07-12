@@ -16,6 +16,11 @@
             />
         <SwitchPreference 
             android:defaultValue="true"
+            android:key="show_in_statusbar"
+            android:title="@string/show_in_statusbar"
+            />
+        <SwitchPreference 
+            android:defaultValue="true"
             android:key="bootstart"
             android:title="@string/bootstart"
             />

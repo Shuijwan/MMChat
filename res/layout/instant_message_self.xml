@@ -4,7 +4,8 @@
     android:layout_height="wrap_content"
     android:paddingLeft="20dp"
     android:paddingTop="10dip"
-    android:paddingBottom="10dip" >
+    android:paddingBottom="10dip"
+    >
 
     <ImageView
         android:id="@+id/contactPicture"
