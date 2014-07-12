@@ -15,12 +15,12 @@
         android:paddingRight="8dp"
         android:paddingTop="5dp" >
 
-        <ImageView
+        <com.aaron.mmchat.widget.AvatarView
             android:id="@+id/contact_avatar"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_marginRight="8dp"
-            android:src="@drawable/default_avatar" />
+             />
 
         <LinearLayout
             android:layout_width="match_parent"

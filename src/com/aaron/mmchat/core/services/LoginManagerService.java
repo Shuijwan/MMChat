@@ -111,8 +111,8 @@ public class LoginManagerService extends BaseManagerService implements LoginMana
 
     @Override
     public void login(String email, String password) {
-        int index = email.lastIndexOf("@");
-        String domain = email.substring(index+1);
+        String username = StringUtils.parseName(email);
+        String domain = StringUtils.parseServer(email);
         
         ConnectionConfiguration configuration = initConfiguration(domain);
         XMPPConnection connection = new XMPPTCPConnection(configuration);
@@ -122,7 +122,7 @@ public class LoginManagerService extends BaseManagerService implements LoginMana
         con.configuration = configuration;
         
         initServiceDiscovery(connection);
-        doLoginByDisCovery(con, email, password);
+        doLogin(con, username, password, domain, true);
       
     }
 
@@ -136,7 +136,7 @@ public class LoginManagerService extends BaseManagerService implements LoginMana
         con.configuration = configuration;
 
         initServiceDiscovery(connection);
-        doLogin(con, username, password, server);
+        doLogin(con, username, password, server, false);
         
     }
     
@@ -202,31 +202,18 @@ public class LoginManagerService extends BaseManagerService implements LoginMana
             }});
     }
     
-    private void doLoginByDisCovery(final Connection connection, final String email, final String password) {
+    private void doLogin(final Connection connection, final String username, final String password, final String domain, final boolean discovery) {
         enqueneTask(new Runnable() {
             
             @Override
             public void run() {
-                String username = StringUtils.parseName(email);
-                String domain = StringUtils.parseServer(email);
-                
-                doLoginInternal(connection, email, username, password, domain, true);
+                doLoginInternal(connection, username, password, domain, discovery);
             }
         });
     }
     
-    private void doLogin(final Connection connection, final String username, final String password, final String domain) {
-        enqueneTask(new Runnable() {
-            
-            @Override
-            public void run() {
-                String id = username+"@"+domain;
-                doLoginInternal(connection, id, username, password, domain, false);
-            }
-        });
-    }
-    
-    private void doLoginInternal(Connection connection, String email, String username, String password, String domain, boolean discovery) {
+    private void doLoginInternal(Connection connection, String username, String password, String domain, boolean discovery) {
+        String email = username+"@"+domain;
         try {
             connection.connection.connect();
             connection.connection.login(username, password, "MMChat");

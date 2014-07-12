@@ -27,9 +27,7 @@ import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
 
 import com.aaron.mmchat.R;
@@ -41,6 +39,7 @@ import com.aaron.mmchat.core.MMContext;
 import com.aaron.mmchat.core.Message;
 import com.aaron.mmchat.core.P2PChat;
 import com.aaron.mmchat.utils.ViewUtils;
+import com.aaron.mmchat.widget.AvatarView;
 
 import java.util.ArrayList;
 
@@ -251,7 +250,7 @@ public class ChatActivity extends Activity implements OnRefreshListener, OnClick
                 
                 holder = new ViewHolder();
 
-                holder.avator = (ImageView) convertView.findViewById(R.id.contact_avatar);
+                holder.avator = (AvatarView) convertView.findViewById(R.id.contact_avatar);
 
                 holder.name = (TextView) convertView.findViewById(R.id.contact_display_name);
                 holder.presence = (TextView) convertView.findViewById(R.id.contact_presence_text);
@@ -271,7 +270,7 @@ public class ChatActivity extends Activity implements OnRefreshListener, OnClick
     }
     
     static class ViewHolder {
-        ImageView avator;
+        AvatarView avator;
         TextView name;
         TextView presence;
     }

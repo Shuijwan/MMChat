@@ -94,17 +94,16 @@ public class ChatManagerService extends BaseManagerService implements ChatManage
     @Override
     public P2PChat getOrCreateP2PChat(String clientJid, String jid) {
         
-        for(P2PChat chat : mP2pChats) {
-            if(clientJid.equals(chat.getClientJid()) && jid.equals(chat.getParticipantJid())) {
-                return chat;
-            }
+        P2PChat p2pChat = getP2PChat(clientJid, jid);
+        if(p2pChat != null) {
+            return p2pChat;
         }
         
         XMPPConnection connection = getXmppConnection(clientJid);
         org.jivesoftware.smack.ChatManager chatManager = org.jivesoftware.smack.ChatManager.getInstanceFor(connection);
    
         Chat chat = chatManager.createChat(jid, null);
-        P2PChat p2pChat = new P2PChat(clientJid, chat);
+        p2pChat = new P2PChat(clientJid, chat);
         mP2pChats.add(p2pChat);
         notifyP2PChatCreated(p2pChat);
         return p2pChat;
@@ -198,13 +197,10 @@ public class ChatManagerService extends BaseManagerService implements ChatManage
                         CarbonManager.getInstanceFor(connection).sendCarbonsEnabled(true);
                     }
                 } catch (NotConnectedException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 } catch (XMPPException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 } catch (SmackException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
                 
@@ -215,7 +211,6 @@ public class ChatManagerService extends BaseManagerService implements ChatManage
     
     @Override
     public void onLoginFailed(String clientJid, int errorcode) {
-        // TODO Auto-generated method stub
         
     }
 
