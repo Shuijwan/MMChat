@@ -77,7 +77,7 @@ public class ContactGroup extends BaseXmppObject implements ContactCallback {
         
         @Override
         public int compare(Contact lhs, Contact rhs) {
-            return lhs.getName().compareTo(rhs.getName());
+            return lhs.getName().compareToIgnoreCase(rhs.getName());
         }
     };
     
