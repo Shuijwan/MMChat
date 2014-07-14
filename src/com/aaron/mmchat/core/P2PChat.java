@@ -105,4 +105,9 @@ public class P2PChat extends BaseChat implements MessageListener {
         
     }
 
+    @Override
+    public String getChatName() {
+        return getParticipantName();
+    }
+
 }

@@ -8,9 +8,9 @@
 package com.aaron.mmchat.home;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,8 +36,6 @@ public class SettingFragment extends PreferenceFragment {
         
     }
 
-   
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,6 +56,7 @@ public class SettingFragment extends PreferenceFragment {
     @Override
     public void onDetach() {
         super.onDetach();
+       
     }
     
     

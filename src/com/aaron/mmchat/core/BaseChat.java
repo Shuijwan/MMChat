@@ -87,4 +87,6 @@ public abstract class BaseChat {
     }
     
     public abstract void sendMessage(String text);
+    
+    public abstract String getChatName();
 }

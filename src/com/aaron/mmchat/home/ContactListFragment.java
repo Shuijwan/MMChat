@@ -305,16 +305,11 @@ public class ContactListFragment extends Fragment implements OnChildClickListene
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.contactlist_menu_search:
+            case R.id.menu_search:
                 
                 break;
-            case R.id.contactlist_menu_groupchat:
-                List<Account> accounts = AccountManager.getInstance(getActivity()).getAccounts();
-                if(accounts.size() == 1) {
-                    InviteGroupchatActivity.startInviteGroupchatActivity(getActivity(), accounts.get(0).jid);
-                } else {
-                    showSelectAccountDialog();
-                }
+            case R.id.menu_add:
+                
                 break;
             default:
                 break;
@@ -379,25 +374,6 @@ public class ContactListFragment extends Fragment implements OnChildClickListene
         }
             
         return true;
-    }
-
-    private void showSelectAccountDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        final List<Account> accounts = AccountManager.getInstance(getActivity()).getAccounts();
-        builder.setTitle(R.string.select_account);
-        
-        String[] items = new String[accounts.size()];
-        for(int i=0; i<accounts.size(); i++) {
-            items[i] = accounts.get(i).username;
-        }
-        builder.setItems(items, new DialogInterface.OnClickListener() {
-            
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                Account account = accounts.get(which);
-                InviteGroupchatActivity.startInviteGroupchatActivity(getActivity(), account.jid);
-            }
-        }).show();
     }
     
     private void showContactOperationDialog(final ContactGroup group, final Contact contact) {

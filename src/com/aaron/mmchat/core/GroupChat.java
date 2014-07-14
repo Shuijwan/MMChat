@@ -242,4 +242,9 @@ public class GroupChat extends BaseChat implements PacketListener, InvitationRej
         
     }
 
+    @Override
+    public String getChatName() {
+        return mChat.getSubject();
+    }
+
 }

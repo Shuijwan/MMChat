@@ -37,13 +37,13 @@ public class Contact extends BaseXmppObject {
         /**
          * callback for @Contact' info changed
          * */
-        public void onContactUpdated();
+        public void onContactUpdated(Contact contact);
         
         /**
          * callback for @Contact's presence changed
          * 
          * */
-        public void onContactPresenceUpdated();
+        public void onContactPresenceUpdated(Contact contact);
     }
 
     private ArrayList<ContactCallback> mCallbacks;
@@ -72,13 +72,13 @@ public class Contact extends BaseXmppObject {
     
     private void notifyContactUpdated() {
         for(ContactCallback callback : mCallbacks) {
-            callback.onContactUpdated();
+            callback.onContactUpdated(this);
         }
     }
     
     private void notifyContactPresenceUpdated() {
         for(ContactCallback callback : mCallbacks) {
-            callback.onContactPresenceUpdated();
+            callback.onContactPresenceUpdated(this);
         }
     }
     

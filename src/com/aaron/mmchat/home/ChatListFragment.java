@@ -8,9 +8,15 @@
 package com.aaron.mmchat.home;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
 import android.app.Fragment;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -23,13 +29,18 @@ import android.widget.TextView;
 
 import com.aaron.mmchat.R;
 import com.aaron.mmchat.chat.ChatActivity;
+import com.aaron.mmchat.core.AccountManager;
+import com.aaron.mmchat.core.BaseChat;
 import com.aaron.mmchat.core.ChatManager;
 import com.aaron.mmchat.core.GroupChat;
 import com.aaron.mmchat.core.InstantMessage;
 import com.aaron.mmchat.core.MMContext;
 import com.aaron.mmchat.core.P2PChat;
+import com.aaron.mmchat.core.AccountManager.Account;
+import com.aaron.mmchat.invitegroupchat.InviteGroupchatActivity;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -45,12 +56,14 @@ import java.util.ArrayList;
 public class ChatListFragment extends Fragment implements OnItemClickListener, OnItemLongClickListener {
 
     private ChatListAdapter mAdapter;
+    private ChatManager mChatManager;
     
     @Override
     public void onAttach(Activity activity) {
         // TODO Auto-generated method stub
         super.onAttach(activity);
-        
+        setHasOptionsMenu(true);
+        mChatManager = (ChatManager) MMContext.getInstance(getActivity()).getService(MMContext.CHAT_SERVICE);
     }
 
     @Override
@@ -101,13 +114,11 @@ public class ChatListFragment extends Fragment implements OnItemClickListener, O
 
     class ChatListAdapter extends BaseAdapter {
 
-        private ChatManager mChatManager;
         private LayoutInflater mInflater;
         private ArrayList<P2PChat> mP2pChats;
         private ArrayList<GroupChat> mGroupChats;
         
-        public ChatListAdapter() {
-            mChatManager = (ChatManager) MMContext.getInstance(getActivity()).getService(MMContext.CHAT_SERVICE);
+        public ChatListAdapter() {  
             mInflater = LayoutInflater.from(getActivity());
             mP2pChats = mChatManager.getP2PChatList();
             mGroupChats = mChatManager.getGroupChatList();
@@ -175,6 +186,25 @@ public class ChatListFragment extends Fragment implements OnItemClickListener, O
         TextView time;
         TextView unreadCount;
     }
+    
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.chatlist_menu, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_start_groupchat:
+                InviteGroupchatActivity.startInviteGroupchatActivity(getActivity());
+                break;
+            default:
+                break;
+        }
+
+        return true;
+    }
 
     @Override
     public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
@@ -184,7 +214,21 @@ public class ChatListFragment extends Fragment implements OnItemClickListener, O
 
     @Override
     public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-        // TODO Auto-generated method stub
-        return false;
+        final BaseChat chat = (BaseChat) mAdapter.getItem(arg2);
+        AlertDialog.Builder builder = new Builder(getActivity());
+        builder.setTitle(chat.getChatName());
+        builder.setItems(R.array.chat_list_operation, new DialogInterface.OnClickListener() {
+            
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if(which == 0) {
+                    
+                } else if(which == 1) {
+                    mChatManager.removeChat(chat);
+                }
+                mAdapter.notifyDataSetChanged();
+            }
+        }).show();
+        return true;
     }
 }

@@ -39,6 +39,7 @@
     
     <string name="empty_contact_info">No Contacts. Add contact to start chat.</string>
     <string name="search">Search</string>
+    <string name="add_contact">Add Contact</string>
     <string name="start_groupchat">Start a GroupChat</string>
     <string name="empty_chat_info">No Chats.</string>
     
@@ -46,6 +47,11 @@
         <item >Available</item>
         <item >Away</item>
         <item >Do not disturb</item>
+    </string-array>
+    
+    <string-array name="chat_list_operation">
+        <item >Set as Top</item>
+        <item >Delete</item>
     </string-array>
     
     <string name="general">General</string>

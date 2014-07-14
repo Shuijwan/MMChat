@@ -43,12 +43,10 @@ public interface ChatManager {
     
     public P2PChat getOrCreateP2PChat(String clientJid, String jid);
     
-    public void removeP2PChat(P2PChat chat);
+    public void removeChat(BaseChat chat);
     
     public void createGroupChat(String[] jids);
-    
-    public void removeGroupChat(GroupChat chat);
-    
+     
     public void createPersistentGroupChat(String[] jids);
     
     public void removePersistentGroupChat(PersistentGroupChat chat);

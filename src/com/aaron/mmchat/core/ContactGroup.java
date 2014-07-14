@@ -7,8 +7,10 @@
 
 package com.aaron.mmchat.core;
 
+import android.preference.PreferenceManager;
 import android.util.Log;
 
+import com.aaron.mmchat.core.Contact.ContactCallback;
 import com.aaron.mmchat.core.services.ContactManagerService;
 
 import org.jivesoftware.smack.Roster;
@@ -21,6 +23,8 @@ import org.jivesoftware.smack.XMPPException.XMPPErrorException;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 
 /**
@@ -34,7 +38,7 @@ import java.util.HashMap;
  *
  */
 
-public class ContactGroup extends BaseXmppObject {
+public class ContactGroup extends BaseXmppObject implements ContactCallback {
     
     public static final int ERROR_TIME_OUT = 1;
     
@@ -69,9 +73,18 @@ public class ContactGroup extends BaseXmppObject {
         public void onContactAddedFailed(String contact, int errorcode);
     }
     
+    private static Comparator<Contact> sComparator = new Comparator<Contact>() {
+        
+        @Override
+        public int compare(Contact lhs, Contact rhs) {
+            return lhs.getName().compareTo(rhs.getName());
+        }
+    };
+    
     private ArrayList<ContactGroupCallback> mCallbacks;
     private RosterGroup mRosterGroup;
     private ArrayList<Contact> mContacts;
+    private ArrayList<Contact> mOnlineContacts;
     private HashMap<String, Contact> mContactMap;
     private String mClientJid;
     
@@ -87,10 +100,12 @@ public class ContactGroup extends BaseXmppObject {
         for(RosterEntry entry : entries) {
             ContactManagerService contactManager = (ContactManagerService) MMContext.peekInstance().getService(MMContext.CONTACT_SERVICE);
             contact = contactManager.getOrCreateContact(mClientJid, entry);
+            contact.registerContactCallback(this);
             mContacts.add(contact);
             mContactMap.put(entry.getUser(), contact);
             Log.i("TTT", "c:"+entry.getUser());
         }
+        sortContacts();
     }
     
     public String getClientJid() {
@@ -143,6 +158,10 @@ public class ContactGroup extends BaseXmppObject {
         return mContacts;
     }
     
+    public ArrayList<Contact> getOnlineContacts() {
+        return mOnlineContacts;
+    }
+    
     public Contact getContact(String jid) {
         return mContactMap.get(jid);
     }
@@ -165,6 +184,7 @@ public class ContactGroup extends BaseXmppObject {
         Contact contact = contactManager.getOrCreateContact(mClientJid, rosterEntry);
         mContacts.add(contact);
         mContactMap.put(rosterEntry.getUser(), contact);
+        sortContacts();
         notifyContactAdded(rosterEntry.getUser());
         return true;
     }
@@ -264,5 +284,21 @@ public class ContactGroup extends BaseXmppObject {
                 } 
             }
         });   
+    }
+    
+    private void sortContacts() {
+        Collections.sort(mContacts, sComparator);
+    }
+
+    @Override
+    public void onContactUpdated(Contact contact) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void onContactPresenceUpdated(Contact contact) {
+        
+        
     }
 }

@@ -26,9 +26,8 @@ import com.aaron.mmchat.core.AccountManager.Account;
 
 public class InviteGroupchatActivity extends Activity {
     
-    public static void startInviteGroupchatActivity(Context context, String clientJid) {
+    public static void startInviteGroupchatActivity(Context context) {
         Intent intent = new Intent(context, InviteGroupchatActivity.class);
-        intent.putExtra("clientJid", clientJid);
         context.startActivity(intent);
     }
     

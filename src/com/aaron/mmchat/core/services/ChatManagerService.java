@@ -7,6 +7,7 @@
 
 package com.aaron.mmchat.core.services;
 
+import com.aaron.mmchat.core.BaseChat;
 import com.aaron.mmchat.core.ChatManager;
 import com.aaron.mmchat.core.GroupChat;
 import com.aaron.mmchat.core.LoginManager;
@@ -110,21 +111,17 @@ public class ChatManagerService extends BaseManagerService implements ChatManage
     }
 
     @Override
-    public void removeP2PChat(P2PChat chat) {
-        ArrayList<P2PChat> chats = new ArrayList<P2PChat>();
-        chats.add(chat);
-        mP2pChats.remove(chat);
-        notifyP2PChatsRemoved(chats);
+    public void removeChat(BaseChat chat) {
+        if(chat instanceof P2PChat) {
+            ArrayList<P2PChat> chats = new ArrayList<P2PChat>();
+            chats.add((P2PChat)chat);
+            mP2pChats.remove(chat);
+            notifyP2PChatsRemoved(chats);
+        }
     }
 
     @Override
     public void createGroupChat(String[] jids) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public void removeGroupChat(GroupChat chat) {
         // TODO Auto-generated method stub
         
     }
