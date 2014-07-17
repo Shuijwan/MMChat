@@ -1,7 +1,5 @@
 package com.aaron.mmchat.home;
 
-import android.R.anim;
-import android.R.interpolator;
 import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;

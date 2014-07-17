@@ -7,9 +7,10 @@
 
 package com.aaron.mmchat.core;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+
+import com.aaron.mmchat.MMChatApplication;
 import com.aaron.mmchat.R;
 
 /**
@@ -27,22 +28,12 @@ public class SettingManager {
     
     private static SettingManager sSettingManager;
     
-    private Context mContext;
-    
-    private SettingManager(Context context) {
-        mContext = context.getApplicationContext();
-    }
-    
-    //hidden, only seen by core package
-    static void initDefaultSettingManager(Context context) {
-        if(sSettingManager == null) {
-            sSettingManager = new SettingManager(context);
-        }
+    private SettingManager() {
     }
     
     public static synchronized SettingManager getDefaultSettingManager() {
         if(sSettingManager == null) {
-            throw new IllegalStateException("SettingManager has not been inited!");
+            sSettingManager = new SettingManager();
         }
         return sSettingManager;
     }
@@ -68,7 +59,7 @@ public class SettingManager {
     }
 
     private boolean getBoolean(int key, boolean def) {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
-        return preferences.getBoolean(mContext.getString(key), def);
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(MMChatApplication.getAppContext());
+        return preferences.getBoolean(MMChatApplication.getAppContext().getString(key), def);
     }
 }

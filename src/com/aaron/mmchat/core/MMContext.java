@@ -51,8 +51,6 @@ public class MMContext {
         
         SmackAndroid.init(appContext);
         SmackConfiguration.DEBUG_ENABLED = true;
-        
-        SettingManager.initDefaultSettingManager(context);
     }
     
     /**
