@@ -34,10 +34,15 @@ public class MMContext {
     
     private static MMContext sInstance; 
     
+    private CoreThreadPool mThreadPool;
+    
     private HashMap<String, BaseManagerService> mServices;
       
     private MMContext(Context context) {
         Context appContext = context.getApplicationContext();
+        
+        mThreadPool = new CoreThreadPool();
+        
         mServices = new HashMap<String, BaseManagerService>();
         LoginManagerService loginManagerService = new LoginManagerService(appContext);
         mServices.put(LOGIN_SERVICE, loginManagerService);
@@ -78,4 +83,15 @@ public class MMContext {
         return mServices.get(service);
     }
 
+    /**
+     * free resources
+     * 
+     * */
+    public void cleanup() {
+        mThreadPool.stopThreadPool();
+    }
+    
+    CoreThreadPool getCoreThreadPool() {
+        return mThreadPool;
+    }
 }

@@ -29,7 +29,7 @@ public class SettingManager {
     
     private Context mContext;
     
-    SettingManager(Context context) {
+    private SettingManager(Context context) {
         mContext = context.getApplicationContext();
     }
     

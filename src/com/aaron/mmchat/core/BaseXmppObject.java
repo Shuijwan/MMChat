@@ -7,9 +7,6 @@
 
 package com.aaron.mmchat.core;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 /**
  *
  * @Title: BaseXmppObject.java
@@ -24,13 +21,7 @@ import java.util.concurrent.Executors;
 
 public abstract class BaseXmppObject {
     
-    private static ExecutorService sThreadPool;
-    
-    static {
-        sThreadPool = Executors.newFixedThreadPool(3);
-    }
-    
-    public void enqueneTask(Runnable runnable) {
-        sThreadPool.submit(runnable);
+    public final void enqueneTask(Runnable runnable) {
+        MMContext.peekInstance().getCoreThreadPool().submitTask(runnable);
     }
 }

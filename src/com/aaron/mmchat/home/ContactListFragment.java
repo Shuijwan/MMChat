@@ -16,29 +16,24 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnChildClickListener;
-import android.widget.ImageView;
 import android.widget.TextView;
+
 import com.aaron.mmchat.R;
 import com.aaron.mmchat.chat.ChatActivity;
-import com.aaron.mmchat.core.AccountManager;
-import com.aaron.mmchat.core.AccountManager.Account;
-import com.aaron.mmchat.core.ChatManager;
 import com.aaron.mmchat.core.Contact;
 import com.aaron.mmchat.core.ContactGroup;
 import com.aaron.mmchat.core.ContactGroup.ContactGroupCallback;
 import com.aaron.mmchat.core.ContactManager;
 import com.aaron.mmchat.core.ContactManager.ContactListCallback;
 import com.aaron.mmchat.core.MMContext;
-import com.aaron.mmchat.invitegroupchat.InviteGroupchatActivity;
 import com.aaron.mmchat.widget.AbstractStickyHeaderExpandableListViewAdapter;
 import com.aaron.mmchat.widget.AvatarView;
 import com.aaron.mmchat.widget.StickyHeaderExpandableListView;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
-
 /**
  * @Title: ContactListFragment.java
  * @Package: com.aaron.mmchat.home
@@ -51,12 +46,10 @@ public class ContactListFragment extends Fragment implements OnChildClickListene
 
     private ExpandableListView mExpandableListView;
     private ContactListAdapter mAdapter;
-    private ChatManager mChatManager;
-
+    
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        mChatManager = (ChatManager) MMContext.getInstance(activity).getService(MMContext.CHAT_SERVICE);
         setHasOptionsMenu(true);
     }
 

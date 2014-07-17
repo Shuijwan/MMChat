@@ -29,18 +29,15 @@ import android.widget.TextView;
 
 import com.aaron.mmchat.R;
 import com.aaron.mmchat.chat.ChatActivity;
-import com.aaron.mmchat.core.AccountManager;
 import com.aaron.mmchat.core.BaseChat;
 import com.aaron.mmchat.core.ChatManager;
 import com.aaron.mmchat.core.GroupChat;
 import com.aaron.mmchat.core.InstantMessage;
 import com.aaron.mmchat.core.MMContext;
 import com.aaron.mmchat.core.P2PChat;
-import com.aaron.mmchat.core.AccountManager.Account;
 import com.aaron.mmchat.invitegroupchat.InviteGroupchatActivity;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  *

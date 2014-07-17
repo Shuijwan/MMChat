@@ -18,7 +18,6 @@ import com.aaron.mmchat.core.LoginManager;
 import com.aaron.mmchat.core.MMContext;
 import com.aaron.mmchat.utils.NetWorkUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -62,6 +61,10 @@ public class MMChatService extends Service {
                 loginManager.relogin(account);
             }
         }
-        
+    }
+    
+    public void onDestroy() {
+        super.onDestroy();
+        MMContext.peekInstance().cleanup();
     }
 }

@@ -18,11 +18,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.TextView;
-
 import com.aaron.mmchat.R;
 import com.aaron.mmchat.core.AccountManager;
-import com.aaron.mmchat.core.AccountType;
 import com.aaron.mmchat.core.LoginManager;
 import com.aaron.mmchat.core.ReconnectManager;
 import com.aaron.mmchat.core.LoginManager.LoginCallback;
@@ -85,34 +82,22 @@ public class AccountFragment extends Fragment implements OnClickListener, LoginC
         mDelete = (Button) mContentView.findViewById(R.id.delete);
         mDelete.setOnClickListener(this);
 
-
-        return mContentView;
-    }
-
-    @Override
-    public void onHiddenChanged(boolean hidden) {
-        super.onHiddenChanged(hidden);
-        if(!hidden) {
-            int index = getArguments().getInt("accountIndex");
-            AccountManager accountManager = AccountManager.getInstance(getActivity());
-            Account account = accountManager.getAccounts().get(index);
-            getActivity().getActionBar().setTitle(account.username);
-            
-            mUsername.setText(account.username);
-            
-            if(mLoginManager.isSignedIn(account.jid)) {
-                mLogin.setText(R.string.logout);
-            } else {
-                mLogin.setText(R.string.login);
-            }
-                   
-            mAccount = account;
+        String jid = getArguments().getString("jid");
+        AccountManager accountManager = AccountManager.getInstance(getActivity());
+        Account account = accountManager.getAccount(jid);
+        getActivity().getActionBar().setTitle(account.username);
+        
+        mUsername.setText(account.username);
+        
+        if(mLoginManager.isSignedIn(account.jid)) {
+            mLogin.setText(R.string.logout);
+        } else {
+            mLogin.setText(R.string.login);
         }
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+               
+        mAccount = account;
+        
+        return mContentView;
     }
 
     @Override

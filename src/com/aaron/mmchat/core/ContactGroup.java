@@ -7,7 +7,6 @@
 
 package com.aaron.mmchat.core;
 
-import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.aaron.mmchat.core.Contact.ContactCallback;

@@ -14,6 +14,7 @@ import android.view.MenuItem;
 
 import com.aaron.mmchat.R;
 import com.aaron.mmchat.core.AccountManager;
+import com.aaron.mmchat.core.AccountManager.Account;
 import com.aaron.mmchat.home.MenuFragment.MenuCallback;
 import com.aaron.mmchat.login.ChooseAccountTypeActivity;
 import com.aaron.mmchat.service.MMChatService;
@@ -91,40 +92,35 @@ public class HomeActivity extends Activity implements MenuCallback {
 
         FragmentManager fragmentManager = getFragmentManager();
 
-        final String fragmentClassName = fragmentClass.getName();
+        String fragmentClassName = fragmentClass.getName();
+        
+        Account account = null;
+        if(itemId >= MenuFragment.MENU_ACCOUNT) {
+            int accountIndex = itemId - MenuFragment.MENU_ACCOUNT;
+            account = AccountManager.getInstance(this).getAccounts().get(accountIndex);
+            fragmentClassName += ":"+account.jid;
+        }
         final FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         Fragment fragment;
 
         if (mFragmentName != null
                 && (fragment = fragmentManager.findFragmentByTag(mFragmentName)) != null) {
-            if(mFragmentName.equals(AccountFragment.class.getName())) {
-                fragmentTransaction.hide(fragment);
-            } else {
-                fragmentTransaction.detach(fragment);
-            }
+            fragmentTransaction.detach(fragment);
         }
 
         mFragmentName = fragmentClassName;
 
         if ((fragment = fragmentManager.findFragmentByTag(mFragmentName)) == null) {
             if(itemId >= MenuFragment.MENU_ACCOUNT) {
-                int accountIndex = itemId - MenuFragment.MENU_ACCOUNT;
                 Bundle bundle = new Bundle();
-                bundle.putInt("accountIndex", accountIndex);
-                fragment = Fragment.instantiate(this, fragmentClassName, bundle);
+                bundle.putString("jid", account.jid);
+                fragment = Fragment.instantiate(this, AccountFragment.class.getName(), bundle);
             } else {
                 fragment = Fragment.instantiate(this, fragmentClassName);
             }
             fragmentTransaction.add(R.id.main_content, fragment , mFragmentName);
         } else {
-            Bundle bundle = fragment.getArguments();
-            if(itemId >= MenuFragment.MENU_ACCOUNT) {
-                int accountIndex = itemId - MenuFragment.MENU_ACCOUNT;
-                bundle.putInt("accountIndex", accountIndex);
-                fragmentTransaction.show(fragment);
-            } else {
-                fragmentTransaction.attach(fragment);
-            }
+            fragmentTransaction.attach(fragment);
         }
         
         fragmentTransaction.commit();
