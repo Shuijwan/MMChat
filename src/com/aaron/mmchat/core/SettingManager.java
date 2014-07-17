@@ -10,7 +10,6 @@ package com.aaron.mmchat.core;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
-import com.aaron.mmchat.MMChatApplication;
 import com.aaron.mmchat.R;
 
 /**
@@ -59,7 +58,7 @@ public class SettingManager {
     }
 
     private boolean getBoolean(int key, boolean def) {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(MMChatApplication.getAppContext());
-        return preferences.getBoolean(MMChatApplication.getAppContext().getString(key), def);
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(MMContext.getAppContext());
+        return preferences.getBoolean(MMContext.getAppContext().getString(key), def);
     }
 }

@@ -34,12 +34,14 @@ public class MMContext {
     
     private static MMContext sInstance; 
     
+    private static Context sAppContext;
+    
     private CoreThreadPool mThreadPool;
     
     private HashMap<String, BaseManagerService> mServices;
       
-    private MMContext(Context context) {
-        Context appContext = context.getApplicationContext();
+    private MMContext() {
+        Context appContext = sAppContext;
         
         mThreadPool = new CoreThreadPool();
         
@@ -57,18 +59,10 @@ public class MMContext {
      * get instance of MMContext
      * 
      * */
-    public synchronized static MMContext getInstance(Context context) {
+    public synchronized static MMContext getInstance() {
         if(sInstance == null) {
-            sInstance = new MMContext(context);
+            sInstance = new MMContext();
         }
-        return sInstance;
-    }
-    
-    /**
-     * peek instance of MMContext, will return null if getInstance is not called before.
-     * 
-     * */
-    public static MMContext peekInstance() {
         return sInstance;
     }
     
@@ -81,6 +75,18 @@ public class MMContext {
         return mServices.get(service);
     }
 
+    /**
+     * init MMContext's global info, should be inited in the beginning of app
+     * 
+     * */
+    public static void init(Context context) {
+        sAppContext = context;
+    }
+    
+    static Context getAppContext() {
+        return sAppContext;
+    }
+    
     /**
      * free resources
      * 

@@ -184,7 +184,7 @@ public class MenuFragment extends Fragment implements OnItemClickListener {
         public MenuAdapter() {
             mAccounts = AccountManager.getInstance(getActivity()).getAccounts();
             mInflater = LayoutInflater.from(getActivity());
-            mLoginManager = (LoginManager) MMContext.getInstance(getActivity()).getService(MMContext.LOGIN_SERVICE);
+            mLoginManager = (LoginManager) MMContext.getInstance().getService(MMContext.LOGIN_SERVICE);
             mLoginManager.registerLoginCallback(this);
             ReconnectManager.getInstance().registerReconnectCallback(this);
         }

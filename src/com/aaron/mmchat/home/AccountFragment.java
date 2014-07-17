@@ -60,7 +60,7 @@ public class AccountFragment extends Fragment implements OnClickListener, LoginC
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        mLoginManager = (LoginManager) MMContext.peekInstance().getService(MMContext.LOGIN_SERVICE);
+        mLoginManager = (LoginManager) MMContext.getInstance().getService(MMContext.LOGIN_SERVICE);
         mReconnectManager = ReconnectManager.getInstance();
         mReconnectManager.registerReconnectCallback(this);
     }

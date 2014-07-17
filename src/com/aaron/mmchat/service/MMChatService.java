@@ -56,7 +56,7 @@ public class MMChatService extends Service {
         if(NetWorkUtils.isNetworkAvailable(this)) {
             AccountManager accountManager = AccountManager.getInstance(this);
             List<Account> accounts = accountManager.getAccounts();
-            LoginManager loginManager = (LoginManager) MMContext.getInstance(this).getService(MMContext.LOGIN_SERVICE);
+            LoginManager loginManager = (LoginManager) MMContext.getInstance().getService(MMContext.LOGIN_SERVICE);
             for(Account account : accounts) {
                 loginManager.relogin(account);
             }
@@ -65,6 +65,6 @@ public class MMChatService extends Service {
     
     public void onDestroy() {
         super.onDestroy();
-        MMContext.peekInstance().cleanup();
+        MMContext.getInstance().cleanup();
     }
 }

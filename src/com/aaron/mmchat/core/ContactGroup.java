@@ -97,7 +97,7 @@ public class ContactGroup extends BaseXmppObject implements ContactCallback {
         Collection<RosterEntry> entries = mRosterGroup.getEntries();
         Contact contact;
         for(RosterEntry entry : entries) {
-            ContactManagerService contactManager = (ContactManagerService) MMContext.peekInstance().getService(MMContext.CONTACT_SERVICE);
+            ContactManagerService contactManager = (ContactManagerService) MMContext.getInstance().getService(MMContext.CONTACT_SERVICE);
             contact = contactManager.getOrCreateContact(mClientJid, entry);
             contact.registerContactCallback(this);
             mContacts.add(contact);
@@ -179,7 +179,7 @@ public class ContactGroup extends BaseXmppObject implements ContactCallback {
             return false;
         }
         
-        ContactManagerService contactManager = (ContactManagerService) MMContext.peekInstance().getService(MMContext.CONTACT_SERVICE);
+        ContactManagerService contactManager = (ContactManagerService) MMContext.getInstance().getService(MMContext.CONTACT_SERVICE);
         Contact contact = contactManager.getOrCreateContact(mClientJid, rosterEntry);
         mContacts.add(contact);
         mContactMap.put(rosterEntry.getUser(), contact);
@@ -227,7 +227,7 @@ public class ContactGroup extends BaseXmppObject implements ContactCallback {
             
             @Override
             public void run() {
-                ContactManagerService contactManager = (ContactManagerService) MMContext.peekInstance().getService(MMContext.CONTACT_SERVICE);
+                ContactManagerService contactManager = (ContactManagerService) MMContext.getInstance().getService(MMContext.CONTACT_SERVICE);
                 try {
                     mRosterGroup.removeEntry(contact.mRosterEntry);
                     contactManager.addPendingRemoveContact(contact.getJid());
@@ -259,7 +259,7 @@ public class ContactGroup extends BaseXmppObject implements ContactCallback {
             
             @Override
             public void run() {
-                ContactManagerService contactManager = (ContactManagerService) MMContext.peekInstance().getService(MMContext.CONTACT_SERVICE);
+                ContactManagerService contactManager = (ContactManagerService) MMContext.getInstance().getService(MMContext.CONTACT_SERVICE);
                 try {
                     Roster roster = contactManager.getRoster(mClientJid);
                     roster.createEntry(jid, jid.substring(jid.lastIndexOf("@")+1), new String[] {getName()});

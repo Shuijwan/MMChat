@@ -36,7 +36,7 @@ public class P2PChat extends BaseChat implements MessageListener {
         super(clientJid);
         mChat = chat;
         mChat.addMessageListener(this);
-        ContactManagerService contactManager = (ContactManagerService) MMContext.peekInstance().getService(MMContext.CONTACT_SERVICE);
+        ContactManagerService contactManager = (ContactManagerService) MMContext.getInstance().getService(MMContext.CONTACT_SERVICE);
         mContact = contactManager.getContact(clientJid, chat.getParticipant());
     }
     

@@ -60,7 +60,7 @@ public class ChatListFragment extends Fragment implements OnItemClickListener, O
         // TODO Auto-generated method stub
         super.onAttach(activity);
         setHasOptionsMenu(true);
-        mChatManager = (ChatManager) MMContext.getInstance(getActivity()).getService(MMContext.CHAT_SERVICE);
+        mChatManager = (ChatManager) MMContext.getInstance().getService(MMContext.CHAT_SERVICE);
     }
 
     @Override

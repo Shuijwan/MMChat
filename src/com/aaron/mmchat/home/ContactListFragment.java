@@ -79,7 +79,7 @@ public class ContactListFragment extends Fragment implements OnChildClickListene
 
         public ContactListAdapter() {
             mLayoutInflater = LayoutInflater.from(getActivity());
-            mContactManager = (ContactManager) MMContext.getInstance(getActivity()).getService(
+            mContactManager = (ContactManager) MMContext.getInstance().getService(
                     MMContext.CONTACT_SERVICE);
             mAllContactList = mContactManager.getAllContactList();
             mSparseArray = new SparseArray<ContactGroup>();

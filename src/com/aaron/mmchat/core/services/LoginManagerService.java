@@ -196,7 +196,7 @@ public class LoginManagerService extends BaseManagerService implements LoginMana
         dm.addReceiptReceivedListener(new ReceiptReceivedListener() { // DOES NOT WORK IN CARBONS
             public void onReceiptReceived(String fromJid, String toJid, String receiptId) {
                 Log.i("TTT","from:"+fromJid+"   to:"+toJid+"   receiptId:"+receiptId);
-                ChatManagerService chatManagerService = (ChatManagerService) MMContext.peekInstance().getService(MMContext.CHAT_SERVICE);
+                ChatManagerService chatManagerService = (ChatManagerService) MMContext.getInstance().getService(MMContext.CHAT_SERVICE);
                 chatManagerService.updateMessageDeliverStatus();
             }});
     }

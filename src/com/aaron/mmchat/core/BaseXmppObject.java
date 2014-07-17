@@ -22,6 +22,6 @@ package com.aaron.mmchat.core;
 public abstract class BaseXmppObject {
     
     public final void enqueneTask(Runnable runnable) {
-        MMContext.peekInstance().getCoreThreadPool().submitTask(runnable);
+        MMContext.getInstance().getCoreThreadPool().submitTask(runnable);
     }
 }

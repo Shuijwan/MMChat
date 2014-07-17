@@ -100,7 +100,7 @@ public class ChatActivity extends Activity implements OnRefreshListener, OnClick
         mTextInput.setOnClickListener(this);
         mTextInput.addTextChangedListener(this);
  
-        mChatManager = (ChatManager) MMContext.peekInstance().getService(MMContext.CHAT_SERVICE);
+        mChatManager = (ChatManager) MMContext.getInstance().getService(MMContext.CHAT_SERVICE);
         String clientJid = getIntent().getStringExtra("clientJid");
         String jid = getIntent().getStringExtra("jid");
         

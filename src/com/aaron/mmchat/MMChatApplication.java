@@ -8,9 +8,8 @@
 package com.aaron.mmchat;
 
 import android.app.Application;
-import android.content.Context;
-
 import com.aaron.mmchat.core.AccountType;
+import com.aaron.mmchat.core.MMContext;
 
 /**
  *
@@ -24,16 +23,10 @@ import com.aaron.mmchat.core.AccountType;
  */
 
 public class MMChatApplication extends Application {
-
-    private static Context sApplicationContext;
     
     public void onCreate() {
         super.onCreate();
         AccountType.loadAllAccountType(this);
-        sApplicationContext = this;
-    }
-    
-    public static Context getAppContext() {
-        return sApplicationContext;
+        MMContext.init(this);
     }
 }

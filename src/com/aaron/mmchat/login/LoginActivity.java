@@ -87,7 +87,7 @@ public class LoginActivity extends Activity implements OnClickListener, LoginCal
         
         mLogin.setOnClickListener(this);
         
-        mLoginManager = (LoginManager) MMContext.getInstance(this).getService(MMContext.LOGIN_SERVICE);
+        mLoginManager = (LoginManager) MMContext.getInstance().getService(MMContext.LOGIN_SERVICE);
         
         getActionBar().setDisplayHomeAsUpEnabled(true);
         getActionBar().setDisplayShowHomeEnabled(true);
