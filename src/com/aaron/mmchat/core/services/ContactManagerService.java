@@ -12,6 +12,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 
+import com.aaron.mmchat.core.ClientUser;
 import com.aaron.mmchat.core.Contact;
 import com.aaron.mmchat.core.ContactGroup;
 import com.aaron.mmchat.core.ContactManager;
@@ -169,6 +170,7 @@ public class ContactManagerService extends BaseManagerService implements Contact
     private HashMap<String, ArrayList<ContactGroup>> mAllContactLists;
     private HashMap<String, Roster> mRosters;
     private HashMap<String, HashMap<String,Contact>> mAllContactsMap;
+    private HashMap<String, ClientUser> mClientUsers;
     private ArrayList<ContactListCallback> mCallbacks;
     private LoginManager mLoginManager;
     private ArrayList<String> mPendingAddContacts;
@@ -360,14 +362,8 @@ public class ContactManagerService extends BaseManagerService implements Contact
                 Iterator<RosterGroup> groupIterator = groups.iterator();
                 contactGroup = contactlistMap.get(groupIterator.next().getName());
                 contact = contactGroup.getContact(jid);
-                contact.updatePresence();
+                contact.updateRosterPresence();
             }
-            
-//            for(RosterGroup group : groups) {
-//                contactGroup = contactlistMap.get(group.getName());
-//                contact = contactGroup.getContact(jid);
-//                contact.updatePresence();
-//            }
         }
         
         @Override
@@ -413,6 +409,7 @@ public class ContactManagerService extends BaseManagerService implements Contact
         mAllContactLists = new HashMap<String, ArrayList<ContactGroup>>();
         mAllContactListsMap = new HashMap<String, HashMap<String,ContactGroup>>();
         mAllContactsMap = new HashMap<String, HashMap<String,Contact>>();
+        mClientUsers = new HashMap<String, ClientUser>();
         mLoginManager = manager;
         mLoginManager.registerLoginCallback(this);
     }
@@ -530,6 +527,16 @@ public class ContactManagerService extends BaseManagerService implements Contact
         roster.addRosterListener(new ContactListListener(clientJid));
         roster.addRosterListener2(new ContactListListener2(clientJid));
         
+        ClientUser clientUser = mClientUsers.get(clientJid);
+        if(clientUser == null) {
+            clientUser = new ClientUser(clientJid, connection);
+            mClientUsers.put(clientJid, clientUser);
+        } else {
+            clientUser.setConnection(connection);
+        }
+        
+        clientUser.refreshSelfPresence();
+        
         refreshContactList(clientJid);
     }
 
@@ -543,11 +550,24 @@ public class ContactManagerService extends BaseManagerService implements Contact
     public void onLogoutFinished(String clientJid, boolean remove) {
         if(remove) {
             mRosters.remove(clientJid);
+            ClientUser clientUser = mClientUsers.remove(clientJid);
+            clientUser.delete();
+            
             mAllContactLists.remove(clientJid);
             mAllContactListsMap.remove(clientJid);
             mAllContactsMap.remove(clientJid);
             notifyContactListAllRefreshed(clientJid);
         }
         
+    }
+
+    @Override
+    public ClientUser getClientUser(String clientJid) {
+        ClientUser clientUser = mClientUsers.get(clientJid);
+        if(clientUser == null) {
+            clientUser = new ClientUser(clientJid, null);
+            mClientUsers.put(clientJid, clientUser);
+        }
+        return clientUser;
     }
 }

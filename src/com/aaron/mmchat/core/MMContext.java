@@ -27,10 +27,22 @@ import java.util.HashMap;
 
 public class MMContext {
     
+    /**
+     * service name for retrieve LoginManager
+     * 
+     * */
     public static final String LOGIN_SERVICE = "login";
+    
+    /**
+     * service name for retrieve ContactManager
+     * */
     public static final String CONTACT_SERVICE = "contact";
+    
+    /**
+     * service name for retrieve ChatManager
+     * 
+     * */
     public static final String CHAT_SERVICE = "chat";
-    public static final String CONFIG_SERVICE = "config";
     
     private static MMContext sInstance; 
     
@@ -81,6 +93,7 @@ public class MMContext {
      * */
     public static void init(Context context) {
         sAppContext = context;
+        AccountType.loadAllAccountType(context);
     }
     
     static Context getAppContext() {

@@ -26,6 +26,7 @@ import com.aaron.mmchat.core.ContactGroup.ContactGroupCallback;
 import com.aaron.mmchat.core.ContactManager;
 import com.aaron.mmchat.core.ContactManager.ContactListCallback;
 import com.aaron.mmchat.core.MMContext;
+import com.aaron.mmchat.core.Presence;
 import com.aaron.mmchat.widget.AbstractStickyHeaderExpandableListViewAdapter;
 import com.aaron.mmchat.widget.AvatarView;
 import com.aaron.mmchat.widget.StickyHeaderExpandableListView;
@@ -220,9 +221,9 @@ public class ContactListFragment extends Fragment implements OnChildClickListene
             final Contact data = getChild(groupPosition, childPosition);
 
             holder.avatarView.setTag(data);
-            holder.avatarView.setPresence(data.getPresence());
+            holder.avatarView.setPresence(data.getPresence().getPresenceType());
             holder.name.setText(data.getName());
-            holder.presenceStatus.setText(data.getPresenceStatus());
+            holder.presenceStatus.setText(data.getPresence().getPresenceStatus());
 
             return convertView;
         }
@@ -373,7 +374,7 @@ public class ContactListFragment extends Fragment implements OnChildClickListene
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(contact.getName());
         String[] operations;
-        boolean available = contact.getPresence() == Contact.AVAILABLE;
+        boolean available = contact.getPresence().getPresenceType() == Presence.AVAILABLE;
         if(available) {
             operations = new String[1];
             operations[0] = "delete";

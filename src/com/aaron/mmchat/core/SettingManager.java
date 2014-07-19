@@ -12,6 +12,8 @@ import android.preference.PreferenceManager;
 
 import com.aaron.mmchat.R;
 
+import java.util.HashMap;
+
 /**
  *
  * @Title: SettingManager.java

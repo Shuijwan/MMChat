@@ -47,6 +47,7 @@
         <item >Available</item>
         <item >Away</item>
         <item >Do not disturb</item>
+        <item >Unavailable</item>
     </string-array>
     
     <string-array name="chat_list_operation">

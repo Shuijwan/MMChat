@@ -10,7 +10,6 @@ package com.aaron.mmchat.core;
 import android.text.TextUtils;
 
 import org.jivesoftware.smack.RosterEntry;
-import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.Presence.Mode;
 
 import java.util.ArrayList;
@@ -19,7 +18,7 @@ import java.util.ArrayList;
  *
  * @Title: Contact.java
  * @Package: com.aaron.mmchat.core
- * @Description: 
+ * @Description: represent a xmpp contact object.
  * 
  * @Author: aaron
  * @Date: 2014-6-12
@@ -27,11 +26,6 @@ import java.util.ArrayList;
  */
 
 public class Contact extends BaseXmppObject {
-    
-    public static final int AVAILABLE = 0;
-    public static final int AWAY = 1;
-    public static final int DND = 2;
-    public static final int UNAVAILABLE = 3;
     
     public static interface ContactCallback {
         /**
@@ -47,16 +41,26 @@ public class Contact extends BaseXmppObject {
     }
 
     private ArrayList<ContactCallback> mCallbacks;
+    private Presence mPresence;
     
     RosterEntry mRosterEntry;
     
     public Contact(RosterEntry rosterEntry) {
         mRosterEntry = rosterEntry;
         mCallbacks = new ArrayList<Contact.ContactCallback>();
+        mPresence = new Presence();
+        
+        updatePresence();
+    }
+    
+    private void updatePresence() {
+        mPresence.presenceType = getPresenceType();
+        mPresence.presenceStatus = getPresenceStatus();
     }
     
     public void setRosterEntry(RosterEntry entry) {
         mRosterEntry = entry;
+        updatePresence();
         notifyContactUpdated();
     }
     
@@ -82,8 +86,9 @@ public class Contact extends BaseXmppObject {
         }
     }
     
-    public void updatePresence() {
+    public void updateRosterPresence() {
         mRosterEntry.updatePresence();
+        updatePresence();
         notifyContactPresenceUpdated();
     }
     
@@ -99,21 +104,25 @@ public class Contact extends BaseXmppObject {
         return name;
     }
     
-    public int getPresence() {
-        Presence.Mode mode = mRosterEntry.getPresence();
-        if(mode == Mode.available || mode == Mode.chat) {
-            return AVAILABLE;
-        }
-        if(mode == Mode.away || mode == Mode.xa) {
-            return AWAY;
-        }
-        if(mode == Mode.dnd) {
-            return DND;
-        }
-        return UNAVAILABLE;
+    public Presence getPresence() {
+        return mPresence;
     }
     
-    public String getPresenceStatus() {
+    private int getPresenceType() {
+        Mode mode = mRosterEntry.getPresence();
+        if(mode == Mode.available || mode == Mode.chat) {
+            return Presence.AVAILABLE;
+        }
+        if(mode == Mode.away || mode == Mode.xa) {
+            return Presence.AWAY;
+        }
+        if(mode == Mode.dnd) {
+            return Presence.DND;
+        }
+        return Presence.UNAVAILABLE;
+    }
+    
+    private String getPresenceStatus() {
         return mRosterEntry.getPresenceStatus();
     }
 }

@@ -86,6 +86,10 @@ public class AccountManager {
         return sAccountManager;
     }
     
+    public static AccountManager peekInstance() {
+        return sAccountManager;
+    }
+    
     public List<Account> getAccounts() {
         return Collections.unmodifiableList(mAccounts);
     }

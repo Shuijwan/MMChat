@@ -32,9 +32,11 @@ public class ReconnectManager {
     public class ReconnectListener implements ConnectionListener {
 
         private String mClientJid;
+        private ContactManager mContactManager;
         
         public ReconnectListener(String clientJid) {
             mClientJid = clientJid;
+            mContactManager = (ContactManager) MMContext.getInstance().getService(MMContext.CONTACT_SERVICE);
         }
         
         @Override
@@ -50,13 +52,17 @@ public class ReconnectManager {
         }
 
         @Override
-        public void connectionClosed() {
+        public void connectionClosed() {         
+            ClientUser clientUser = mContactManager.getClientUser(mClientJid);
+            clientUser.updatePresenceTypeInternal(Presence.UNAVAILABLE);
             notifyDisConnected(mClientJid);
             
         }
 
         @Override
         public void connectionClosedOnError(Exception e) {
+            ClientUser clientUser = mContactManager.getClientUser(mClientJid);
+            clientUser.updatePresenceTypeInternal(Presence.UNAVAILABLE);
             notifyDisConnected(mClientJid);
         }
 
@@ -68,7 +74,8 @@ public class ReconnectManager {
 
         @Override
         public void reconnectionSuccessful() {
-            // TODO Auto-generated method stub
+            ClientUser clientUser = mContactManager.getClientUser(mClientJid);
+            clientUser.updatePresenceTypeInternal(Presence.AVAILABLE);
             notifyConnected(mClientJid); 
         }
 

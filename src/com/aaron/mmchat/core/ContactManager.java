@@ -75,5 +75,12 @@ public interface ContactManager {
      * 
      * */
     public boolean refreshContactList(String clientJid);
+    
+    
+    /**
+     * get the ClientUser of clientJid
+     * 
+     * */
+    public ClientUser getClientUser(String clientJid);
 
 }

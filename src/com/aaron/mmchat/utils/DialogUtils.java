@@ -27,11 +27,15 @@ import com.aaron.mmchat.R;
 public class DialogUtils {
     
     public static Dialog showLoginingDialog(Context context) {
+        return showProgressDialog(context, context.getString(R.string.login));
+    }
+
+    public static Dialog showProgressDialog(Context context, String message) {
         ProgressDialog progressDialog = new ProgressDialog(context);
-        progressDialog.setMessage(context.getString(R.string.signing_in));
+        progressDialog.setMessage(message);
         progressDialog.setCancelable(false);
         progressDialog.show();
         return progressDialog;
     }
-
+    
 }

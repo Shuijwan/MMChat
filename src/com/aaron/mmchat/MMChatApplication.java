@@ -8,7 +8,6 @@
 package com.aaron.mmchat;
 
 import android.app.Application;
-import com.aaron.mmchat.core.AccountType;
 import com.aaron.mmchat.core.MMContext;
 
 /**
@@ -26,7 +25,6 @@ public class MMChatApplication extends Application {
     
     public void onCreate() {
         super.onCreate();
-        AccountType.loadAllAccountType(this);
         MMContext.init(this);
     }
 }

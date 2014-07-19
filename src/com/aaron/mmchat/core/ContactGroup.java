@@ -30,7 +30,7 @@ import java.util.HashMap;
  *
  * @Title: ContactGroup.java
  * @Package: com.aaron.mmchat.core
- * @Description: 
+ * @Description: represent a contact group
  * 
  * @Author: aaron
  * @Date: 2014-6-12
@@ -107,6 +107,10 @@ public class ContactGroup extends BaseXmppObject implements ContactCallback {
         sortContacts();
     }
     
+    /**
+     * return the clientJid which this group belongs to
+     * 
+     * */
     public String getClientJid() {
         return mClientJid;
     }
@@ -153,18 +157,34 @@ public class ContactGroup extends BaseXmppObject implements ContactCallback {
         }
     }
     
+    /**
+     * return all contacts in this group
+     * 
+     * */
     public ArrayList<Contact> getContacts() {
         return mContacts;
     }
     
+    /**
+     * return all online contacts in this group
+     * 
+     * */
     public ArrayList<Contact> getOnlineContacts() {
         return mOnlineContacts;
     }
     
+    /**
+     * return contact by jid
+     * 
+     * */
     public Contact getContact(String jid) {
         return mContactMap.get(jid);
     }
     
+    /**
+     * return the group name
+     * 
+     * */
     public String getName() {
         return mRosterGroup.getName();
     }

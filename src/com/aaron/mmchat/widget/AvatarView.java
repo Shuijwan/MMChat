@@ -9,7 +9,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import com.aaron.mmchat.R;
-import com.aaron.mmchat.core.Contact;
+import com.aaron.mmchat.core.Presence;
 
 public class AvatarView extends FrameLayout {
     
@@ -53,12 +53,12 @@ public class AvatarView extends FrameLayout {
     
     public void setPresence(int presence) {
         switch (presence) {
-            case Contact.AVAILABLE:
-            case Contact.AWAY:
-            case Contact.DND:
+            case Presence.AVAILABLE:
+            case Presence.AWAY:
+            case Presence.DND:
                 mPresenceView.setImageResource(R.drawable.presence_available);
                 break;
-            case Contact.UNAVAILABLE:
+            case Presence.UNAVAILABLE:
                 mPresenceView.setImageResource(R.drawable.presence_unavailable);
                 break;
             default:

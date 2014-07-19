@@ -224,8 +224,6 @@ public class LoginManagerService extends BaseManagerService implements LoginMana
             AccountManager.getInstance(mContext).addAccount(bareJid, domain, discovery ? email : username, password);
             AccountType.addCusteomAccountType(mContext, domain, connection.configuration.getHostAddresses().get(0).getPort(), true);
             
-            setSelfPresenceAvailable(connection.connection);
-            
             sendLoginSuccessMsg(bareJid);
             
         } catch (SmackException e) {
@@ -237,19 +235,6 @@ public class LoginManagerService extends BaseManagerService implements LoginMana
         } catch (XMPPException e) {
             e.printStackTrace();
             sendLoginFailMsg(email, LOGIN_ERROR_OTHER);
-        }
-    }
-    
-    private void setSelfPresenceAvailable(XMPPConnection connection) {
-        Presence presence = new Presence(Presence.Type.available);
-        presence.setMode(Mode.available);
-        presence.setStatus("Available");
-        presence.setPriority(127);
-        try {
-            connection.sendPacket(presence);
-        } catch (NotConnectedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         }
     }
 

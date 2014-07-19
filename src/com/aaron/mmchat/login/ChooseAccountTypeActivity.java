@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -26,6 +27,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.aaron.mmchat.R;
+import com.aaron.mmchat.core.AccountManager;
 import com.aaron.mmchat.core.AccountType;
 
 import java.util.List;
@@ -72,6 +74,19 @@ public class ChooseAccountTypeActivity extends Activity implements OnItemSelecte
         mAccounts = AccountType.getKnownAccountTypes();
         mAccountSpinner.setAdapter(new AccountAdapter(mAccounts));
         mAccountSpinner.setOnItemSelectedListener(this);
+        
+        if(AccountManager.getInstance(this).getAccounts().size() > 0) {
+            getActionBar().setDisplayHomeAsUpEnabled(true);
+            getActionBar().setDisplayShowHomeEnabled(true);
+        }
+    }
+    
+    @Override
+    public final boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId() == android.R.id.home) {
+            onBackPressed();
+        }
+        return true;
     }
     
     class AccountAdapter extends BaseAdapter {
