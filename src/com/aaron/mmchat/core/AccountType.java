@@ -38,7 +38,7 @@ public class AccountType implements Parcelable {
     private static ArrayList<AccountType> sKnownAccountTypes;
     private static ArrayList<AccountType> sCustomAccountTypes;
     
-    public String id;//there is no use
+    String id;//there is no use
     public int icon;
     public int name;
     public String domain;//it is the real identification

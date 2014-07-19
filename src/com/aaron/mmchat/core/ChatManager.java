@@ -13,7 +13,7 @@ import java.util.ArrayList;
  *
  * @Title: ChatManager.java
  * @Package: com.aaron.mmchat.core
- * @Description: 
+ * @Description: chat interface, get ChatManager through {@link MMContext.getInstance(context).getService(MMContext.CHAT_SERVICE)}
  * 
  * @Author: aaron
  * @Date: 2014-6-10

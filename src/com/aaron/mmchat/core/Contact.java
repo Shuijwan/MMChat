@@ -58,18 +58,30 @@ public class Contact extends BaseXmppObject {
         mPresence.presenceStatus = getPresenceStatus();
     }
     
+    /**
+     * set the internal RosterEntry, it is called by core, not for UI
+     * 
+     * */
     public void setRosterEntry(RosterEntry entry) {
         mRosterEntry = entry;
         updatePresence();
         notifyContactUpdated();
     }
     
+    /**
+     * register a ContactCallback
+     * 
+     * */
     public void registerContactCallback(ContactCallback callback) {
         if(!mCallbacks.contains(callback)) {
             mCallbacks.add(callback);
         }
     }
     
+    /**
+     * unregister a ContactCallback
+     * 
+     * */
     public void unregisterContactCallback(ContactCallback callback) {
         mCallbacks.remove(callback);
     }
@@ -86,16 +98,28 @@ public class Contact extends BaseXmppObject {
         }
     }
     
+    /**
+     * update the internal RosterEntry's presence, this is called by core, not for UI
+     * 
+     * */
     public void updateRosterPresence() {
         mRosterEntry.updatePresence();
         updatePresence();
         notifyContactPresenceUpdated();
     }
     
+    /**
+     * return the Jid of this Contact
+     * 
+     * */
     public String getJid() {
         return mRosterEntry.getUser();
     }
     
+    /**
+     * return the Name of this Contact
+     * 
+     * */
     public String getName() {
         String name = mRosterEntry.getName();
         if(TextUtils.isEmpty(name)) {
@@ -104,6 +128,10 @@ public class Contact extends BaseXmppObject {
         return name;
     }
     
+    /**
+     * return the Presence of this Contact
+     * 
+     * */
     public Presence getPresence() {
         return mPresence;
     }

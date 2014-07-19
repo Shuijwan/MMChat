@@ -18,7 +18,7 @@ import java.util.Set;
  *
  * @Title: AccountManager.java
  * @Package: com.aaron.mmchat.core
- * @Description: 
+ * @Description: manage all Accounts
  * 
  * @Author: aaron
  * @Date: 2014-6-14
@@ -31,6 +31,10 @@ public class AccountManager {
     
     private static final String ACCOUNT_FILENAME = "accounts";
 
+    /**
+     * represent a Account info
+     * 
+     * */
     public static class Account {
         public String accountTypeId;
         public String jid;
@@ -79,6 +83,10 @@ public class AccountManager {
     private ArrayList<Account> mAccounts;
     private Context mContext;
     
+    /**
+     * get the singleton instance
+     * 
+     * */
     public synchronized static AccountManager getInstance(Context context) {
         if(sAccountManager == null) {
             sAccountManager = new AccountManager(context);
@@ -86,14 +94,26 @@ public class AccountManager {
         return sAccountManager;
     }
     
+    /**
+     * peek the singleton instance, maybe null if getInstance has not be called yet.
+     * 
+     * */
     public static AccountManager peekInstance() {
         return sAccountManager;
     }
     
+    /**
+     * return all Accounts
+     * 
+     * */
     public List<Account> getAccounts() {
         return Collections.unmodifiableList(mAccounts);
     }
     
+    /**
+     * return a Account by jid
+     * 
+     * */
     public Account getAccount(String jid) {
         for(Account account : mAccounts) {
             if(account.jid.equals(jid)) {
@@ -103,6 +123,10 @@ public class AccountManager {
         return null;
     }
     
+    /**
+     * add a Account, this is called by core, UI no need to care
+     * 
+     * */
     public void addAccount(String jid, String accountTypeId, String username, String password) {
         Log.i(TAG,"addAccount:"+jid);
         if(getAccount(jid) != null) {
@@ -130,6 +154,10 @@ public class AccountManager {
         editor.commit();
     }
     
+    /**
+     * delete a Account by jid, this is called by core, UI don't need care
+     * 
+     * */
     public void deleteAccount(String jid) {
         Account account;
         if((account = getAccount(jid)) == null) {
