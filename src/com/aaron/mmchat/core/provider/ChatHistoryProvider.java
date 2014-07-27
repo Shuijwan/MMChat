@@ -39,19 +39,27 @@ import android.util.Log;
 public class ChatHistoryProvider extends ContentProvider {
 
     public static final String AUTHORITY = "com.aaron.mmchat.core.provider.ChatHistory";
-    public static final String TABLE_NAME = "chats";
-    public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY
-            + "/" + TABLE_NAME);
+    public static final String P2PCHAT_TABLE_NAME = "p2pchat";
+    public static final String GROUPCHAT_TABLE_NAME = "groupchat";
+    
+    public static final Uri P2PCHAT_CONTENT_URI = Uri.parse("content://" + AUTHORITY
+            + "/" + P2PCHAT_TABLE_NAME);
+    public static final Uri GROUPCHAT_CONTENT_URI = Uri.parse("content://" + AUTHORITY
+            + "/" + GROUPCHAT_TABLE_NAME); 
 
     private static final UriMatcher URI_MATCHER = new UriMatcher(
             UriMatcher.NO_MATCH);
 
-    private static final int MESSAGES = 1;
-    private static final int MESSAGE_ID = 2;
+    private static final int P2PCHAT_MESSAGES = 1;
+    private static final int P2PCHAT_MESSAGE_ID = 2;
+    private static final int GROUPCHAT_MESSAGES = 3;
+    private static final int GROUPCHAT_MESSAGE_ID = 4;
 
     static {
-        URI_MATCHER.addURI(AUTHORITY, "chats", MESSAGES);
-        URI_MATCHER.addURI(AUTHORITY, "chats/#", MESSAGE_ID);
+        URI_MATCHER.addURI(AUTHORITY, "p2pchat", P2PCHAT_MESSAGES);
+        URI_MATCHER.addURI(AUTHORITY, "p2pchat/#", P2PCHAT_MESSAGE_ID);
+        URI_MATCHER.addURI(AUTHORITY, "groupchat", GROUPCHAT_MESSAGES);
+        URI_MATCHER.addURI(AUTHORITY, "groupchat/#", GROUPCHAT_MESSAGE_ID);
     }
 
     private static final String TAG = ChatHistoryProvider.class.getSimpleName();
@@ -65,13 +73,15 @@ public class ChatHistoryProvider extends ContentProvider {
     public int delete(Uri url, String where, String[] whereArgs) {
         SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         int count;
+        String segment;
+        
         switch (URI_MATCHER.match(url)) {
 
-        case MESSAGES:
-            count = db.delete(TABLE_NAME, where, whereArgs);
+        case P2PCHAT_MESSAGES:
+            count = db.delete(P2PCHAT_TABLE_NAME, where, whereArgs);
             break;
-        case MESSAGE_ID:
-            String segment = url.getPathSegments().get(1);
+        case P2PCHAT_MESSAGE_ID:
+            segment = url.getPathSegments().get(1);
 
             if (TextUtils.isEmpty(where)) {
                 where = "_id=" + segment;
@@ -79,7 +89,21 @@ public class ChatHistoryProvider extends ContentProvider {
                 where = "_id=" + segment + " AND (" + where + ")";
             }
 
-            count = db.delete(TABLE_NAME, where, whereArgs);
+            count = db.delete(P2PCHAT_TABLE_NAME, where, whereArgs);
+            break;
+        case GROUPCHAT_MESSAGES:
+            count = db.delete(GROUPCHAT_TABLE_NAME, where, whereArgs);
+            break;
+        case GROUPCHAT_MESSAGE_ID:
+            segment = url.getPathSegments().get(1);
+
+            if (TextUtils.isEmpty(where)) {
+                where = "_id=" + segment;
+            } else {
+                where = "_id=" + segment + " AND (" + where + ")";
+            }
+
+            count = db.delete(GROUPCHAT_TABLE_NAME, where, whereArgs);
             break;
         default:
             throw new IllegalArgumentException("Cannot delete from URL: " + url);
@@ -93,10 +117,14 @@ public class ChatHistoryProvider extends ContentProvider {
     public String getType(Uri url) {
         int match = URI_MATCHER.match(url);
         switch (match) {
-        case MESSAGES:
-            return ChatHistoryColumns.CONTENT_TYPE;
-        case MESSAGE_ID:
-            return ChatHistoryColumns.CONTENT_ITEM_TYPE;
+        case P2PCHAT_MESSAGES:
+            return P2PChatHistoryColumns.CONTENT_TYPE;
+        case P2PCHAT_MESSAGE_ID:
+            return P2PChatHistoryColumns.CONTENT_ITEM_TYPE;
+        case GROUPCHAT_MESSAGES:
+            return GroupChatHistoryColumns.CONTENT_TYPE;
+        case GROUPCHAT_MESSAGE_ID:
+            return GroupChatHistoryColumns.CONTENT_ITEM_TYPE;
         default:
             throw new IllegalArgumentException("Unknown URL");
         }
@@ -104,28 +132,50 @@ public class ChatHistoryProvider extends ContentProvider {
 
     @Override
     public Uri insert(Uri url, ContentValues initialValues) {
-        if (URI_MATCHER.match(url) != MESSAGES) {
-            throw new IllegalArgumentException("Cannot insert into URL: " + url);
+        int match = URI_MATCHER.match(url);
+        switch (match) {
+            case P2PCHAT_MESSAGES:
+            case GROUPCHAT_MESSAGES:
+                break;
+            default:
+                throw new IllegalArgumentException("Cannot insert into URL: " + url);
         }
 
         ContentValues values = (initialValues != null) ? new ContentValues(
                 initialValues) : new ContentValues();
 
-        for (String colName : ChatHistoryColumns.getRequiredColumns()) {
-            if (values.containsKey(colName) == false) {
+        ArrayList<String> requiredColumns;
+        if(match == P2PCHAT_MESSAGES) {
+            requiredColumns = P2PChatHistoryColumns.getRequiredColumns();
+        } else {
+            requiredColumns = GroupChatHistoryColumns.getRequiredColumns();
+        }
+        
+        for (String colName : requiredColumns) {
+            if (!values.containsKey(colName)) {
                 throw new IllegalArgumentException("Missing column: " + colName);
             }
         }
 
         SQLiteDatabase db = mOpenHelper.getWritableDatabase();
 
-        long rowId = db.insert(TABLE_NAME, ChatHistoryColumns.DATE, values);
+        long rowId;
+        if(match == P2PCHAT_MESSAGES) {
+            rowId = db.insert(P2PCHAT_TABLE_NAME, BaseChatHistoryColumns.DATE, values);
+        } else {
+            rowId = db.insert(GROUPCHAT_TABLE_NAME, BaseChatHistoryColumns.DATE, values);
+        }
 
         if (rowId < 0) {
             throw new SQLException("Failed to insert row into " + url);
         }
 
-        Uri noteUri = ContentUris.withAppendedId(CONTENT_URI, rowId);
+        Uri noteUri;
+        if(match == P2PCHAT_MESSAGES) {
+            noteUri = ContentUris.withAppendedId(P2PCHAT_CONTENT_URI, rowId);
+        } else {
+            noteUri = ContentUris.withAppendedId(GROUPCHAT_CONTENT_URI, rowId);
+        }
         getContext().getContentResolver().notifyChange(noteUri, null);
         return noteUri;
     }
@@ -144,11 +194,19 @@ public class ChatHistoryProvider extends ContentProvider {
         int match = URI_MATCHER.match(url);
 
         switch (match) {
-        case MESSAGES:
-            qBuilder.setTables(TABLE_NAME);
+        case P2PCHAT_MESSAGES:
+            qBuilder.setTables(P2PCHAT_TABLE_NAME);
             break;
-        case MESSAGE_ID:
-            qBuilder.setTables(TABLE_NAME);
+        case P2PCHAT_MESSAGE_ID:
+            qBuilder.setTables(P2PCHAT_TABLE_NAME);
+            qBuilder.appendWhere("_id=");
+            qBuilder.appendWhere(url.getPathSegments().get(1));
+            break;
+        case GROUPCHAT_MESSAGES:
+            qBuilder.setTables(GROUPCHAT_TABLE_NAME);
+            break;
+        case GROUPCHAT_MESSAGE_ID:
+            qBuilder.setTables(GROUPCHAT_TABLE_NAME);
             qBuilder.appendWhere("_id=");
             qBuilder.appendWhere(url.getPathSegments().get(1));
             break;
@@ -158,7 +216,7 @@ public class ChatHistoryProvider extends ContentProvider {
 
         String orderBy;
         if (TextUtils.isEmpty(sortOrder)) {
-            orderBy = ChatHistoryColumns.DEFAULT_SORT_ORDER;
+            orderBy = BaseChatHistoryColumns.DEFAULT_SORT_ORDER;
         } else {
             orderBy = sortOrder;
         }
@@ -183,15 +241,23 @@ public class ChatHistoryProvider extends ContentProvider {
         long rowId = 0;
         int match = URI_MATCHER.match(url);
         SQLiteDatabase db = mOpenHelper.getWritableDatabase();
-
+        String segment;
         switch (match) {
-        case MESSAGES:
-            count = db.update(TABLE_NAME, values, where, whereArgs);
+        case P2PCHAT_MESSAGES:
+            count = db.update(P2PCHAT_TABLE_NAME, values, where, whereArgs);
             break;
-        case MESSAGE_ID:
-            String segment = url.getPathSegments().get(1);
+        case P2PCHAT_MESSAGE_ID:
+            segment = url.getPathSegments().get(1);
             rowId = Long.parseLong(segment);
-            count = db.update(TABLE_NAME, values, "_id=" + rowId, null);
+            count = db.update(P2PCHAT_TABLE_NAME, values, "_id=" + rowId, null);
+            break;
+        case GROUPCHAT_MESSAGES:
+            count = db.update(GROUPCHAT_TABLE_NAME, values, where, whereArgs);
+            break;
+        case GROUPCHAT_MESSAGE_ID:
+            segment = url.getPathSegments().get(1);
+            rowId = Long.parseLong(segment);
+            count = db.update(GROUPCHAT_TABLE_NAME, values, "_id=" + rowId, null);
             break;
         default:
             throw new UnsupportedOperationException("Cannot update URL: " + url);
@@ -205,7 +271,7 @@ public class ChatHistoryProvider extends ContentProvider {
     private static class ChatDatabaseHelper extends SQLiteOpenHelper {
 
         private static final String DATABASE_NAME = "mmchat.db";
-        private static final int DATABASE_VERSION = 5;
+        private static final int DATABASE_VERSION = 1;
 
         public ChatDatabaseHelper(Context context) {
             super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -213,43 +279,45 @@ public class ChatHistoryProvider extends ContentProvider {
 
         @Override
         public void onCreate(SQLiteDatabase db) {
-            db.execSQL("CREATE TABLE " + TABLE_NAME + " (" + ChatHistoryColumns._ID
+            db.execSQL("CREATE TABLE " + P2PCHAT_TABLE_NAME + " (" + P2PChatHistoryColumns._ID
                     + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                    + ChatHistoryColumns.DATE + " INTEGER,"
-                    + ChatHistoryColumns.DIRECTION + " INTEGER,"
-                    + ChatHistoryColumns.JID + " TEXT,"
-                    + ChatHistoryColumns.CONTENT + " TEXT,"
-                    + ChatHistoryColumns.DELIVERY_STATUS + " INTEGER,"
-                    + ChatHistoryColumns.PACKET_ID + " TEXT);");
+                    + P2PChatHistoryColumns.DATE + " INTEGER,"
+                    + P2PChatHistoryColumns.DIRECTION + " INTEGER,"
+                    + P2PChatHistoryColumns.JID + " TEXT,"
+                    + P2PChatHistoryColumns.CONTENT + " TEXT,"
+                    + P2PChatHistoryColumns.DELIVERY_STATUS + " INTEGER,"
+                    + P2PChatHistoryColumns.PACKET_ID + " TEXT);");
+            
+            db.execSQL("CREATE TABLE " + GROUPCHAT_TABLE_NAME + " (" + GroupChatHistoryColumns._ID
+                    + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                    + GroupChatHistoryColumns.DATE + " INTEGER,"
+                    + GroupChatHistoryColumns.DIRECTION + " INTEGER,"
+                    + GroupChatHistoryColumns.JID + " TEXT,"
+                    + GroupChatHistoryColumns.CONTENT + " TEXT,"
+                    + GroupChatHistoryColumns.DELIVERY_STATUS + " INTEGER,"
+                    + GroupChatHistoryColumns.PACKET_ID + " TEXT,"
+                    + GroupChatHistoryColumns.CHAT_TYPE + " INTEGER,"
+                    + GroupChatHistoryColumns.ROOM_ID + " TEXT);");
         }
 
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            switch (oldVersion) {
-            case 3:
-                db.execSQL("UPDATE " + TABLE_NAME + " SET READ=1");
-            case 4:
-                db.execSQL("ALTER TABLE " + TABLE_NAME + " ADD " + ChatHistoryColumns.PACKET_ID + " TEXT");
-                break;
-            default:
-                db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
-                onCreate(db);
-            }
+            
         }
 
     }
 
-    public static final class ChatHistoryColumns implements BaseColumns {
+    
+    
+    static class BaseChatHistoryColumns implements BaseColumns {
 
-        private ChatHistoryColumns() {
+        private BaseChatHistoryColumns() {
         }
-
-        public static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.mmchat.chat";
-        public static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.mmchat.chat";
+        
         public static final String DEFAULT_SORT_ORDER = "_id ASC"; // sort by auto-id
 
         public static final String DATE = "date";
-        public static final String DIRECTION = "from_me";
+        public static final String DIRECTION = "direction";
         public static final String JID = "jid";
         public static final String CONTENT = "content";
         public static final String DELIVERY_STATUS = "status"; // SQLite can not rename columns, reuse old name
@@ -258,11 +326,18 @@ public class ChatHistoryProvider extends ContentProvider {
         // boolean mappings
         public static final int INCOMING = 0;
         public static final int OUTGOING = 1;
+        
         public static final int DS_NEW = 0; //< this message has not been sent/displayed yet
         public static final int DS_SENT_OR_READ = 1; //< this message was sent but not yet acked, or it was received and read
         public static final int DS_ACKED = 2; //< this message was XEP-0184 acknowledged
         public static final int DS_FAILED = 3; //< this message was returned as failed
 
+    } 
+    
+    public static final class P2PChatHistoryColumns extends BaseChatHistoryColumns {
+        public static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.mmchat.p2pchat";
+        public static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.mmchat.p2pchat";
+        
         public static ArrayList<String> getRequiredColumns() {
             ArrayList<String> tmpList = new ArrayList<String>();
             tmpList.add(DATE);
@@ -271,7 +346,27 @@ public class ChatHistoryProvider extends ContentProvider {
             tmpList.add(CONTENT);
             return tmpList;
         }
-
     }
 
+    public static final class GroupChatHistoryColumns extends BaseChatHistoryColumns {
+        public static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.mmchat.groupchat";
+        public static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.mmchat.groupchat";
+        
+        public static final String CHAT_TYPE = "chat_type";
+        public static final String ROOM_ID = "room_id";
+        
+        public static final int TYPE_TEMPORARY = 0;
+        public static final int TYPE_PERSISTENT = 1;
+        
+        public static ArrayList<String> getRequiredColumns() {
+            ArrayList<String> tmpList = new ArrayList<String>();
+            tmpList.add(DATE);
+            tmpList.add(DIRECTION);
+            tmpList.add(JID);
+            tmpList.add(CONTENT);
+            tmpList.add(CHAT_TYPE);
+            tmpList.add(ROOM_ID);
+            return tmpList;
+        }
+    }
 }

@@ -112,6 +112,10 @@ public class ChatManagerService extends BaseManagerService implements ChatManage
 
     @Override
     public void removeChat(BaseChat chat) {
+        if(chat == null) {
+            return;
+        }
+        
         if(chat instanceof P2PChat) {
             ArrayList<P2PChat> chats = new ArrayList<P2PChat>();
             chats.add((P2PChat)chat);
@@ -121,6 +125,11 @@ public class ChatManagerService extends BaseManagerService implements ChatManage
     }
 
     @Override
+    public void removeChats(ArrayList<BaseChat> chats) {
+        
+    }
+    
+    @Override
     public void createGroupChat(String[] jids) {
         // TODO Auto-generated method stub
         
@@ -128,12 +137,6 @@ public class ChatManagerService extends BaseManagerService implements ChatManage
 
     @Override
     public void createPersistentGroupChat(String[] jids) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public void removePersistentGroupChat(PersistentGroupChat chat) {
         // TODO Auto-generated method stub
         
     }

@@ -25,12 +25,12 @@ public class InstantMessage extends Message {
     private String mContent;
     
     public InstantMessage(org.jivesoftware.smack.packet.Message msg, boolean self) {
-        super(msg.getFrom(), "sfsdf", self);
+        super(msg.getFrom(), msg.getTo(), "sfsdf", msg.getPacketID(), self);
         mContent = msg.getBody();
     }
     
     public InstantMessage(Cursor cursor) {
-        super(cursor.getString(1), "", true);
+        super(cursor.getString(1),"",  "", "" ,true);
         mContent = cursor.getString(2);
     }
     

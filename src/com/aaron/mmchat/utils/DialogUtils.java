@@ -27,7 +27,7 @@ import com.aaron.mmchat.R;
 public class DialogUtils {
     
     public static Dialog showLoginingDialog(Context context) {
-        return showProgressDialog(context, context.getString(R.string.login));
+        return showProgressDialog(context, context.getString(R.string.signing_in));
     }
 
     public static Dialog showProgressDialog(Context context, String message) {

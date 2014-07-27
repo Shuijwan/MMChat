@@ -33,11 +33,13 @@ public abstract class BaseChat {
     protected String mClientJid;
     protected LinkedList<Message> mMessages;
     private HashSet<ChatCallback> mCallbacks;
+    private ChatHistoryManager mChatHistoryManager;
     
     public BaseChat(String clientJid) {
         mClientJid = clientJid;
         mMessages = new LinkedList<Message>();
         mCallbacks = new HashSet<ChatCallback>();
+        mChatHistoryManager = ChatHistoryManager.getChatHistoryManager();
     }
     
     public void registerChatCallback(ChatCallback callback) {
@@ -76,10 +78,16 @@ public abstract class BaseChat {
     
     protected void removeMessage(Message msg) {
         mMessages.remove(msg);
+        if(msg instanceof InstantMessage) {
+            mChatHistoryManager.deleteInstantMessage((InstantMessage) msg);
+        }
     }
     
     protected void addMessage(Message msg) {
         mMessages.add(msg);
+        if(msg instanceof InstantMessage) {
+            mChatHistoryManager.addInstantMessage((InstantMessage) msg);
+        }
     }
     
     public Message getLastMessage() {

@@ -20,13 +20,17 @@ package com.aaron.mmchat.core;
 
 public abstract class Message {
     protected String mFrom;
+    protected String mTo;
     protected String mDate;
+    protected String mPacketId;
     protected boolean mSelfMessage;
     protected boolean mReaded;
     
-    public Message(String from, String date, boolean self) {
+    public Message(String from, String to,  String date, String packetId, boolean self) {
         mFrom = from;
+        mTo = to;
         mDate = date;
+        mPacketId = packetId;
         mSelfMessage = self;
         mReaded = self;
     }
@@ -75,5 +79,13 @@ public abstract class Message {
      * */
     public void markAsReaded() {
         mReaded = true;
+    }
+    
+    /**
+     * return the packetId
+     * 
+     * */
+    public String getPacketId() {
+        return mPacketId;
     }
 }
