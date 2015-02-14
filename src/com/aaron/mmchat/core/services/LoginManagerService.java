@@ -17,6 +17,7 @@ import com.aaron.mmchat.core.AccountType;
 import com.aaron.mmchat.core.MMContext;
 import com.aaron.mmchat.core.AccountManager.Account;
 import com.aaron.mmchat.core.LoginManager;
+import com.aaron.mmchat.service.MMChatService;
 
 import de.duenndns.ssl.MemorizingTrustManager;
 
@@ -90,6 +91,10 @@ public class LoginManagerService extends BaseManagerService implements LoginMana
                         AccountManager.getInstance(mContext).deleteAccount(jid);
                         removeConnection(jid);
                     }
+                    if(getActiveConnectionCount() == 0) {
+                        MMChatService.stopMMChatService(mContext);
+                    }
+                        
                     notifyLogoutFinished(jid, remove);
                     break;
                 default:
@@ -216,6 +221,7 @@ public class LoginManagerService extends BaseManagerService implements LoginMana
         try {
             connection.connection.connect();
             connection.connection.login(username, password, "MMChat");
+            connection.active = true;
             String rawjid = connection.connection.getUser();
             int index = rawjid.indexOf("/");
             String bareJid = rawjid.substring(0, index);
@@ -297,6 +303,7 @@ public class LoginManagerService extends BaseManagerService implements LoginMana
                     } catch (NotConnectedException e) {
                         e.printStackTrace();
                     }   
+                    connection.active = false;
                 }
                 sendLogoutFinishedMsg(account.jid, remove);
             }
@@ -327,6 +334,7 @@ public class LoginManagerService extends BaseManagerService implements LoginMana
                     connection.configuration.setReconnectionAllowed(true);
                     try {
                         connection.connection.connect();
+                        connection.active = true;
                         sendLoginSuccessMsg(account.jid);
                     } catch (SmackException e) {
                         e.printStackTrace();

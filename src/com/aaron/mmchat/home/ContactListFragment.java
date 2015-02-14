@@ -30,6 +30,7 @@ import com.aaron.mmchat.core.Presence;
 import com.aaron.mmchat.widget.AbstractStickyHeaderExpandableListViewAdapter;
 import com.aaron.mmchat.widget.AvatarView;
 import com.aaron.mmchat.widget.StickyHeaderExpandableListView;
+import com.beardedhen.androidbootstrap.BootstrapCircleThumbnail;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -207,7 +208,7 @@ public class ContactListFragment extends Fragment implements OnChildClickListene
 
                 holder = new ViewHolder();
 
-                holder.avatarView = (AvatarView) convertView.findViewById(R.id.contact_avatar);
+                holder.avatarView = (BootstrapCircleThumbnail) convertView.findViewById(R.id.contact_avatar);
                 
                 holder.name = (TextView) convertView.findViewById(R.id.contact_display_name);
                 holder.presenceStatus = (TextView) convertView.findViewById(R.id.contact_presence_text);
@@ -221,7 +222,7 @@ public class ContactListFragment extends Fragment implements OnChildClickListene
             final Contact data = getChild(groupPosition, childPosition);
 
             holder.avatarView.setTag(data);
-            holder.avatarView.setPresence(data.getPresence().getPresenceType());
+            holder.avatarView.setCircleColor(data.getPresence().getPresenceType());
             holder.name.setText(data.getName());
             holder.presenceStatus.setText(data.getPresence().getPresenceStatus());
 
@@ -285,7 +286,7 @@ public class ContactListFragment extends Fragment implements OnChildClickListene
     }
 
     public static class ViewHolder {
-        AvatarView avatarView;
+        BootstrapCircleThumbnail avatarView;
         TextView name;
         TextView presenceStatus;
     }

@@ -13,7 +13,9 @@ import com.aaron.mmchat.core.ReconnectManager;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.XMPPConnection;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 
 /**
  *
@@ -32,6 +34,7 @@ public abstract class BaseManagerService extends BaseXmppObject {
     static class Connection {
         XMPPConnection connection;
         ConnectionConfiguration configuration;
+        boolean active;
     }
     
     private static HashMap<String, Connection> sConnections;
@@ -58,5 +61,22 @@ public abstract class BaseManagerService extends BaseXmppObject {
         if(connection != null) {
             connection.connection.removeConnectionListener(ReconnectManager.getInstance().getReconnectListener(clientJid));
         }
+    }
+    
+    /**
+     * return Active Connection Count.
+     * Active means the connection is connected or connecting
+     * 
+     * */
+    public int getActiveConnectionCount() {
+        Collection<Connection> connections = sConnections.values();
+        Iterator<Connection> iterator = connections.iterator();
+        int count = 0;
+        while(iterator.hasNext()) {
+            if(iterator.next().active) {
+                count ++;
+            }
+        }
+        return count;
     }
 }

@@ -38,6 +38,11 @@ public class MMChatService extends Service {
         context.startService(intent);
     }
 
+    public static void stopMMChatService(Context context) {
+        Intent intent = new Intent(context, MMChatService.class);
+        context.stopService(intent);
+    }
+    
     public void onCreate() {
         super.onCreate();
         login();

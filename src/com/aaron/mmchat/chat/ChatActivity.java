@@ -54,7 +54,7 @@ import java.util.ArrayList;
  *
  */
 
-public class ChatActivity extends Activity implements OnRefreshListener, OnClickListener, ChatCallback, TextWatcher, OnNavigationListener {
+public class ChatActivity extends Activity implements OnRefreshListener, OnClickListener, ChatCallback, TextWatcher {
     
     public static void startP2PChatActivity(Context context, String clientJid, String jid) {
         Intent intent = new Intent(context, ChatActivity.class);
@@ -79,7 +79,6 @@ public class ChatActivity extends Activity implements OnRefreshListener, OnClick
     private BaseChat mCurrentChat;
     private ChatManager mChatManager;
     private LayoutInflater mInflater;
-    private ChatSessionListAdapter mChatSessionListAdapter;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -118,15 +117,9 @@ public class ChatActivity extends Activity implements OnRefreshListener, OnClick
 
     private void initActionBar() {
         ActionBar actionBar = getActionBar();
-        actionBar.setDisplayShowTitleEnabled(false);
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-        mChatSessionListAdapter = new ChatSessionListAdapter();
-        actionBar.setListNavigationCallbacks(mChatSessionListAdapter, this);
-        
-        ArrayList<P2PChat> list = mChatManager.getP2PChatList();
-        actionBar.setSelectedNavigationItem(list.indexOf(mCurrentChat));
-        
+        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+        actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_TITLE | ActionBar.DISPLAY_HOME_AS_UP | ActionBar.DISPLAY_SHOW_HOME);
+        actionBar.setTitle(mCurrentChat.getChatName());
     }
     
     @Override
@@ -403,14 +396,6 @@ public class ChatActivity extends Activity implements OnRefreshListener, OnClick
     public void onTextChanged(CharSequence s, int start, int before, int count) {
         // TODO Auto-generated method stub
         
-    }
-
-    @Override
-    public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-        mCurrentChat = (BaseChat) mChatSessionListAdapter.getItem(itemPosition);
-        mAdapter.notifyDataSetChanged();
-        mChatSessionListAdapter.notifyDataSetChanged();
-        return true;
     }
     
     public void onDestroy() {
